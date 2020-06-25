@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#BSUB -J myjob
+#BSUB -n 40
+#BSUB -gpu "num=1"
+#BSUB -R "span[ptile=40] rusage[mem=4]"
+#BSUB -q gpuqueue
+#BSUB -W 04:00
+#BSUB -o myjob.%J.log
+
+
+source ~/.bashrc
+source activate my_conda_env
+
+python ../plot_tsne.py
+
+conda deactivate
+source deactivate

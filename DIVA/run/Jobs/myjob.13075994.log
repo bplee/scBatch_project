@@ -1,0 +1,83 @@
+Sender: LSF System <lsfadmin@lu10>
+Subject: Job 13075994: <myjob> in cluster <lila> Done
+
+Job <myjob> was submitted from host <lilac> by user <karbalaa> in cluster <lila> at Wed Oct 30 19:21:49 2019
+Job was executed on host(s) <40*lu10>, in queue <gpuqueue>, as user <karbalaa> in cluster <lila> at Wed Oct 30 20:02:45 2019
+</home/karbalaa> was used as the home directory.
+</data/leslie/alireza/DIVA-master/paper_experiments/rotated_mnist/additional_unlabeled_domain/add_60/Jobs> was used as the working directory.
+Started at Wed Oct 30 20:02:45 2019
+Terminated at Wed Oct 30 20:03:08 2019
+Results reported at Wed Oct 30 20:03:08 2019
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+
+#BSUB -J myjob
+#BSUB -n 40
+#BSUB -gpu "num=1"
+#BSUB -R "span[ptile=40] rusage[mem=4]"
+#BSUB -q gpuqueue
+#BSUB -W 48:00
+#BSUB -o myjob.%J.log
+
+
+source ~/.bashrc
+source activate my_conda_env
+
+python ../rcc_experiment.py --test_patient 5
+python ../rcc_experiment.py --test_patient 4
+python ../rcc_experiment.py --test_patient 3
+python ../rcc_experiment.py --test_patient 2
+python ../rcc_experiment.py --test_patient 1
+python ../rcc_experiment.py --test_patient 0
+
+conda deactivate
+source deactivate
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   12.00 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     160.00 GB
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              7
+    Max Threads :                                40
+    Run time :                                   23 sec.
+    Turnaround time :                            2479 sec.
+
+The output (if any) follows:
+
+Traceback (most recent call last):
+  File "../rcc_experiment.py", line 13, in <module>
+    from paper_experiments.rotated_mnist.supervised.model_diva import DIVA
+ModuleNotFoundError: No module named 'paper_experiments'
+Traceback (most recent call last):
+  File "../rcc_experiment.py", line 13, in <module>
+    from paper_experiments.rotated_mnist.supervised.model_diva import DIVA
+ModuleNotFoundError: No module named 'paper_experiments'
+Traceback (most recent call last):
+  File "../rcc_experiment.py", line 13, in <module>
+    from paper_experiments.rotated_mnist.supervised.model_diva import DIVA
+ModuleNotFoundError: No module named 'paper_experiments'
+Traceback (most recent call last):
+  File "../rcc_experiment.py", line 13, in <module>
+    from paper_experiments.rotated_mnist.supervised.model_diva import DIVA
+ModuleNotFoundError: No module named 'paper_experiments'
+Traceback (most recent call last):
+  File "../rcc_experiment.py", line 13, in <module>
+    from paper_experiments.rotated_mnist.supervised.model_diva import DIVA
+ModuleNotFoundError: No module named 'paper_experiments'
+Traceback (most recent call last):
+  File "../rcc_experiment.py", line 13, in <module>
+    from paper_experiments.rotated_mnist.supervised.model_diva import DIVA
+ModuleNotFoundError: No module named 'paper_experiments'
+DeprecationWarning: 'source deactivate' is deprecated. Use 'conda deactivate'.

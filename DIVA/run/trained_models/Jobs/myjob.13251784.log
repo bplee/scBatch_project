@@ -1,0 +1,112 @@
+Sender: LSF System <lsfadmin@lg02>
+Subject: Job 13251784: <myjob_vae> in cluster <lila> Done
+
+Job <myjob_vae> was submitted from host <lilac> by user <karbalaa> in cluster <lila> at Tue Nov 12 08:57:06 2019
+Job was executed on host(s) <50*lg02>, in queue <gpuqueue>, as user <karbalaa> in cluster <lila> at Tue Nov 12 08:57:07 2019
+</home/karbalaa> was used as the home directory.
+</data/leslie/alireza/DIVA-master/paper_experiments/rotated_mnist/additional_unlabeled_domain/add_60/trained_models/Jobs> was used as the working directory.
+Started at Tue Nov 12 08:57:07 2019
+Terminated at Tue Nov 12 09:11:33 2019
+Results reported at Tue Nov 12 09:11:33 2019
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+
+#BSUB -J myjob_vae
+#BSUB -n 50
+#BSUB -gpu "num=1"
+#BSUB -R "span[hosts=1] rusage[mem=3]"
+#BSUB -q gpuqueue
+#BSUB -W 04:00
+#BSUB -o myjob.%J.log
+
+
+source ~/.bashrc
+source activate my_conda_env
+
+python ../calculate_test.py
+
+conda deactivate
+source deactivate
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   1709.35 sec.
+    Max Memory :                                 92 GB
+    Average Memory :                             45.42 GB
+    Total Requested Memory :                     150.00 GB
+    Delta Memory :                               58.00 GB
+    Max Swap :                                   -
+    Max Processes :                              5
+    Max Threads :                                101
+    Run time :                                   867 sec.
+    Turnaround time :                            867 sec.
+
+The output (if any) follows:
+
+[2019-11-12 08:57:23,945] INFO - scvi._settings | Added StreamHandler with custom formatter to 'scvi' logger.
+/home/karbalaa/anaconda3/envs/my_conda_env/lib/python3.7/site-packages/torch/serialization.py:453: SourceChangeWarning: source code of class 'paper_experiments.rotated_mnist.supervised.model_diva.qzy' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  warnings.warn(msg, SourceChangeWarning)
+[2019-11-12 08:59:42,087] INFO - scvi.dataset.dataset | Downsampling from 16323 to 784 genes
+[2019-11-12 08:59:43,631] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 08:59:44,056] INFO - scvi.dataset.dataset | Filtering non-expressing cells.
+[2019-11-12 08:59:44,507] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 08:59:44,718] INFO - scvi.dataset.dataset | Downsampled from 129097 to 129097 cells
+/home/karbalaa/anaconda3/envs/my_conda_env/lib/python3.7/site-packages/torch/serialization.py:453: SourceChangeWarning: source code of class 'paper_experiments.rotated_mnist.supervised.model_diva.qzy' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  warnings.warn(msg, SourceChangeWarning)
+[2019-11-12 09:02:02,954] INFO - scvi.dataset.dataset | Downsampling from 16323 to 784 genes
+[2019-11-12 09:02:04,490] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:02:04,901] INFO - scvi.dataset.dataset | Filtering non-expressing cells.
+[2019-11-12 09:02:05,341] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:02:05,551] INFO - scvi.dataset.dataset | Downsampled from 129097 to 129097 cells
+/home/karbalaa/anaconda3/envs/my_conda_env/lib/python3.7/site-packages/torch/serialization.py:453: SourceChangeWarning: source code of class 'paper_experiments.rotated_mnist.supervised.model_diva.qzy' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  warnings.warn(msg, SourceChangeWarning)
+[2019-11-12 09:04:21,215] INFO - scvi.dataset.dataset | Downsampling from 16323 to 784 genes
+[2019-11-12 09:04:22,762] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:04:23,177] INFO - scvi.dataset.dataset | Filtering non-expressing cells.
+[2019-11-12 09:04:23,602] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:04:23,804] INFO - scvi.dataset.dataset | Downsampled from 129097 to 129097 cells
+/home/karbalaa/anaconda3/envs/my_conda_env/lib/python3.7/site-packages/torch/serialization.py:453: SourceChangeWarning: source code of class 'paper_experiments.rotated_mnist.supervised.model_diva.qzy' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  warnings.warn(msg, SourceChangeWarning)
+[2019-11-12 09:06:40,405] INFO - scvi.dataset.dataset | Downsampling from 16323 to 784 genes
+[2019-11-12 09:06:41,961] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:06:42,356] INFO - scvi.dataset.dataset | Filtering non-expressing cells.
+[2019-11-12 09:06:42,776] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:06:42,973] INFO - scvi.dataset.dataset | Downsampled from 129097 to 129097 cells
+/home/karbalaa/anaconda3/envs/my_conda_env/lib/python3.7/site-packages/torch/serialization.py:453: SourceChangeWarning: source code of class 'paper_experiments.rotated_mnist.supervised.model_diva.qzy' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  warnings.warn(msg, SourceChangeWarning)
+[2019-11-12 09:08:59,376] INFO - scvi.dataset.dataset | Downsampling from 16323 to 784 genes
+[2019-11-12 09:09:00,887] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:09:01,273] INFO - scvi.dataset.dataset | Filtering non-expressing cells.
+[2019-11-12 09:09:01,688] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:09:01,889] INFO - scvi.dataset.dataset | Downsampled from 129097 to 129097 cells
+/home/karbalaa/anaconda3/envs/my_conda_env/lib/python3.7/site-packages/torch/serialization.py:453: SourceChangeWarning: source code of class 'paper_experiments.rotated_mnist.supervised.model_diva.qzy' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  warnings.warn(msg, SourceChangeWarning)
+[2019-11-12 09:11:20,715] INFO - scvi.dataset.dataset | Downsampling from 16323 to 784 genes
+[2019-11-12 09:11:22,347] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:11:22,751] INFO - scvi.dataset.dataset | Filtering non-expressing cells.
+[2019-11-12 09:11:23,181] INFO - scvi.dataset.dataset | Computing the library size for the new data
+[2019-11-12 09:11:23,382] INFO - scvi.dataset.dataset | Downsampled from 129097 to 129097 cells
+/lila/data/leslie/alireza/DIVA-master/paper_experiments/rotated_mnist/additional_unlabeled_domain/add_60/trained_models
+./../rcc_test_domain_0_semi_sup_seed_0
+Namespace(aux_loss_multiplier_d=2000.0, aux_loss_multiplier_y=4200.0, batch_size=100, beta_d=1.0, beta_x=1.0, beta_y=1.0, cuda=True, d_dim=6, epochs=200, lr=0.001, max_beta=1.0, min_beta=0.0, no_cuda=False, outpath='./', seed=0, test_patient=0, warmup=50, x_dim=784, y_dim=16, zd_dim=64, zx_dim=64, zy_dim=64)
+./../rcc_test_domain_1_semi_sup_seed_0
+Namespace(aux_loss_multiplier_d=2000.0, aux_loss_multiplier_y=4200.0, batch_size=100, beta_d=1.0, beta_x=1.0, beta_y=1.0, cuda=True, d_dim=6, epochs=200, lr=0.001, max_beta=1.0, min_beta=0.0, no_cuda=False, outpath='./', seed=0, test_patient=1, warmup=50, x_dim=784, y_dim=16, zd_dim=64, zx_dim=64, zy_dim=64)
+./../rcc_test_domain_2_semi_sup_seed_0
+Namespace(aux_loss_multiplier_d=2000.0, aux_loss_multiplier_y=4200.0, batch_size=100, beta_d=1.0, beta_x=1.0, beta_y=1.0, cuda=True, d_dim=6, epochs=200, lr=0.001, max_beta=1.0, min_beta=0.0, no_cuda=False, outpath='./', seed=0, test_patient=2, warmup=50, x_dim=784, y_dim=16, zd_dim=64, zx_dim=64, zy_dim=64)
+./../rcc_test_domain_3_semi_sup_seed_0
+Namespace(aux_loss_multiplier_d=2000.0, aux_loss_multiplier_y=4200.0, batch_size=100, beta_d=1.0, beta_x=1.0, beta_y=1.0, cuda=True, d_dim=6, epochs=200, lr=0.001, max_beta=1.0, min_beta=0.0, no_cuda=False, outpath='./', seed=0, test_patient=3, warmup=50, x_dim=784, y_dim=16, zd_dim=64, zx_dim=64, zy_dim=64)
+./../rcc_test_domain_4_semi_sup_seed_0
+Namespace(aux_loss_multiplier_d=2000.0, aux_loss_multiplier_y=4200.0, batch_size=100, beta_d=1.0, beta_x=1.0, beta_y=1.0, cuda=True, d_dim=6, epochs=200, lr=0.001, max_beta=1.0, min_beta=0.0, no_cuda=False, outpath='./', seed=0, test_patient=4, warmup=50, x_dim=784, y_dim=16, zd_dim=64, zx_dim=64, zy_dim=64)
+./../rcc_test_domain_5_semi_sup_seed_0
+Namespace(aux_loss_multiplier_d=2000.0, aux_loss_multiplier_y=4200.0, batch_size=100, beta_d=1.0, beta_x=1.0, beta_y=1.0, cuda=True, d_dim=6, epochs=200, lr=0.001, max_beta=1.0, min_beta=0.0, no_cuda=False, outpath='./', seed=0, test_patient=5, warmup=50, x_dim=784, y_dim=16, zd_dim=64, zx_dim=64, zy_dim=64)
+[0.8495575221238938, 0.8491174213353799, 0.87999537999538, 0.848955199935828, 0.877381459614097, 0.8644711193187647]
+[0.8043580829107448, 0.7941782948205087, 0.8511694646688228, 0.7981617966755046, 0.8184035190363329, 0.756214911007741]
+DeprecationWarning: 'source deactivate' is deprecated. Use 'conda deactivate'.

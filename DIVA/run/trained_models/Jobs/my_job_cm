@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#BSUB -J myjob_vae
+#BSUB -n 50
+#BSUB -gpu "num=1"
+#BSUB -R "span[hosts=1] rusage[mem=3]"
+#BSUB -q gpuqueue
+#BSUB -W 04:00
+#BSUB -o myjob.%J.log
+
+
+source ~/.bashrc
+source activate my_conda_env
+
+python ../calculate_test.py
+
+conda deactivate
+source deactivate
