@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#BSUB -J myjob_vae
+#BSUB -n 50
+#BSUB -gpu "num=1"
+#BSUB -R "span[hosts=1] rusage[mem=3]"
+#BSUB -q gpuqueue
+#BSUB -W 24:00
+#BSUB -o myjob.%J.log
+
+
+source ~/.bashrc
+source activate my_conda_env
+
+python ../rcc_experiment_only_sup_vae.py --test_patient 5
+python ../rcc_experiment_only_sup_vae.py --test_patient 4
+python ../rcc_experiment_only_sup_vae.py --test_patient 3
+python ../rcc_experiment_only_sup_vae.py --test_patient 2
+python ../rcc_experiment_only_sup_vae.py --test_patient 1
+python ../rcc_experiment_only_sup_vae.py --test_patient 0
+
+conda deactivate
+source deactivate
