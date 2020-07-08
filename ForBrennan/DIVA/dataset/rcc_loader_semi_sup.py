@@ -85,44 +85,27 @@ class RccDatasetSemi(data_utils.Dataset):
 
         # changing out the lines below so that it will make boolean numpy of correct size
 
-        idx_batch_train = ~(gene_dataset.batch_indices == self.test_patient).ravel()
-        idx_batch_test = (gene_dataset.batch_indices == self.test_patient).ravel()
 
-        #idx_batch_train = ~(batch_indices == self.test_patient).ravel()
-        #idx_batch_test = (batch_indices == self.test_patient).ravel()
+        # idx_batch_train = ~(batch_indices == self.test_patient).ravel()
+        # idx_batch_test = (batch_indices == self.test_patient).ravel()
+
+        # batch_train = batch_indices[idx_batch_train].ravel()
+        # batch_test = batch_indices[idx_batch_test].ravel()
+
+        # labels_train = labels[idx_batch_train].ravel()
+        # labels_test = labels[idx_batch_test].ravel()
 
         # looks like the gene_dataset.X matrix gets downsampled by the bach indices and test indices don't
         # so those boolean numpy lists are of the og size (129097) but the gene_dataset.X arrays are of size (109221,50)
-        # 
 
-        #print("HEY BRENNAN")
-        #print(idx_batch_train, len(idx_batch_train))
-        #print(idx_batch_test, len(idx_batch_train))
-
-        #print(type(gene_dataset.X))
-        #print(gene_dataset.X.shape)
-
-        #print("Batch indices Gene dataset version")
-        #print(type(gene_dataset.batch_indices))
-        #print(gene_dataset.batch_indices.shape)
-        #print(gene_dataset.batch_indices)
- 
-        #print("Batch indices in scope mem")
-        #print(type(batch_indices))
-        #print(batch_indices.shape)
-        #print(batch_indices)
-
-
-        # CHANGING THE COdE
-        #batch_train = batch_indices[idx_batch_train].ravel()
-        #batch_test = batch_indices[idx_batch_test].ravel()
+        idx_batch_train = ~(gene_dataset.batch_indices == self.test_patient).ravel()
+        idx_batch_test = (gene_dataset.batch_indices == self.test_patient).ravel()
 
         batch_train = gene_dataset.batch_indices[idx_batch_train].ravel()
         batch_test = gene_dataset.batch_indices[idx_batch_train].ravel()
 
-
-        labels_train = labels[idx_batch_train].ravel()
-        labels_test = labels[idx_batch_test].ravel()
+        labels_train = gene_dataset.labels[idx_batch_train].ravel()
+        labels_test = gene_dataset.labels[idx_batch_test].ravel()
 
         data_train = gene_dataset.X[idx_batch_train]
         data_test = gene_dataset.X[idx_batch_test]
