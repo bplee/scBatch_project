@@ -1,6 +1,8 @@
 import os
 try:
-	os.chdir("/data/leslie/alireza/scRNAseq_ccRCC/starspace")
+	# os.chdir("/data/leslie/alireza/scRNAseq_ccRCC/starspace")
+	# print(os.getcwd())
+	os.chdir("/data/leslie/bplee/scBatch/ccRCC")
 	print(os.getcwd())
 except:
 	pass

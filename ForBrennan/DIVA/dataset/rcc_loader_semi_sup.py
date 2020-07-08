@@ -83,8 +83,11 @@ class RccDatasetSemi(data_utils.Dataset):
         del df_annot_all_6_pat
         gene_dataset.subsample_genes(self.x_dim)
 
-        # changing out the lines below so that it will make boolean numpy of correct size
+        # looks like the gene_dataset.X matrix gets downsampled by the bach indices and test indices don't
+        # so those boolean numpy lists are of the og size (129097) but the gene_dataset.X arrays are of size (109221,50)
 
+
+        # changing out the lines below so that it will make boolean numpy of correct size
 
         # idx_batch_train = ~(batch_indices == self.test_patient).ravel()
         # idx_batch_test = (batch_indices == self.test_patient).ravel()
@@ -95,8 +98,6 @@ class RccDatasetSemi(data_utils.Dataset):
         # labels_train = labels[idx_batch_train].ravel()
         # labels_test = labels[idx_batch_test].ravel()
 
-        # looks like the gene_dataset.X matrix gets downsampled by the bach indices and test indices don't
-        # so those boolean numpy lists are of the og size (129097) but the gene_dataset.X arrays are of size (109221,50)
 
         idx_batch_train = ~(gene_dataset.batch_indices == self.test_patient).ravel()
         idx_batch_test = (gene_dataset.batch_indices == self.test_patient).ravel()
