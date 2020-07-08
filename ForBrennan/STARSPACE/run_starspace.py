@@ -157,7 +157,7 @@ if __name__ == "__main__":
     batch_test = batch_test[inds]
 
     filepath_to_train = "./trainfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
-    with open(filepath_to_train, 'w') as fw:
+    with open(filepath_to_train, 'w+') as fw:
         for i in range(0,n_train):
             data_train_norm = data_train[i]/data_train[i].sum()
             sample_train = np.random.choice(len(gene_names), 
