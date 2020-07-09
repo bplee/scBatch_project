@@ -127,6 +127,9 @@ class RccDatasetSemi(data_utils.Dataset):
         data_train = torch.as_tensor(data_train)
         data_test = torch.as_tensor(data_test)
 
+        # adding this line because of int type error when converting into tensor
+        labels_train.astype(int)
+
         labels_train = torch.as_tensor(labels_train)
         labels_test = torch.as_tensor(labels_test)
 
