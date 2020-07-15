@@ -156,7 +156,7 @@ if __name__ == "__main__":
     labels_test = labels_test[inds]
     batch_test = batch_test[inds]
 
-    filepath_to_train = "./trainfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
+    filepath_to_train = "./train_files/trainfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
     print(os.getcwd())
     with open(filepath_to_train, 'w+') as fw:
         for i in range(0,n_train):
@@ -172,7 +172,7 @@ if __name__ == "__main__":
             fw.write(line)
             fw.write('\n')
 
-    filepath_to_test = "./testfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
+    filepath_to_test = "./train_files/testfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
     with open(filepath_to_test, 'w') as fw:
         for i in range(0,n_test):
             data_test_norm = data_test[i]/data_test[i].sum()

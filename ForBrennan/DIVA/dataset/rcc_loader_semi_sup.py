@@ -83,7 +83,7 @@ class RccDatasetSemi(data_utils.Dataset):
         del df_annot_all_6_pat
         gene_dataset.subsample_genes(self.x_dim)
 
-        # looks like the gene_dataset.X matrix gets downsampled by the bach indices and test indices don't
+        # looks like the gene_dataset.X matrix gets downsampled but the bach indices and test indices don't
         # so those boolean numpy lists are of the og size (129097) but the gene_dataset.X arrays are of size (109221,50)
 
 
