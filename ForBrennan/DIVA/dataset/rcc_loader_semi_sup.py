@@ -128,13 +128,17 @@ class RccDatasetSemi(data_utils.Dataset):
         data_test = torch.as_tensor(data_test)
 
         # adding this line because of int type error when converting into tensor
-        labels_train.astype(int)
+        #labels_train = labels_train.astype("uint8")
 
-        labels_train = torch.as_tensor(labels_train)
-        labels_test = torch.as_tensor(labels_test)
+        #labels_train = torch.as_tensor(labels_train)
+        labels_train = torch.from_numpy(labels_train.astype("int"))
+        #labels_test = torch.as_tensor(labels_test)
+        labels_test = torch.from_numpy(labels_test.astype("uint8"))
 
-        batch_train = torch.as_tensor(batch_train)
-        batch_test = torch.as_tensor(batch_test)
+        #batch_train = torch.as_tensor(batch_train)
+        batch_train = torch.from_numpy(batch_train.astype("float"))
+        #batch_test = torch.as_tensor(batch_test)
+        batch_test = torch.from_numpy(batch_test.astype("float"))
 
         # Shuffle everything one more time
         inds = np.arange(n_train)
@@ -151,13 +155,23 @@ class RccDatasetSemi(data_utils.Dataset):
 
         # Convert to onehot
         y = torch.eye(16)
-        labels_train = y[labels_train]
-        labels_test = y[labels_test]
+        a = np.random.randint(0,15,(1000))
+        #print("y[a].shape:", y[a].shape)
+        #labels_test = y[np.array(labels_test)]
+        #labels_train = y[np.array(labels_train)]
+        #print(y[labels_test.unsqueeze(0)].shape)
+        labels_train = torch.nn.functional.one_hot(labels_train)
+        print("\n\n\n")
+        print(labels_test.shape)
+        print(np.array(labels_test).shape)
+        print(np.array(labels_test.unsqueeze(0)).shape)
+        print("\n\n\n")
+        labels_test = torch.nn.functional.one_hot(labels_test.long())
 
         # Convert to onehot
         d = torch.eye(6)
-        batch_train = d[batch_train]
-        batch_test = d[batch_test]
+        batch_train = d[batch_train.long()]
+        batch_test = d[batch_test.long()]
 
         if self.train:
             return data_train.unsqueeze(1), labels_train, batch_train, cell_types, patients
