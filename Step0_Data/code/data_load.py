@@ -22,7 +22,7 @@ print("\tNew working dir: %s\n" % (os.getcwd()))
 # adding the project dir to the path to import relevant modules
 print("________CHANGING PATH_________")
 sys.path.append(WORKING_DIR)
-print("\tWorking dir appened to Sys path.")
+print("\tWorking dir appended to Sys path.")
 
 # importing a data class
 from ForBrennan.DIVA.model.model_diva import DIVA
@@ -32,5 +32,5 @@ print("trying to use the class")
 data_obj = RccDatasetSemi(test_patient=1, x_dim=200)
 
 print("done")
-print(type(data_obt))
+print(type(data_obj))
 
