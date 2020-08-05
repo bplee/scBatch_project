@@ -156,6 +156,8 @@ if __name__ == "__main__":
     labels_test = labels_test[inds]
     batch_test = batch_test[inds]
 
+    print("LINE 159 OF RUN_STARSPACE.PY")
+
     filepath_to_train = "../train_files/trainfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
     print(os.getcwd())
     with open(filepath_to_train, 'w+') as fw:
