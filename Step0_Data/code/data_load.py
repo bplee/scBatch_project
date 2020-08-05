@@ -13,15 +13,16 @@ import torch.utils.data as data_utils
 
 
 # changing directory to project dir
-
+print("________CHANGING WORKING DIR________")
 print(os.getcwd())
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 os.chdir(WORKING_DIR)
-print("New working dir: %s\n" % (os.getcwd()))
+print("\tNew working dir: %s\n" % (os.getcwd()))
 
 # adding the project dir to the path to import relevant modules
+print("________CHANGING PATH_________")
 sys.path.append(WORKING_DIR)
-print("Sys path appended to")
+print("\tWorking dir appened to Sys path.")
 
 # importing a data class
 from DIVA.model.model_diva import DIVA
