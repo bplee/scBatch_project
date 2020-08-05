@@ -29,7 +29,7 @@ from ForBrennan.DIVA.model.model_diva import DIVA
 from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 
 print("trying to use the class")
-data_obj = RccDatasetSemi(test_patient=1, x_dim=200)
+data_obj = RccDatasetSemi(test_patient=1, x_dim=1024)
 
 print("done")
 print(type(data_obj))
