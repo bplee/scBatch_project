@@ -232,7 +232,7 @@ if __name__ == "__main__":
     # Load supervised training
     train_loader_sup = data_utils.DataLoader(
         RccDatasetSemi(args.test_patient,
-                     train=True, x_dim=1024), #this x_dim was 256 but was changed
+                     train=True, x_dim=512), #this x_dim was 256 but was changed
         batch_size=args.batch_size,
         shuffle=True)
 
