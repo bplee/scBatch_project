@@ -23,6 +23,39 @@ save_path = '/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC'
 
 print("Starting the run")
 
+parser = argparse.ArgumentParser(description='StarSpace')
+parser.add_argument('--seed', type=int, default=0,
+                    help='random seed (default: 1)')
+parser.add_argument('--train_mode', type=int, default=0,
+                    help='train_mode')
+parser.add_argument('--batch_size', type=int, default=2,
+                    help='input batch size for training (default: 64)')
+parser.add_argument('--maxNegSamples', type=int, default=10,
+                    help='maxNegSamples')
+parser.add_argument('--epochs', type=int, default=5,
+                    help='number of epochs to train (default: 10)')
+parser.add_argument('--lr', type=float, default=0.01,
+                    help='learning rate (default: 0.01)')
+parser.add_argument('--dim', type=int, default=100,
+                    help='dim')
+parser.add_argument('--margin', type=float, default=0.05,
+                    help='margin')
+parser.add_argument('--ngrams', type=int, default=1,
+                    help='ngrams')
+parser.add_argument('--n_gene_sample_train', type=int, default=10000,
+                    help='n_gene_sample_train')
+parser.add_argument('--n_gene_sample_test', type=int, default=10000,
+                    help='n_gene_sample_test')
+parser.add_argument('--n_batch_rep', default=5, type=int,
+                    help="n_batch_rep")
+parser.add_argument('--test_patient', type=int, default=5,
+                    help='test domain')
+parser.add_argument('--thread', type=int, default=50,
+                    help='thread')
+parser.add_argument("-f", "--fff", help="a dummy argument to fool ipython", default="1")
+args_starspace = parser.parse_args()
+
+print(args_starspace)
 
 annot_tam = pyreadr.read_r('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tams_annotations.rds')
 df_annot_tam = annot_tam[None]
