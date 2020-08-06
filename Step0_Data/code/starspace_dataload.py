@@ -151,3 +151,10 @@ np.random.shuffle(inds)
 data_test = data_test[inds]
 labels_test = labels_test[inds]
 batch_test = batch_test[inds]
+
+print(data_train.shape)
+print(labels_train.shape)
+print(batch_train.shape)
+print(data_test.shape)
+print(labels_test.shape)
+print(batch_test.shape)
