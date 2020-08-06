@@ -19,6 +19,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 #from scvi.dataset import GeneExpressionDataset
 #save_path = '/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC'
 
+save_path = '/data/leslie/bplee/scBatch/Step0_data/code'
+
 print("Starting the run")
 
 
