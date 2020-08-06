@@ -156,7 +156,7 @@ if __name__ == "__main__":
     labels_test = labels_test[inds]
     batch_test = batch_test[inds]
 
-    print("LINE 159 OF RUN_STARSPACE.PY")
+    print("Done loading data (line 159 run_starspace.py")
 
     filepath_to_train = "../train_files/trainfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
     print(os.getcwd())
