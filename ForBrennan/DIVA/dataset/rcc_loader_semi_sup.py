@@ -174,8 +174,18 @@ class RccDatasetSemi(data_utils.Dataset):
         batch_test = d[batch_test.long()]
 
         if self.train:
+            print("data_train.unsqueeze(1).shape:",data_train.unsqueeze(1).shape)
+            print("labels_train.shape:", labels_train.shape)
+            print("batch_train.shape:", batch_train.shape)
+            print("cell_types.shape:", cell_types.shape)
+            print("patients.shape:", patients.shape)
             return data_train.unsqueeze(1), labels_train, batch_train, cell_types, patients
         else:
+            print("data_test.unsqueeze(1).shape:", data_test.unsqueeze(1).shape)
+            print("labels_test.shape:", labels_test.shape)
+            print("batch_test.shape:", batch_test.shape)
+            print("cell_types.shape:", cell_types.shape)
+            print("patients.shape:", patients.shape)
             return data_test.unsqueeze(1), labels_test, batch_test, cell_types, patients
 
     def __len__(self):
