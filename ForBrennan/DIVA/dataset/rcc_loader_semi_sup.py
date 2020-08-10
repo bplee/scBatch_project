@@ -156,16 +156,7 @@ class RccDatasetSemi(data_utils.Dataset):
         # Convert to onehot
         y = torch.eye(16)
         a = np.random.randint(0,15,(1000))
-        #print("y[a].shape:", y[a].shape)
-        #labels_test = y[np.array(labels_test)]
-        #labels_train = y[np.array(labels_train)]
-        #print(y[labels_test.unsqueeze(0)].shape)
         labels_train = torch.nn.functional.one_hot(labels_train)
-        print("\n\n\n")
-        print(labels_test.shape)
-        print(np.array(labels_test).shape)
-        print(np.array(labels_test.unsqueeze(0)).shape)
-        print("\n\n\n")
         labels_test = torch.nn.functional.one_hot(labels_test.long())
 
         # Convert to onehot
