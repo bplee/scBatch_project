@@ -215,12 +215,15 @@ if __name__ == "__main__":
 
     # Save the model:
     # added in the prior folder path, since were operating out of bplee/scBatch/ccRCC
-    sp.saveModel('../starspace_models/starspace_model_'+str(args_starspace.test_patient))
-    sp.saveModelTsv('../starspace_models/starspace_model_'+str(args_starspace.test_patient)+'.tsv')
+    # changing folder to  /bplee/scBatch/starspace_models
+    os.chdir("/data/leslie/bplee/scBatch/starspace_models")
+    
+    sp.saveModel('starspace_model_'+str(args_starspace.test_patient))
+    sp.saveModelTsv('starspace_model_'+str(args_starspace.test_patient)+'.tsv')
 
     # Reload the model
-    sp.initFromSavedModel('../starspace_models/starspace_model_'+str(args_starspace.test_patient))
-    sp.initFromTsv('../starspace_models/starspace_model_'+str(args_starspace.test_patient)+'.tsv')
+    sp.initFromSavedModel('starspace_model_'+str(args_starspace.test_patient))
+    sp.initFromTsv('starspace_model_'+str(args_starspace.test_patient)+'.tsv')
 
     # Test the model and create the file './predictfile_starspace.txt'
     sp.evaluate()
