@@ -101,6 +101,7 @@ class qzd(nn.Module):
 
     def forward(self, x):
         h = self.encoder(x)
+        print("HERE:", x.shape, h.shape)
         h = h.view(-1, 1024)
         zd_loc = self.fc11(h)
         zd_scale = self.fc12(h) + 1e-7
