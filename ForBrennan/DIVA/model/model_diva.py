@@ -260,7 +260,11 @@ class DIVA(nn.Module):
         if self.zx_dim != 0:
             zx_p_loc, zx_p_scale = torch.zeros(zd_p_loc.size()[0], self.zx_dim).cuda(),\
                                    torch.ones(zd_p_loc.size()[0], self.zx_dim).cuda()
-        zy_p_loc, zy_p_scale = self.pzy(y)
+        print("\nmodel_diva.py line 263:\ny.type():", y.type())
+        print("d:", d.shape, d.type())
+        print("x:", x.shape, x.type())
+        print("y:", y.shape, y.type())
+        zy_p_loc, zy_p_scale = self.pzy(y.long()) # threw an error for float vs. long here
 
         # Reparameterization trick
         pzd = dist.Normal(zd_p_loc, zd_p_scale)
