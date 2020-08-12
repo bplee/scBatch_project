@@ -1,7 +1,6 @@
 import os
 try:
-	# os.chdir("/data/leslie/alireza/scRNAseq_ccRCC/starspace")
-	# print(os.getcwd())
+    # changing dir to get to allow relative filepaths in the python file work
 	os.chdir("/data/leslie/bplee/scBatch/ccRCC")
 	print(os.getcwd())
 except:
@@ -19,6 +18,7 @@ import pyreadr
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 import matplotlib.pyplot as plt
+import umap
 from sklearn.manifold import TSNE
 from sklearn.metrics import confusion_matrix
 import seaborn as sn
@@ -300,9 +300,9 @@ if __name__ == "__main__":
     colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
     for i, cell_type in zip(range(n_labels), cell_types):
         if i < 10:
-            plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c = colors[i], label = cell_type)
+            plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c=colors[i], label=cell_type)
         else:
-            plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c = colors[i%10], label = cell_type, marker='x')
+            plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c=colors[i%10], label=cell_type, marker='x')
     plt.legend()
     plt.savefig('fig_starspace_tsne_by_labels_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
 
@@ -310,9 +310,37 @@ if __name__ == "__main__":
     colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
     for i, batch in zip(range(len(patients)), patients):
         if i < 10:
-            plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c = colors[i], label = batch)
+            plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c=colors[i], label=batch)
         else:
-            plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c = colors[i%10], label = batch, marker='x')
+            plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c=colors[i%10], label=batch, marker='x')
     plt.legend()
     plt.savefig('fig_starspace_tsne_by_batches_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
+
+    # UMAP plot
+    reducer = umap.UMAP()
+    umap_embedding = reducer.fit_transform(X_starspace_sampled)
+
+    plt.figure(figsize=(20, 14))
+    colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
+    for i, cell_type in zip(range(n_labels), cell_types):
+        if i < 10:
+            plt.scatter(umap_embedding[labels_starspace_sampled == i, 0], umap_embedding[labels_starspace_sampled == i, 1],
+                        c=colors[i], label=cell_type)
+        else:
+            plt.scatter(umap_embedding[labels_starspace_sampled == i, 0], umap_embedding[labels_starspace_sampled == i, 1],
+                        c=colors[i % 10], label=cell_type, marker='x')
+    plt.legend()
+    plt.savefig('fig_starspace_umap_by_labels_test_is_pat_' + str(args_starspace.test_patient) + '.pdf')
+
+    plt.figure(figsize=(20, 14))
+    colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
+    for i, batch in zip(range(len(patients)), patients):
+        if i < 10:
+            plt.scatter(umap_embedding[batches_starspace_sampled == i, 0], umap_embedding[batches_starspace_sampled == i, 1],
+                        c=colors[i], label=batch)
+        else:
+            plt.scatter(umap_embedding[batches_starspace_sampled == i, 0], umap_embedding[batches_starspace_sampled == i, 1],
+                        c=colors[i % 10], label=batch, marker='x')
+    plt.legend()
+    plt.savefig('fig_starspace_umap_by_batches_test_is_pat_' + str(args_starspace.test_patient) + '.pdf')
 
