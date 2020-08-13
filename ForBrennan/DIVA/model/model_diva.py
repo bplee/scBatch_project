@@ -72,6 +72,7 @@ class pzy(nn.Module):
         self.fc22[0].bias.data.zero_()
 
     def forward(self, y):
+        print("\nmodel_diva.py line 75\n", print(y.type()))
         hidden = self.fc1(y)
         zy_loc = self.fc21(hidden)
         zy_scale = self.fc22(hidden) + 1e-7
@@ -101,7 +102,6 @@ class qzd(nn.Module):
 
     def forward(self, x):
         h = self.encoder(x)
-        print("\nHERE:", x.shape, h.shape)
         h = h.view(-1, 1024)
         zd_loc = self.fc11(h)
         zd_scale = self.fc12(h) + 1e-7
@@ -260,7 +260,7 @@ class DIVA(nn.Module):
         if self.zx_dim != 0:
             zx_p_loc, zx_p_scale = torch.zeros(zd_p_loc.size()[0], self.zx_dim).cuda(),\
                                    torch.ones(zd_p_loc.size()[0], self.zx_dim).cuda()
-        print("\nmodel_diva.py line 263:\ny.type():", y.type())
+        print("\nmodel_diva.py line 264:\ny.type():", y.type())
         print("d:", d.shape, d.type())
         print("x:", x.shape, x.type())
         print("y:", y.shape, y.type())
