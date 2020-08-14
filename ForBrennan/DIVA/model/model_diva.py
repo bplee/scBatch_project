@@ -367,7 +367,7 @@ class DIVA(nn.Module):
                    + self.aux_loss_multiplier_d * CE_d
 
         else: # supervised
-            x_recon, d_hat, y_hat, qzd, pzd, zd_q, qzx, pzx, zx_q, qzy, pzy, zy_q = self.forward(d, x, y)
+            x_recon, d_hat, y_hat, qzd, pzd, zd_q, qzx, pzx, zx_q, qzy, pzy, zy_q = self.forward(d, x, y.long())
 
             x_recon = x_recon.view(-1, 256)
             x_target = (x.view(-1) * 255).long()
