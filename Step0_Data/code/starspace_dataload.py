@@ -19,6 +19,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 #from scvi.dataset import GeneExpressionDataset
 save_path = '/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC'
 
+# to put data into anndata.Anndata obj for scNym
+import anndata
+
 #save_path = '/data/leslie/bplee/scBatch/Step0_data/code'
 
 print("Starting the run")
@@ -158,3 +161,12 @@ print(batch_train.shape)
 print(data_test.shape)
 print(labels_test.shape)
 print(batch_test.shape)
+
+train_adata = anndata.AnnData(data_train)
+target_adata = anndata.AnnData(data_test)
+
+target_adata.obs['annotations'] = 'Unlabled'
+
+adata = train_adata.concatenate(target_adata)
+
+print("%d cells, %d genes in the joined training and target set" % adata.shape)
