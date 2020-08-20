@@ -18,7 +18,6 @@ Simply change the `UPLOAD_NEW_DATA` variable in the cells below to upload your o
 ## Install dependencies and import packages
 """
 
-# dependencies that came with
 #!pip install tqdm ConfigArgParse numpy torch pandas scanpy matplotlib seaborn mock
 #!pip install scnym
 
@@ -47,8 +46,6 @@ import seaborn as sns
 # %matplotlib inline
 
 from scnym.api import scnym_api
-
-import sys
 
 """## Get links to Cell Atlas datasets"""
 
@@ -88,8 +85,6 @@ else:
   print('\t!rm ./train_data.h5ad')
   print('in a cell below.')
   print('Then, rerun this cell.')
-
-print(os.listdir())
 
 train_adata = anndata.read_h5ad('./train_data.h5ad',)
 print('%d cells, %d genes in training data set.' % train_adata.shape)
@@ -162,7 +157,6 @@ if not UPLOAD_NEW_DATA:
   train_adata = train_adata[train_adata.obs['age']=='Y', :]
 
 if UPLOAD_NEW_DATA:
-# TODO: need to change this to be my data
   from google.colab import drive
   # mount google drive to the Colab runtime
   drive.mount('/gdrive')
@@ -176,8 +170,7 @@ if UPLOAD_NEW_DATA:
 
 print('%d cells, %d genes in the training data.' % train_adata.shape)
 print('%d cells, %d genes in the target data.' % target_adata.shape)
-sys.exit()
-print("nothing here")
+
 """## Train an scNym model
 
 Here, we train an scNym model using the MixMatch semi-supervised learning method to transfer lables from the training data set to the target data set.
