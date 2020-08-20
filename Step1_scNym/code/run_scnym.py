@@ -3,6 +3,7 @@ import torch
 import os
 import numpy as np
 import anndata
+import sys
 
 # changing directory to project dir
 print("________CHANGING WORKING DIR________")
@@ -34,7 +35,7 @@ train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, 
 test_adata = anndata.AnnData(np.array(test.test_data.reshape(test_cell_num, X_DIM)))
 
 # converting 1 hot vectors into int labels
-train_int_labels = np.array(train.train_labels).dot(np.arrange(len(train.train_labels[0])))
+train_int_labels = np.array(train.train_labels).dot(np.arange(len(train.train_labels[0])))
 
 # setting labels
 train_adata.obs['annotations'] = train_int_labels
