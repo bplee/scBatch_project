@@ -4,13 +4,7 @@ import sys
 import argparse
 import time
 import numpy as np
-from sklearn.metrics import confusion_matrix
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.utils.data as data_utils
-
-import anndata
 
 
 # changing directory to project dir
@@ -30,8 +24,9 @@ from ForBrennan.DIVA.model.model_diva import DIVA
 from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 
 print("trying to use the class")
-data_obj = RccDatasetSemi(test_patient=1, x_dim=1024)
+data_obj = RccDatasetSemi(test_patient=1, x_dim=784, train=True)
 
 print("done")
-print(type(data_obj))
+#Data is now stored in data_obj.train_data etc
+
 

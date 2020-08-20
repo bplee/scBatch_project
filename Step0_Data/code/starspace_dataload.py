@@ -162,6 +162,8 @@ print(data_test.shape)
 print(labels_test.shape)
 print(batch_test.shape)
 
+print(np.unique(labels_train))
+
 train_adata = anndata.AnnData(data_train)
 target_adata = anndata.AnnData(data_test)
 
