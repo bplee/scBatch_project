@@ -40,7 +40,7 @@ train_patient_inds = train.train_domain[:,TRAIN_PATIENT] == 1
 train_patient_data = train.train_data.reshape(train_cell_num, X_DIM)[train_patient_inds]
 
 # making the data obj for our training and test patient
-train_adata = anndata.AnnData(train_patient_data)
+train_adata = anndata.AnnData(np.array(train_patient_data))
 #train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
 test_adata = anndata.AnnData(np.array(test.test_data.reshape(test_cell_num, X_DIM)))
 
