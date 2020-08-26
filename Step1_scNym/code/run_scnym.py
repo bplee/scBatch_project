@@ -31,14 +31,24 @@ test = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=False)
 train_cell_num = train.train_data.shape[0]
 test_cell_num = test.test_data.shape[0]
 
-train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
+# need to select one patient to use as training domain:
+TRAIN_PATIENT = 4 #choose {0,...,5}i
+
+# selecting all of the indices that mark our patient
+train_patient_inds = train.train_domain[:,TRAIN_PATIENT] == 1 
+# using inds to select data for our patient
+train_patient_data = train.train_data.reshape(train_cell_num, X_DIM)[train_patient_inds]
+
+# making the data obj for our training and test patient
+train_adata = anndata.AnnData(train_patient_data)
+#train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
 test_adata = anndata.AnnData(np.array(test.test_data.reshape(test_cell_num, X_DIM)))
 
 # converting 1 hot vectors into int labels
 train_int_labels = np.array(train.train_labels).dot(np.arange(len(train.train_labels[0]), dtype=float))
 
-# setting labels
-train_adata.obs['annotations'] = train_int_labels
+# setting labels by grabbing the labels for our training partient
+train_adata.obs['annotations'] = train_int_labels[train_patient_inds]
 test_adata.obs['annotations'] = 'Unlabeled'
 
 
