@@ -14,10 +14,11 @@ from rpy2.robjects import pandas2ri
 
 
 class RccDatasetSemi(data_utils.Dataset):
-    def __init__(self, test_patient, x_dim, train=True):
+    def __init__(self, test_patient, x_dim, train=True, diva=True):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
+        self.diva = diva #made this so sqrt(dim) doesnt have to be integer (line 120)
 
         if self.train:
             self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
@@ -117,8 +118,12 @@ class RccDatasetSemi(data_utils.Dataset):
         data_train = data_train / np.max(data_train)
         data_test = data_test / np.max(data_test)
 
-        data_train = np.reshape(data_train, [data_train.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
-        data_test = np.reshape(data_test, [data_test.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
+        if self.diva:
+            data_train = np.reshape(data_train, [data_train.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
+            data_test = np.reshape(data_test, [data_test.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
+
+        else: # dont make the output a list of square matrices, dont do anything
+            pass
 
         n_train = len(labels_train)
         n_test = len(labels_test)
