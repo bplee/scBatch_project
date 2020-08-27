@@ -4,6 +4,17 @@ import os
 import numpy as np
 import anndata
 import sys
+import pandas as pd
+import scnym
+
+import urllib
+import json
+
+# allow tensorboard outputs even though TF2 is installed
+# broke the tensorboard/pytorch API
+import tensorflow as tf
+import tensorboard as tb
+tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
 # changing directory to project dir
 print("________CHANGING WORKING DIR________")
@@ -32,7 +43,7 @@ train_cell_num = train.train_data.shape[0]
 test_cell_num = test.test_data.shape[0]
 
 # need to select one patient to use as training domain:
-TRAIN_PATIENT = 4 #choose {0,...,5}i
+TRAIN_PATIENT = 3 #choose {0,...,5}i
 
 # selecting all of the indices that mark our patient
 train_patient_inds = train.train_domain[:,TRAIN_PATIENT] == 1 
@@ -69,3 +80,10 @@ scnym_api(adata=adata,
           out_path='./scnym_test_output',  # this is going in WORKING DIR
           groupby='annotations')
 
+#scnym_api(
+#    adata=adata,
+#    task='predict',
+#    key_added='scNym',
+#    config='no_new_identity',
+#    trained_model='./scnym_test_output'
+#)

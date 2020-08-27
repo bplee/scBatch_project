@@ -4,7 +4,7 @@
 #BSUB -J scnym_exp
 #BSUB -n 10
 #BSUB -gpu "num=1"
-#BSUB -R "rusage[mem=24GB]"
+#BSUB -R "rusage[mem=16GB]"
 #BSUB -W 5:00
 #BSUB -o scnym.stdout
 #BSUB -e scnym.stderr
