@@ -51,6 +51,10 @@ train_patient_inds = train.train_domain[:,TRAIN_PATIENT] == 1
 # using inds to select data for our patient
 train_patient_data = train.train_data[train_patient_inds]
 
+print('run_scnym.py line 54')
+print("train_patient_data.shape", train_patient_data.shape)
+print("test_data.shape", test_data.shape)
+
 # making the data obj for our training and test patient
 train_adata = anndata.AnnData(np.array(train_patient_data))
 # train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
