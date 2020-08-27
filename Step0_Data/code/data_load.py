@@ -24,7 +24,7 @@ from ForBrennan.DIVA.model.model_diva import DIVA
 from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 
 print("trying to use the class")
-data_obj = RccDatasetSemi(test_patient=1, x_dim=784, train=True)
+data_obj = RccDatasetSemi(test_patient=1, x_dim=784, train=True, diva=False)
 
 print("done")
 #Data is now stored in data_obj.train_data etc
