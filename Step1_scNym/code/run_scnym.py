@@ -79,11 +79,11 @@ scnym_api(adata=adata,
           config='no_new_identity',
           out_path='./scnym_test_output',  # this is going in WORKING DIR
           groupby='annotations')
-
-#scnym_api(
-#    adata=adata,
-#    task='predict',
-#    key_added='scNym',
-#    config='no_new_identity',
-#    trained_model='./scnym_test_output'
-#)
+print("Done training. Now for prediction")
+scnym_api(
+    adata=adata,
+    task='predict',
+    key_added='scNym',
+    config='no_new_identity',
+    trained_model='./scnym_test_output'
+)
