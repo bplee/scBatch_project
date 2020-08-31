@@ -33,7 +33,7 @@ from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 
 # getting training and testing data
 TEST_PATIENT = 5
-X_DIM = 784
+X_DIM = 10000# 784 is the magic number for DIVA
 
 # getting training and testing data
 train = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, diva=False)
@@ -85,3 +85,8 @@ scnym_api(
     config='no_new_identity',
     trained_model='./scnym_test_output'
 )
+
+sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
+sc.tl.umap(adata, min_dist=.3)
+sc.pl.umap(adata, color='batch', size=5, alpha=.2, save='scnym_embedding_batch.png')
+sc.pl.umap(adata, color='annotations', size=5, alpha=.2, save='scnym_embedding_celltypes.png')
