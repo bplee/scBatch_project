@@ -47,7 +47,7 @@ TRAIN_PATIENT = 3 #choose {0,...,5}
 # selecting all of the indices that mark our patient
 train_patient_inds = train.train_domain[:,TRAIN_PATIENT] == 1 
 # using inds to select data for our patient
-train_patient_data = train.train_data[train_patient_inds]
+train_patient_data = train.train_data[train_patient_inds] #doing log transformation here
 
 # making the data obj for our training and test patient
 train_adata = anndata.AnnData(np.array(train_patient_data))
@@ -67,7 +67,7 @@ train_adata.obs['cell_type'] = train_cell_types[train_patient_inds] # there are 
 test_adata.obs['cell_type'] = test_cell_types
 
 # setting the semi_supervised labels:
-train_adata.obs['annotations'] = train_cell_types
+train_adata.obs['annotations'] = train_cell_types[train_patient_inds]
 test_adata.obs['annotations'] = 'Unlabeled'
 
 print('hey')
