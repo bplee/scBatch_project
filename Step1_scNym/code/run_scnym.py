@@ -56,14 +56,14 @@ test_adata = anndata.AnnData(np.array(test.test_data))
 
 # converting 1 hot vectors into int labels
 train_int_labels = np.array(train.train_labels).dot(np.arange(len(train.train_labels[0]), dtype=int))
-test_int_labels = np.array(test.test_labels.dot(np.arage(len(test.test_labels[0]), dtype=int)))
+test_int_labels = np.array(test.test_labels).dot(np.arange(len(test.test_labels[0]), dtype=int))
 
 # creating vectors of cell labels:
 train_cell_types = train.cell_types[train_int_labels]
 test_cell_types = test.cell_types[test_int_labels]
 
 # setting gold labels: (using names and not indices)
-train_adata.obs['cell_type'] = train_cell_types
+train_adata.obs['cell_type'] = train_cell_types[train_patient_inds] # there are cell types for multiple patients so we index for the one we care about
 test_adata.obs['cell_type'] = test_cell_types
 
 # setting the semi_supervised labels:
