@@ -32,7 +32,7 @@ print("\tWorking dir appended to Sys path.")
 from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 
 # getting training and testing data
-TEST_PATIENT = 5
+TEST_PATIENT = 4
 X_DIM = 10000# 784 is the magic number for DIVA
 
 # getting training and testing data
@@ -97,5 +97,10 @@ scnym_api(
 
 sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
 sc.tl.umap(adata, min_dist=.3)
-sc.pl.umap(adata, color='batch', size=5, alpha=.2, save='scnym_embedding_batch.png')
-sc.pl.umap(adata, color='annotations', size=5, alpha=.2, save='scnym_embedding_celltypes.png')
+# the following are the scnym internal embeddings colored by batch and cell type
+sc.pl.umap(adata, color='batch', size=5, alpha=.2, save='scnym_embedding_batch.png') 
+sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='scnym_embedding_celltypes.png')
+
+sc.pp.neighbors(adata, use_rep='X', n_neighbors=30)
+sc.tl.umap(adata, min_dist=.3)
+sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='scnym_og_data_umap_celltype.png')

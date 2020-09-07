@@ -319,7 +319,7 @@ sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
 
 sc.tl.umap(adata, min_dist=0.3)
 
-sc.pl.umap(adata, color='batch', size=5., alpha=0.2)
+sc.pl.umap(adata, color='batch', size=5., alpha=0.2, save="ex_data_internal_embedding.png")
 
 sc.pl.umap(adata, color='cell_ontology_class', size=5., alpha=0.2)
 
@@ -330,13 +330,13 @@ target_adata.obs.to_csv(
 )
 
 # save files locally
-from google.colab import files
+#from google.colab import files
 
-files.download('annotations.csv')
+#files.download('annotations.csv')
 
 # save files to Google Drive
-from google.colab import drive
-drive.mount('/gdrive')
+#from google.colab import drive
+#drive.mount('/gdrive')
 
 # make a directory if not present already
 #!mkdir "/gdrive/My Drive/scnym/"

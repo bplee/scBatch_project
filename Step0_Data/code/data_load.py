@@ -6,6 +6,15 @@ import time
 import numpy as np
 import torch
 
+# importing scnym dependencies
+import scnym
+import scanpy as sc
+import anndata
+import json
+import urllib
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 
 # changing directory to project dir
 print("________CHANGING WORKING DIR________")
