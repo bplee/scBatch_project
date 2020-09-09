@@ -106,7 +106,7 @@ def get_balanced_classes(adata):
     counts = adata.obs.cell_type.value_counts()
     min_cell_type, min_num = counts.index[-1], counts[-1]
     rtn = []
-    for i, cell_type_count in enumerate(counts.index):
+    for i, cell_type_count in enumerate(counts):
         cell_type = counts.index[i]
         cell_type_inds = np.array([i for i,val in enumerate(adata.obs.cell_type == cell_type) if val]) # this line is returning the inds of all points with given cell type
         a = np.random.choice(cell_type_count, min_num, replace=False) # choose n points from the list
