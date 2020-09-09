@@ -80,3 +80,11 @@ adata = train_adata.concatenate(test_adata)
 # debugging lines:
 print(adata.obs)
 
+blurb = """
+Loaded 3 useful annData objects:
+	- adata (ready as input to scnym)
+	- train_adata
+	- test_adata
+Ready to train scnym
+"""
+print(blurb)
