@@ -115,6 +115,6 @@ def get_balanced_classes(adata):
     return adata[rtn,:]
 
 
-
+get_balanced_classes(train_adata)
 
 
