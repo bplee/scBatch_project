@@ -190,7 +190,7 @@ class RccDatasetSemi(data_utils.Dataset):
             if self.diva:
                 data_train = data_train.unsqueeze(1)
             self.train_data = data_train
-            self.labels_train = labels_train
+            self.train_labels = labels_train
             self.train_domain = batch_train
 
         if self.test:
@@ -203,7 +203,7 @@ class RccDatasetSemi(data_utils.Dataset):
             if self.diva:
                 data_test.unsqueeze(1)
             self.test_data = data_test
-            self.labels_test = labels_test
+            self.test_labels = labels_test
             self.test_domain = batch_test
 
 
