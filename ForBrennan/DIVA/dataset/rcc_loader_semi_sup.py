@@ -17,6 +17,7 @@ class RccDatasetSemi(data_utils.Dataset):
     def __init__(self, test_patient, x_dim, train=True, diva=True, test=False):
         self.test_patient = test_patient
         self.train = train
+        self.test = test
         self.x_dim = x_dim
         self.diva = diva #made this so sqrt(dim) doesnt have to be integer (line 120)
 
