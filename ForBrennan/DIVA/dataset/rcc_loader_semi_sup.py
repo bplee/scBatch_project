@@ -181,7 +181,7 @@ class RccDatasetSemi(data_utils.Dataset):
                 data_train = data_train.unsqueeze(1)
             self.train_data, self.test_data = data_train, data_test
             self.labels_train, self.labels_test = labels_train, labels_test
-            self.batch_train, self.batch_test = batch_train, batch_test
+            self.train_domain, self.test_domain = batch_train, batch_test
             self.cell_types = cell_types
             self.patients = patients
 
