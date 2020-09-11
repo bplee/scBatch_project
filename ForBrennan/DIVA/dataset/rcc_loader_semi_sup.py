@@ -21,15 +21,17 @@ class RccDatasetSemi(data_utils.Dataset):
         self.x_dim = x_dim
         self.diva = diva #made this so sqrt(dim) doesnt have to be integer (line 120)
 
-        if self.train and self.test:
-            # normally this function returns stuff, but in this case, i just have the
-            # functino interally set all the data since it was easier
-            self._get_data()
-        else:
-            if self.train:
-                self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
-            else:
-                self.test_data, self.test_labels, self.test_domain, self.cell_types, self.patients = self._get_data()
+        self._get_data() # get all the data, training and/or test
+
+        # if self.train and self.test:
+        #     # normally this function returns stuff, but in this case, i just have the
+        #     # functino interally set all the data since it was easier
+        #     self._get_data()
+        # else:
+        #     if self.train:
+        #         self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
+        #     else:
+        #         self.test_data, self.test_labels, self.test_domain, self.cell_types, self.patients = self._get_data()
 
     def cell_types_batches(self):
         return self.cell_types, self.patients
@@ -175,35 +177,55 @@ class RccDatasetSemi(data_utils.Dataset):
         batch_train = d[batch_train.long()]
         batch_test = d[batch_test.long()]
 
-        if self.train and self.test:
-            # pretty jank way of setting all the internal values we want
+        self.cell_types = cell_types
+        self.patients = patients
+
+        if self.train:
+            print('Returning Training data')
+            print("data_train.shape:",data_train.shape)
+            print("labels_train.shape:", labels_train.shape)
+            print("batch_train.shape:", batch_train.shape)
+            print("cell_types.shape:", cell_types.shape)
+            print("patients.shape:", patients.shape)
             if self.diva:
                 data_train = data_train.unsqueeze(1)
-            self.train_data, self.test_data = data_train, data_test
-            self.labels_train, self.labels_test = labels_train, labels_test
-            self.train_domain, self.test_domain = batch_train, batch_test
-            self.cell_types = cell_types
-            self.patients = patients
+            self.train_data = data_train
+            self.labels_train = labels_train
+            self.train_domain = batch_train
 
-        else:
-            if self.train:
-                print("data_train.shape:",data_train.shape)
-                print("labels_train.shape:", labels_train.shape)
-                print("batch_train.shape:", batch_train.shape)
-                print("cell_types.shape:", cell_types.shape)
-                print("patients.shape:", patients.shape)
-                if self.diva:
-                    data_train = data_train.unsqueeze(1)
-                return data_train, labels_train, batch_train, cell_types, patients
-            else:
-                print("data_test.shape:", data_test.shape)
-                print("labels_test.shape:", labels_test.shape)
-                print("batch_test.shape:", batch_test.shape)
-                print("cell_types.shape:", cell_types.shape)
-                print("patients.shape:", patients.shape)
-                if self.diva:
-                    data_test = data_test.unsqueeze(1)
-                return data_test, labels_test, batch_test, cell_types, patients
+        if self.test:
+            print('Returning Testing data')
+            print("data_test.shape:", data_test.shape)
+            print("labels_test.shape:", labels_test.shape)
+            print("batch_test.shape:", batch_test.shape)
+            print("cell_types.shape:", cell_types.shape)
+            print("patients.shape:", patients.shape)
+            if self.diva:
+                data_test.unsqueeze(1)
+            self.test_data = data_test
+            self.labels_test = labels_test
+            self.test_domain = batch_test
+
+
+        # else:
+        #     if self.train:
+        #         print("data_train.shape:",data_train.shape)
+        #         print("labels_train.shape:", labels_train.shape)
+        #         print("batch_train.shape:", batch_train.shape)
+        #         print("cell_types.shape:", cell_types.shape)
+        #         print("patients.shape:", patients.shape)
+        #         if self.diva:
+        #             data_train = data_train.unsqueeze(1)
+        #         return data_train, labels_train, batch_train, cell_types, patients
+        #     else:
+        #         print("data_test.shape:", data_test.shape)
+        #         print("labels_test.shape:", labels_test.shape)
+        #         print("batch_test.shape:", batch_test.shape)
+        #         print("cell_types.shape:", cell_types.shape)
+        #         print("patients.shape:", patients.shape)
+        #         if self.diva:
+        #             data_test = data_test.unsqueeze(1)
+        #         return data_test, labels_test, batch_test, cell_types, patients
 
     def __len__(self):
         if self.train:
