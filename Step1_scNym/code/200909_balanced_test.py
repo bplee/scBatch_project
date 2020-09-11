@@ -114,6 +114,8 @@ def get_balanced_classes(adata):
         rtn.extend(n_inds)
     return adata[rtn,:]
 
+balanced_adata = get_balanced_classes(test_adata) 
+print("created balanced_adata from test_adata")
 
 
 

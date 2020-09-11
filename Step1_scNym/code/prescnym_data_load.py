@@ -33,7 +33,7 @@ from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 
 # getting training and testing data
 TEST_PATIENT = 4
-X_DIM = 10000# 784 is the magic number for DIVA
+X_DIM = 16323# 784 is the magic number for DIVA; 16323 is the max
 
 # getting training and testing data
 train = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, diva=False)
