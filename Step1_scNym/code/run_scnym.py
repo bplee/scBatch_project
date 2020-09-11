@@ -75,10 +75,41 @@ print(type(train_int_labels))
 print(train_int_labels.dtype)
 
 # concatenating data
-adata = train_adata.concatenate(test_adata)
+#adata = train_adata.concatenate(test_adata)
 
-# debugging lines:
-print(adata.obs)
+# to balance the test distribution
+def get_balanced_classes(adata):
+    """
+    Returns an anndata obj with balanced labels
+
+    Input:
+        anndata obj with stuff in adata.obs['cell_type']
+
+    Returns:
+        Smaller anndata obj with balanced labels
+    
+    """
+    counts = adata.obs.cell_type.value_counts()
+    min_cell_type, min_num = counts.index[-1], counts[-1]
+    rtn = []
+    for i, cell_type_count in enumerate(counts):
+        cell_type = counts.index[i]
+        cell_type_inds = np.array([i for i,val in enumerate(adata.obs.cell_type == cell_type) if val]) # this line is returning the inds of all points with given cell type
+        a = np.random.choice(cell_type_count, min_num, replace=False) # choose n points from the list
+        n_inds = cell_type_inds[a] # sampled n random indices
+        rtn.extend(n_inds)
+    return adata[rtn,:]
+
+balanced_train_adata = get_balanced_classes(test_adata)
+print("created balanced_adata from test_adata")
+
+balanced_test_adata = get_balanced_classes(train_adata)
+
+#fixing annotations because we switched the train and test sets
+balanced_train_adata.obs.annotations = balanced_train_adata.obs.cell_type
+balanced_test_adata.obs.annotations = "Unlabeled"
+
+adata = balanced_train_adata.concatenate(balanced_test_adata)
 
 # training scnym
 scnym_api(adata=adata,
