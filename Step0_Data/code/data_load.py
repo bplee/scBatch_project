@@ -8,8 +8,11 @@ import scanpy as sc
 import pandas as pd
 import scnym
 
+import matplotlib.pyplot as plt
+
 import urllib
 import json
+from sklearn.decomposition import PCA
 
 # allow tensorboard outputs even though TF2 is installed
 # broke the tensorboard/pytorch API
@@ -63,8 +66,8 @@ train_adata.obs['annotations'] = train_cell_types
 test_adata.obs['annotations'] = 'Unlabeled'
 
 # setting a column of patients with each value as a str name
-train_adata.obs['patient'] = patients[np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0])))]
-test_adata.obs['patient'] = patients[np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0])))]
+train_adata.obs['patient'] = np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0]),dtype=int))
+test_adata.obs['patient'] = np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0]), dtype=int))
 
 print('hey')
 # print(train_int_labels.dtype)
@@ -85,3 +88,23 @@ Loaded 1 useful class that holds all data:
 """
 print(blurb)
 
+
+def scatter_color(x, y, groups, savepath='./'):
+    """
+    Saves a figure via matplotlib
+    Figure will be colored by integer labels of groups
+    Figure will contain legend of the group names
+    """
+    groups = np.array(groups)
+    for group in np.unique(groups):
+        coor = np.array([[x[i], y[i]] for i in range(len(x)) if groups[i] == group])
+        plt.scatter(coor[:,0], coor[:,1], alpha=.4, s=6, label=group)
+    plt.legend()
+    plt.savefig(savepath)
+    print("Done")
+    print("Saved fig to %s" % savepath)
+
+pca_obj = PCA(n_components=2)
+proj = pca_obj.fit_transform(adata.X)
+
+scatter_color(proj[:,0], proj[:,1], adata.obs.patient, savepath='/data/leslie/bplee/scBatch/Step0_Data/figs/pca_all_patients.png')
