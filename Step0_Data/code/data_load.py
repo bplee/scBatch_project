@@ -38,6 +38,7 @@ X_DIM = 16323# 784 is the magic number for DIVA; 16323 is the max
 # getting training and testing data
 data_obj = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, test=True, diva=False)
 
+patients = data_obj.patients
 cell_types = data_obj.cell_types
 
 # making the data obj for our training and test patient
@@ -60,6 +61,10 @@ test_adata.obs['cell_type'] = test_cell_types
 # setting the semi_supervised labels:
 train_adata.obs['annotations'] = train_cell_types
 test_adata.obs['annotations'] = 'Unlabeled'
+
+# setting a column of patients with each value as a str name
+train_adata.obs['patient'] = patients[np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0])))]
+test_adata.obs['patient'] = patients[np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0])))]
 
 print('hey')
 # print(train_int_labels.dtype)
