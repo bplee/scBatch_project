@@ -112,7 +112,7 @@ class RccDatasetSemi(data_utils.Dataset):
         idx_batch_test = (gene_dataset.batch_indices == self.test_patient).ravel()
 
         batch_train = gene_dataset.batch_indices[idx_batch_train].ravel()
-        batch_test = gene_dataset.batch_indices[idx_batch_train].ravel()
+        batch_test = gene_dataset.batch_indices[idx_batch_test].ravel()
 
         labels_train = gene_dataset.labels[idx_batch_train].ravel()
         labels_test = gene_dataset.labels[idx_batch_test].ravel()
