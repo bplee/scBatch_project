@@ -89,7 +89,7 @@ Loaded 1 useful class that holds all data:
 print(blurb)
 
 
-def scatter_color(x, y, groups, savepath='./'):
+def scatter_color(x, y, groups, savepath=None):
     """
     Saves a figure via matplotlib
     Figure will be colored by integer labels of groups
@@ -98,9 +98,10 @@ def scatter_color(x, y, groups, savepath='./'):
     groups = np.array(groups)
     for group in np.unique(groups):
         coor = np.array([[x[i], y[i]] for i in range(len(x)) if groups[i] == group])
-        plt.scatter(coor[:,0], coor[:,1], alpha=.4, s=6, label=group)
+        plt.scatter(coor[:,0], coor[:,1], alpha=.2, s=4, label=group)
     plt.legend()
-    plt.savefig(savepath)
+    if savepath is not None:
+        plt.savefig(savepath)
     print("Done")
     print("Saved fig to %s" % savepath)
 
