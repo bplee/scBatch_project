@@ -66,8 +66,8 @@ train_adata.obs['annotations'] = train_cell_types
 test_adata.obs['annotations'] = 'Unlabeled'
 
 # setting a column of patients with each value as a str name
-train_adata.obs['patient'] = patients[np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0]),dtype=int))]
-test_adata.obs['patient'] = patients[np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0]), dtype=int))]
+train_adata.obs['patient'] = patients[np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0]))).astype(int)]
+test_adata.obs['patient'] = patients[np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0]))).astype(int)]
 
 print('hey')
 # print(train_int_labels.dtype)
