@@ -107,6 +107,7 @@ def scatter_color(x, y, groups, savepath=None, title=None, legend=True):
         plt.savefig(savepath)
     print("Done")
     print("Saved fig to %s" % savepath)
+    plt.close()
 
 pca_obj = PCA(n_components=2)
 proj = pca_obj.fit_transform(adata.X)
@@ -117,4 +118,5 @@ scatter_color(proj[:,0], proj[:,1], adata.obs.patient,
 
 scatter_color(proj[:,0], proj[:,1], adata.obs.cell_type,
               savepath='/data/leslie/bplee/scBatch/Step0_Data/figs/pca_all_cell_types.png',
-              title='PCA of All Data Colored by Cell Type')
+              title='PCA of All Data Colored by Cell Type',
+              legend=False)
