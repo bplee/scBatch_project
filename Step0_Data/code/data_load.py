@@ -109,14 +109,30 @@ def scatter_color(x, y, groups, savepath=None, title=None, legend=True):
     print("Saved fig to %s" % savepath)
     plt.close()
 
-pca_obj = PCA(n_components=2)
-proj = pca_obj.fit_transform(adata.X)
+# Scanpy has both the running of PCA and UMAP and generation of their plots in neat functions
 
-scatter_color(proj[:,0], proj[:,1], adata.obs.patient,
-              savepath='/data/leslie/bplee/scBatch/Step0_Data/figs/pca_all_patients.png',
-              title='PCA of All Data Colored by Patient')
+# run pca
+# sc.pp.pca(adata)
+# save pca plots
+# sc.pl.pca(adata, color='patient', save='/data/leslie/bplee/scBatch/Step0_Data/figs/pca_all_patients.png')
+# sc.pl.pca(adata, color='cell_type', save='/data/leslie/bplee/scBatch/Step0_Data/figs/pca_all_cell_types.png')
 
-scatter_color(proj[:,0], proj[:,1], adata.obs.cell_type,
-              savepath='/data/leslie/bplee/scBatch/Step0_Data/figs/pca_all_cell_types.png',
-              title='PCA of All Data Colored by Cell Type',
-              legend=False)
+# run umap
+# sc.pp.neighbors(adata, use_rep="X_pca", n_neighbors=30)
+# sc.tl.umap(adata, min_dist=.3)
+# plot umap plots
+# sc.pl.umap(adata, color='patient', size=5, alpha=.2, save='all_data_umap_patient.png')
+# sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='all_data_umap_cell_type.png')
+
+
+#pca_obj = PCA(n_components=2)
+#proj = pca_obj.fit_transform(adata.X)
+
+#scatter_color(proj[:,0], proj[:,1], adata.obs.patient,
+#              savepath='/data/leslie/bplee/scBatch/Step0_Data/figs/pca_all_patients.png',
+#              title='PCA of All Data Colored by Patient')
+
+#scatter_color(proj[:,0], proj[:,1], adata.obs.cell_type,
+#              savepath='/data/leslie/bplee/scBatch/Step0_Data/figs/pca_all_cell_types.png',
+#              title='PCA of All Data Colored by Cell Type',
+#              legend=False)
