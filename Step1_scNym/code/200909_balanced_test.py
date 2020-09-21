@@ -18,11 +18,11 @@ import tensorboard as tb
 tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
 # changing directory to project dir
-print("________CHANGING WORKING DIR________")
-print(os.getcwd())
+# print("________CHANGING WORKING DIR________")
+# print(os.getcwd())
 WORKING_DIR = "/data/leslie/bplee/scBatch"
-os.chdir(WORKING_DIR)
-print("\tNew working dir: %s\n" % (os.getcwd()))
+# os.chdir(WORKING_DIR)
+# print("\tNew working dir: %s\n" % (os.getcwd()))
 
 # adding the project dir to the path to import relevant modules below
 print("________CHANGING PATH_________")
@@ -137,9 +137,11 @@ if __name__ == "__main__":
     sc.pl.umap(exp_adata, color='cell_type', size=5, alpha=.2, save='_scnym_mini_exp_og_data_umap_celltype.png')
     sc.pl.umap(exp_adata, color='patient', size=5, alpha=.2, save='_scnym_mini_exp_og_data_umap_patient.png')
 
-    balanced_test_adata = get_balanced_classes(test_adata)
-    print("created balanced_adata from test_adata")
+    print("While this isn't a run to test balanced classes, its a run of a more balanced easier experiment that scnym should perform well on")
 
-    get_balanced_classes(train_adata)
+    # balanced_test_adata = get_balanced_classes(test_adata)
+    # print("created balanced_adata from test_adata")
+    #
+    # get_balanced_classes(train_adata)
 
 
