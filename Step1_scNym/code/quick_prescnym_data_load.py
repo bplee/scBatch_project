@@ -36,31 +36,30 @@ TEST_PATIENT = 4
 X_DIM = 16323# 784 is the magic number for DIVA; 16323 is the max
 
 # getting training and testing data
-train = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, diva=False)
-test = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=False, diva=False, test=True)
+data_obj = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, test=True, diva=False)
 
-cell_types = train.cell_types
+cell_types = data_obj.cell_types
 
 # need to select one patient to use as training domain:
 TRAIN_PATIENT = 3 #choose {0,...,5}
 
-# selecting all of the indices that mark our patient
-train_patient_inds = train.train_domain[:,TRAIN_PATIENT] == 1 
+# selecting all of the indices that mark our patient of interest
+train_patient_inds = data_obj.train_domain[:,TRAIN_PATIENT] == 1 
 # using inds to select data for our patient
-train_patient_data = train.train_data[train_patient_inds] #doing log transformation here
+train_patient_data = data_obj.train_data[train_patient_inds]
 
 # making the data obj for our training and test patient
 train_adata = anndata.AnnData(np.array(train_patient_data))
 # train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
-test_adata = anndata.AnnData(np.array(test.test_data))
+test_adata = anndata.AnnData(np.array(data_obj.test_data))
 
 # converting 1 hot vectors into int labels
-train_int_labels = np.array(train.train_labels).dot(np.arange(len(train.train_labels[0]), dtype=int))
-test_int_labels = np.array(test.test_labels).dot(np.arange(len(test.test_labels[0]), dtype=int))
+train_int_labels = np.array(data_obj.train_labels).dot(np.arange(len(data_obj.train_labels[0]), dtype=int))
+test_int_labels = np.array(data_obj.test_labels).dot(np.arange(len(data_obj.test_labels[0]), dtype=int))
 
-# creating vectors of cell labels:
-train_cell_types = train.cell_types[train_int_labels]
-test_cell_types = test.cell_types[test_int_labels]
+# creating vectors of cell labels (strings):
+train_cell_types = cell_types[train_int_labels]
+test_cell_types = cell_types[test_int_labels]
 
 # setting gold labels: (using names and not indices)
 train_adata.obs['cell_type'] = train_cell_types[train_patient_inds] # there are cell types for multiple patients so we index for the one we care about
@@ -82,14 +81,13 @@ print(adata.obs)
 
 blurb = """
 Loaded 3 useful annData objects:
-	- adata (ready as input to scnym)
-	- train_adata
-	- test_adata
-2 Useful data objs:
-	- train
-	- test
+	- adata (ready as input to scnym, only 2 patients)
+	- train_adata (train patient)
+	- test_adata (test patient)
+Loaded 1 useful class that holds all data:
+	- data_obj (Rcc Semi super loader, all data)
 Ready to train scnym
 """
 print(blurb)
-print("Test patient: %d" %TEST_PATIENT)
-print("Train patient: %d" %TRAIN_PATIENT)
+print("Test Patient: %d" %TEST_PATIENT)
+print("Train Patient: %d" %TRAIN_PATIENT)
