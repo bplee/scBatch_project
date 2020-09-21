@@ -108,7 +108,8 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
 
     print("Returning adata and RccDatasetSemi loader obj")
     print("Test Patient: %d" % TEST_PATIENT)
-    print("Train Patient: %d" % TRAIN_PATIENT)
+    if TRAIN_PATIENT is not None:
+        print("Train Patient: %d" % TRAIN_PATIENT)
     print("No. of Genes: %d" % X_DIM)
 
     return adata, data_obj
