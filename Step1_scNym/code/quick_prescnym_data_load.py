@@ -77,8 +77,8 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     test_adata = anndata.AnnData(np.array(data_obj.test_data))
 
     # converting 1 hot patient vectors into ints
-    train_int_patients = np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0]), dtype=int))
-    test_int_patients = np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0]), dtype=int))
+    train_int_patients = np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0]))).astype(int)
+    test_int_patients = np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0]))).astype(int)
     # creating vectors of patient names (strings):
     train_patients = patients[train_int_patients]
     test_patients = patients[test_int_patients]
