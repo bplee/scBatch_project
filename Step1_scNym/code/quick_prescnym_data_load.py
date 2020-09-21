@@ -83,7 +83,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     train_patients = patients[train_int_patients]
     test_patients = patients[test_int_patients]
     # setting patient names: (using names and not indices)
-    train_adata.obs['patient'] = train_patients # there are cell types for multiple patients so we index for the one we care about
+    train_adata.obs['patient'] = train_patients if train_patients is None else train_patients[train_patient_inds]
     test_adata.obs['patient'] = test_patients
 
     # converting 1 hot vectors into int labels (for cell types)
