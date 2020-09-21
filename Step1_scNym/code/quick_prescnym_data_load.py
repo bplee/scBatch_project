@@ -45,7 +45,11 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     Returns
     -------
     anndata.AnnData obj
-        obj that contains all data information
+        obj that contains the following columns:
+            - cell_type     (golden label cell type)
+            - patient       (patient where cell came from)
+            - annotations   (Same as `cell type` but all test points are 'Unlabeled')
+            - batch         (boolean vector of training vs. test set)
     """
     # getting training and testing data
     TEST_PATIENT = test_patient
@@ -54,6 +58,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     # getting training and testing data
     data_obj = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, test=True, diva=False)
 
+    patients = data_obj.patients
     cell_types = data_obj.cell_types
 
     # need to select one patient to use as training domain:
@@ -71,14 +76,22 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     train_adata = anndata.AnnData(np.array(train_patient_data))
     test_adata = anndata.AnnData(np.array(data_obj.test_data))
 
-    # converting 1 hot vectors into int labels
+    # converting 1 hot patient vectors into ints
+    train_int_patients = np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0]), dtype=int))
+    test_int_patients = np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0]), dtype=int))
+    # creating vectors of patient names (strings):
+    train_patients = patients[train_int_patients]
+    test_patients = patients[test_int_patients]
+    # setting patient names: (using names and not indices)
+    train_adata.obs['patient'] = train_patients # there are cell types for multiple patients so we index for the one we care about
+    test_adata.obs['patient'] = test_patients
+
+    # converting 1 hot vectors into int labels (for cell types)
     train_int_labels = np.array(data_obj.train_labels).dot(np.arange(len(data_obj.train_labels[0]), dtype=int))
     test_int_labels = np.array(data_obj.test_labels).dot(np.arange(len(data_obj.test_labels[0]), dtype=int))
-
-    # creating vectors of cell labels (strings):
+    # creating vectors of cell types (strings):
     train_cell_types = cell_types[train_int_labels]
     test_cell_types = cell_types[test_int_labels]
-
     # setting gold labels: (using names and not indices)
     train_adata.obs['cell_type'] = train_cell_types[train_patient_inds] # there are cell types for multiple patients so we index for the one we care about
     test_adata.obs['cell_type'] = test_cell_types
