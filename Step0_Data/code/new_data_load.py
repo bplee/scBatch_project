@@ -4,13 +4,16 @@ import numpy as np
 import pandas as pd
 import pyreadr
 import rpy2.robjects as robjects
-readRDS = robjects['readRDS']
+readRDS = robjects.r['readRDS']
 
-new_annot_file_path = '/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds'
+if __name__ == "__main__":
 
-new = readRDS(new_annot_file_path)
+    new_annot_file_path = '/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds'
 
-column_names = new.colnames
+    new = readRDS(new_annot_file_path)
 
-annot_data = pd.DataFrame(np.array(new).T)
-annot_data.columns = column_names
+    column_names = new.colnames
+
+    annot_data = pd.DataFrame(np.array(new).T)
+    annot_data.columns = column_names
+    # so this contains 31 labels instead of 16
