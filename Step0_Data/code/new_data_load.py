@@ -32,7 +32,7 @@ class RccDatasetSemi(data_utils.Dataset):
 
     def _get_data(self):
         readRDS = robjects.r['readRDS']
-        pandas2ri.activate()
+        # pandas2ri.activate()
 
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
         df_annot = annot[None]
