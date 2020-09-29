@@ -16,7 +16,7 @@ sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 
 
-class RccDatasetSemi(data_utils.Dataset):
+class NewRccDatasetSemi(data_utils.Dataset):
     def __init__(self, test_patient, x_dim, train=True):
         self.test_patient = test_patient
         self.train = train
@@ -35,35 +35,29 @@ class RccDatasetSemi(data_utils.Dataset):
         # pandas2ri.activate()
 
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
-        df_annot = annot[None]
 
         raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_data/data/200929_raw_counts.rds').transpose()
-        df_raw_counts = raw_counts[None]
 
-        cell_types = np.array(df_raw_counts.cluster_name.unqiue)
-
-        del raw_counts
+        cell_types = np.unique(annot.cluster_name)
 
         n_data_all = raw_counts.shape[0]
         n_gene_all = raw_counts.shape[1]
 
         labels = np.zeros([n_data_all, 1])
         for i, c in enumerate(cell_types):
-            idx = np.where(df_annot_all_6_pat.cluster_name.values == c)[0]
+            idx = np.where(annot.cluster_name.values == c)[0]
             labels[idx] = i
         labels = labels.astype(int)
         n_labels = len(np.unique(labels))
 
-        patients = np.unique(df_annot_all_6_pat.Sample.values)
+        patients = np.unique(annot.Sample)
         batch_indices = np.zeros([n_data_all, 1])
         for i, b in enumerate(patients):
-            idx = np.where(df_annot_all_6_pat.Sample.values == b)[0]
+            idx = np.where(annot.Sample.values == b)[0]
             batch_indices[idx] = i
         batch_indices = batch_indices.astype(int)
 
-        df = pd.read_csv("/data/leslie/alireza/ccRCC/gene_names.csv", header=0, index_col=0)
-        gene_names = pd.Index(df.x.values)
-        del df
+        gene_names = raw_counts.columns.values # np array
 
         n_each_cell_type = np.zeros(len(cell_types)).astype(int)
         for i in range(len(cell_types)):
@@ -71,15 +65,15 @@ class RccDatasetSemi(data_utils.Dataset):
 
         gene_dataset = GeneExpressionDataset()
         gene_dataset.populate_from_data(
-            X=rawdata_all_6_pat,
+            X=raw_counts,
             batch_indices=batch_indices,
             labels=labels,
             gene_names=gene_names,
             cell_types=cell_types,
             remap_attributes=False
         )
-        del rawdata_all_6_pat
-        del df_annot_all_6_pat
+        del raw_counts
+        del annot
         gene_dataset.subsample_genes(self.x_dim)
 
         idx_batch_train = ~(batch_indices == self.test_patient).ravel()
@@ -166,7 +160,7 @@ class RccDatasetSemi(data_utils.Dataset):
 
 if __name__ == "__main__":
     
-    from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
+    # from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 
     # getting training and testing data
     TEST_PATIENT = 4
@@ -175,6 +169,7 @@ if __name__ == "__main__":
     # getting training and testing data
     data_obj = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, test=True, diva=False)
 
+    new_data_obj = NewRccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True)
 
     new_annot_file_path = '/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds'
     new_batch_corrected_data = '/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_June2020.rds'
