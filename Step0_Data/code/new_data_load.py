@@ -26,12 +26,14 @@ if __name__ == "__main__":
     new_annot_file_path = '/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds'
     new_batch_corrected_data = '/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_June2020.rds'
 
+    raw_counts_file = './200929_raw_counts.rds'    
+
     new = readRDS(new_annot_file_path)
 
     column_names = new.columns
 
     # so this contains 31 labels instead of 16
 
-    data = readRDS(new_batch_corrected_data)
+    #data = readRDS(new_batch_corrected_data)
 
     
