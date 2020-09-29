@@ -3,6 +3,10 @@ import sys
 import numpy as np
 import pandas as pd
 import pyreadr
+import torch
+import torch.utils.data as data_utils
+from torchvision import datasets, transforms
+from scvi.dataset import GeneExpressionDataset
 import rpy2.robjects as robjects
 readRDS = robjects.r['readRDS']
 
