@@ -31,6 +31,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         return self.cell_types, self.patients
 
     def _get_data(self):
+        print('Getting data..')
         readRDS = robjects.r['readRDS']
         # pandas2ri.activate()
 
@@ -42,6 +43,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         n_data_all = raw_counts.shape[0]
         n_gene_all = raw_counts.shape[1]
+
+        print('re writing indices')
 
         labels = np.zeros([n_data_all, 1])
         for i, c in enumerate(cell_types):
@@ -63,6 +66,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
         for i in range(len(cell_types)):
             n_each_cell_type[i] = np.sum(labels == i)
 
+        print('importing gene expression ds')
+
         gene_dataset = GeneExpressionDataset()
         gene_dataset.populate_from_data(
             X=raw_counts,
@@ -75,6 +80,9 @@ class NewRccDatasetSemi(data_utils.Dataset):
         del raw_counts
         del annot
         gene_dataset.subsample_genes(self.x_dim)
+
+        print('making tensor batches')
+
 
         idx_batch_train = ~(batch_indices == self.test_patient).ravel()
         idx_batch_test = (batch_indices == self.test_patient).ravel()
@@ -99,6 +107,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         n_train = len(labels_train)
         n_test = len(labels_test)
+
+        print('run transformers')
 
         # Run transforms
         data_train = torch.as_tensor(data_train)
@@ -168,6 +178,7 @@ if __name__ == "__main__":
 
     # getting training and testing data
     # data_obj = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, test=True, diva=False)
+    print('getting it done')
 
     new_data_obj = NewRccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True)
 
