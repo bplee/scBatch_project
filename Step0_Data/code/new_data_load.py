@@ -46,6 +46,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
 
         raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
+        #raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
 
         cell_types = np.unique(annot.cluster_name)
 
