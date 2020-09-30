@@ -1,14 +1,8 @@
-print("Importing Modules")
 import time
 import os
 import sys
 import numpy as np
 import pandas as pd
-import pyreadr
-import torch
-import torch.utils.data as data_utils
-from torchvision import datasets, transforms
-from scvi.dataset import GeneExpressionDataset
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 
@@ -69,7 +63,7 @@ class PdRccAllData:
 
 if __name__ == "__main__":
 
-    data_obj = PdRccAllData()
+    data_obj = PdRccAllData(test_patient=5, x_dim=784)
     
     # readRDS = robjects.r['readRDS']
     # pandas2ri.activate()
