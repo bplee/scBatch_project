@@ -1,4 +1,5 @@
 print("Importing Modules")
+import time
 import os
 import sys
 import numpy as np
@@ -24,6 +25,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
+        self.init_time = time.time()
 
         if self.train:
             self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
@@ -144,6 +146,9 @@ class NewRccDatasetSemi(data_utils.Dataset):
         d = torch.eye(6)
         batch_train = d[batch_train]
         batch_test = d[batch_test]
+
+        self.return_time = time.time()
+        print(f"Total Load Time: {self.return_time - self.init_time}")
 
         if self.train:
             return data_train.unsqueeze(1), labels_train, batch_train, cell_types, patients
