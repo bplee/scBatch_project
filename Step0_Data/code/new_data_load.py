@@ -138,7 +138,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         batch_test = batch_test[inds]
 
         # Convert to onehot
-        y = torch.eye(16)
+        y = torch.eye(n_labels)
         labels_train = y[labels_train]
         labels_test = y[labels_test]
 
