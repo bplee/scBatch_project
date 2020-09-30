@@ -1,27 +1,20 @@
-print("import os")
+print("Importing Modules")
 import os
-print("import sys")
 import sys
-print("import np")
 import numpy as np
-print("import pd")
 import pandas as pd
 import pyreadr
-print("import torch")
 import torch
 import torch.utils.data as data_utils
 from torchvision import datasets, transforms
-print("import scvi")
 from scvi.dataset import GeneExpressionDataset
-print("import robjects")
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 pandas2ri.activate()
-print('saving readRDS() func.')
 readRDS = robjects.r['readRDS']
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
-print("________CHANGING PATH_________")
+print("CHANGING PATH:")
 sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 
@@ -44,18 +37,18 @@ class NewRccDatasetSemi(data_utils.Dataset):
         print('Getting data..')
         readRDS = robjects.r['readRDS']
         pandas2ri.activate()
-
+        print('Loading annotations...')
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
-
+        print("\tDone.\nLoading raw counts...")
         # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
         raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
-
+        print("\tDone.")
         cell_types = np.unique(annot.cluster_name)
 
         n_data_all = raw_counts.shape[0]
         n_gene_all = raw_counts.shape[1]
 
-        print('re writing indices')
+        print('Re-writing indices')
 
         labels = np.zeros([n_data_all, 1])
         for i, c in enumerate(cell_types):
@@ -77,13 +70,11 @@ class NewRccDatasetSemi(data_utils.Dataset):
         for i in range(len(cell_types)):
             n_each_cell_type[i] = np.sum(labels == i)
 
-        print('importing gene expression ds')
+        print('Importing gene expression ds')
 
         gene_dataset = GeneExpressionDataset()
-        print("\n\nHEY GUY_________________________\n")
-        print([type(x) for x in [raw_counts, batch_indices, labels, gene_names, cell_types]])
         gene_dataset.populate_from_data(
-            X=raw_counts,
+            X=np.array(raw_counts),
             batch_indices=batch_indices,
             labels=labels,
             gene_names=gene_names,
@@ -94,7 +85,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         del annot
         gene_dataset.subsample_genes(self.x_dim)
 
-        print('making tensor batches')
+        print('Making tensor batches')
 
 
         idx_batch_train = ~(batch_indices == self.test_patient).ravel()
@@ -121,7 +112,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         n_train = len(labels_train)
         n_test = len(labels_test)
 
-        print('run transformers')
+        print('Run transformers')
 
         # Run transforms
         data_train = torch.as_tensor(data_train)
@@ -191,7 +182,6 @@ if __name__ == "__main__":
 
     # getting training and testing data
     # data_obj = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, test=True, diva=False)
-    print('getting it done')
 
     new_data_obj = NewRccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True)
 
