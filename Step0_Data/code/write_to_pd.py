@@ -3,8 +3,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
-import rpy2.robjects as robjects
-from rpy2.robjects import pandas2ri
+
 
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
@@ -27,6 +26,9 @@ class PdRccAllData:
         print(f"Loading time: {self.load_time - self.init_time}")
 
     def _create_pkl(self):
+        print("Importing necessary libraries...")
+        import rpy2.robjects as robjects
+        from rpy2.robjects import pandas2ri
         readRDS = robjects.r['readRDS']  # this is a function
         pandas2ri.activate()  # this is so readRDS loads into pandas df's
 
