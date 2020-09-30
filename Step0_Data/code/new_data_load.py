@@ -87,15 +87,14 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         print('Making tensor batches')
 
+        idx_batch_train = ~(gene_dataset.batch_indices == self.test_patient).ravel()
+        idx_batch_test = (gene_dataset.batch_indices == self.test_patient).ravel()
 
-        idx_batch_train = ~(batch_indices == self.test_patient).ravel()
-        idx_batch_test = (batch_indices == self.test_patient).ravel()
+        batch_train = gene_dataset.batch_indices[idx_batch_train].ravel()
+        batch_test = gene_dataset.batch_indices[idx_batch_test].ravel()
 
-        batch_train = batch_indices[idx_batch_train].ravel()
-        batch_test = batch_indices[idx_batch_test].ravel()
-
-        labels_train = labels[idx_batch_train].ravel()
-        labels_test = labels[idx_batch_test].ravel()
+        labels_train = gene_dataset.labels[idx_batch_train].ravel()
+        labels_test = gene_dataset.labels[idx_batch_test].ravel()
 
         data_train = gene_dataset.X[idx_batch_train]
         data_test = gene_dataset.X[idx_batch_test]
