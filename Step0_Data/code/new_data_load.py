@@ -39,10 +39,9 @@ class NewRccDatasetSemi(data_utils.Dataset):
         pandas2ri.activate()
         print('Loading annotations...')
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
-        print("\tDone.\nLoading raw counts...")
+        print("Loading raw counts...")
         # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
         raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
-        print("\tDone.")
         cell_types = np.unique(annot.cluster_name)
 
         n_data_all = raw_counts.shape[0]
@@ -117,8 +116,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
         data_train = torch.as_tensor(data_train)
         data_test = torch.as_tensor(data_test)
 
-        labels_train = torch.as_tensor(labels_train)
-        labels_test = torch.as_tensor(labels_test)
+        labels_train = torch.as_tensor(labels_train.astype(int))
+        labels_test = torch.as_tensor(labels_test.astype(int))
 
         batch_train = torch.as_tensor(batch_train)
         batch_test = torch.as_tensor(batch_test)
@@ -178,6 +177,7 @@ if __name__ == "__main__":
     # getting training and testing data
     TEST_PATIENT = 4
     X_DIM = 16323# 784 is the magic number for DIVA; 16323 is the max
+    X_DIM = 784
 
     # getting training and testing data
     # data_obj = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, test=True, diva=False)
