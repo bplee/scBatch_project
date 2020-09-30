@@ -18,8 +18,8 @@ sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 
 from DIVA.model.model_diva import DIVA
-from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
-
+# from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
+from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 #class _CustomDataParallel(nn.Module):
 #    def __init__(self, model):
 #        super(_CustomDataParallel, self).__init__()
@@ -219,7 +219,7 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = args.outpath + 'rcc_test_domain_' + str(args.test_patient) + '_semi_sup_seed_' + str(
+    model_name = args.outpath + 'rcc_new_test_domain_' + str(args.test_patient) + '_semi_sup_seed_' + str(
         args.seed)
     print(model_name)
 
