@@ -2,10 +2,8 @@ import os
 import sys
 import numpy as np
 import pandas as pd
-import pyreadr
 import torch
 import torch.utils.data as data_utils
-from torchvision import datasets, transforms
 from scvi.dataset import GeneExpressionDataset
 import rpy2.robjects as robjects
 readRDS = robjects.r['readRDS']
@@ -37,7 +35,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
 
-        raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_data/data/200929_raw_counts.rds').transpose()
+        raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
 
         cell_types = np.unique(annot.cluster_name)
 
