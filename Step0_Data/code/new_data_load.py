@@ -80,6 +80,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
         print('importing gene expression ds')
 
         gene_dataset = GeneExpressionDataset()
+        print("\n\nHEY GUY_________________________\n")
+        print([type(x) for x in [raw_counts, batch_indices, labels, gene_names, cell_types]])
         gene_dataset.populate_from_data(
             X=raw_counts,
             batch_indices=batch_indices,
