@@ -35,15 +35,27 @@ class NewRccDatasetSemi(data_utils.Dataset):
     def cell_types_batches(self):
         return self.cell_types, self.patients
 
+    @staticmethod
+    def _convert_Rdf_to_pd(df):
+        if isinstance(df, pd.DataFrame):
+            return df
+        else:
+            print(f"Oops, this df is of type {type(df)}")
+            return pandas2ri.ri2py(df)
+
     def _get_data(self):
         print('Getting data..')
         readRDS = robjects.r['readRDS']
         pandas2ri.activate()
+
         print('Loading annotations...')
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
+        annot = self._convert_Rdf_to_pd(annot)
         print("Loading raw counts...")
         # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
         raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
+        raw_counts = self._convert_Rdf_to_pd(raw_counts)
+
         cell_types = np.unique(annot.cluster_name)
 
         n_data_all = raw_counts.shape[0]
