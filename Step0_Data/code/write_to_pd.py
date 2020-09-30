@@ -11,8 +11,7 @@ from torchvision import datasets, transforms
 from scvi.dataset import GeneExpressionDataset
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
-pandas2ri.activate()
-readRDS = robjects.r['readRDS']
+
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 print("CHANGING PATH:")
@@ -20,96 +19,74 @@ sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 
 
-class NewRccDatasetSemi(data_utils.Dataset):
-    def __init__(self, test_patient, x_dim, train=True):
+class PdRccAllData:
+    def __init__(self, test_patient, x_dim, train=True,
+                 pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/200930_6pat_raw_counts.pkl'):
+        self.pkl_path = pkl_path
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
+
         self.init_time = time.time()
+        self.data = self._load_data()
+        self.load_time = time.time()
+        print(f"Loading time: {self.load_time - self.init_time}")
 
-        if self.train:
-            self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
-        else:
-            self.test_data, self.test_labels, self.test_domain, self.cell_types, self.patients = self._get_data()
+    def _create_pkl(self):
+        readRDS = robjects.r['readRDS']  # this is a function
+        pandas2ri.activate()  # this is so readRDS loads into pandas df's
 
-    def cell_types_batches(self):
-        return self.cell_types, self.patients
-
-    def _get_data(self):
-        print('Getting data..')
-        readRDS = robjects.r['readRDS']
-        pandas2ri.activate()
         print('Loading annotations...')
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
         print("Loading raw counts...")
-        # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
         raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
-        cell_types = np.unique(annot.cluster_name)
+
         cell_labels = np.array(annot.cluster_name)
         patient_labels = np.array(annot.Sample)
-        gene_names = raw_counts.columns.values # np array
-        rtn = pd.DataFrame(raw_counts)
-        rtn['cell_label'] = cell_labels
-        rtn['patient'] = patient_labels
-        
-        n_each_cell_type = np.zeros(len(cell_types)).astype(int)
-        for i in range(len(cell_types)):
-            n_each_cell_type[i] = np.sum(labels == i)
+        gene_names = raw_counts.columns.values  # np array
 
-        print('Importing gene expression ds')
+        # making dataframe to save
+        data = pd.DataFrame(raw_counts)
+        data['cell_type'] = cell_labels
+        data['patient'] = patient_labels
 
-        gene_dataset = GeneExpressionDataset()
-        gene_dataset.populate_from_data(
-            X=np.array(raw_counts),
-            batch_indices=batch_indices,
-            labels=labels,
-            gene_names=gene_names,
-            cell_types=cell_types,
-            remap_attributes=False
-        )
-        del raw_counts
-        del annot
-        gene_dataset.subsample_genes(self.x_dim)
+        # saving new pkl_path
+        self.pkl_path = '/data/leslie/bplee/scBatch/Step0_Data/data/temp_6pat_raw_counts.pkl'
 
+        print(f"Saving .pkl to {self.pkl_path}")
+        data.to_pickle(self.pkl_path)
+        return data
 
-    def __len__(self):
-        if self.train:
-            return len(self.train_labels)
+    def _load_data(self):
+        if not os.path.isfile(self.pkl_path):
+            print(f"Could not find pkl file: {self.pkl_path}")
+            return self._create_pkl()
         else:
-            return len(self.test_labels)
-
-    def __getitem__(self, index):
-        if self.train:
-            x = self.train_data[index]
-            y = self.train_labels[index]
-            d = self.train_domain[index]
-        else:
-            x = self.test_data[index]
-            y = self.test_labels[index]
-            d = self.test_domain[index]
-
-        return x, y, d
+            rtn = pd.read_pickle(self.pkl_path)
+            return rtn
 
 
 
 if __name__ == "__main__":
-    
-    readRDS = robjects.r['readRDS']
-    pandas2ri.activate()
-    print('Loading annotations...')
-    annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
-    print("Loading raw counts...")
-        # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
-    raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
-    cell_types = np.unique(annot.cluster_name)
-    cell_labels = np.array(annot.cluster_name)
-    patient_labels = np.array(annot.Sample)
-    gene_names = raw_counts.columns.values # np array
-    rtn = pd.DataFrame(raw_counts)
-    rtn['cell_type'] = cell_labels
-    rtn['patient'] = patient_labels
 
-    rtn.to_pickle('/data/leslie/bplee/scBatch/Step0_Data/data/200930_6pat_raw_counts.pkl')
+    data_obj = PdRccAllData()
+    
+    # readRDS = robjects.r['readRDS']
+    # pandas2ri.activate()
+    # print('Loading annotations...')
+    # annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
+    # print("Loading raw counts...")
+    #     # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
+    # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
+    # cell_types = np.unique(annot.cluster_name)
+    # cell_labels = np.array(annot.cluster_name)
+    # patient_labels = np.array(annot.Sample)
+    # gene_names = raw_counts.columns.values # np array
+    # rtn = pd.DataFrame(raw_counts)
+    # rtn['cell_type'] = cell_labels
+    # rtn['patient'] = patient_labels
+
+    # rtn.to_pickle('/data/leslie/bplee/scBatch/Step0_Data/data/200930_6pat_raw_counts.pkl')
 
     # from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 
