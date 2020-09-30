@@ -25,7 +25,8 @@ class PdRccAllData:
         self.load_time = time.time()
         print(f"Loading time: {self.load_time - self.init_time}")
 
-    def _create_pkl(self):
+    @staticmethod
+    def _create_pkl(pkl_path):
         print("Importing necessary libraries...")
         import rpy2.robjects as robjects
         from rpy2.robjects import pandas2ri
@@ -46,17 +47,16 @@ class PdRccAllData:
         data['cell_type'] = cell_labels
         data['patient'] = patient_labels
 
-        # saving new pkl_path
-        self.pkl_path = '/data/leslie/bplee/scBatch/Step0_Data/data/temp_6pat_raw_counts.pkl'
-
-        print(f"Saving .pkl to {self.pkl_path}")
-        data.to_pickle(self.pkl_path)
+        print(f"Saving .pkl to {pkl_path}")
+        data.to_pickle(pkl_path)
         return data
 
     def _load_data(self):
         if not os.path.isfile(self.pkl_path):
             print(f"Could not find pkl file: {self.pkl_path}")
-            return self._create_pkl()
+            # saving new pkl_path
+            self.pkl_path = '/data/leslie/bplee/scBatch/Step0_Data/data/temp_6pat_raw_counts.pkl'
+            return self._create_pkl(self.pkl_path)
         else:
             rtn = pd.read_pickle(self.pkl_path)
             return rtn
