@@ -121,8 +121,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
         labels_train = torch.as_tensor(labels_train.astype(int))
         labels_test = torch.as_tensor(labels_test.astype(int))
 
-        batch_train = torch.as_tensor(batch_train)
-        batch_test = torch.as_tensor(batch_test)
+        batch_train = torch.as_tensor(batch_train.astype(int))
+        batch_test = torch.as_tensor(batch_test.astype(int))
 
         # Shuffle everything one more time
         inds = np.arange(n_train)
