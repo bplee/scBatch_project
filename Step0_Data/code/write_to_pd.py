@@ -51,7 +51,7 @@ class PdRccAllData:
         data['patient'] = patient_labels
 
         print(f"Saving .pkl to {pkl_path}")
-        data.to_pickle(pkl_path)
+        data.to_pickle(pkl_path, protocol=4)
         return data
 
     def _load_data(self):
