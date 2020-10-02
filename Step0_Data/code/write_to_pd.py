@@ -13,12 +13,15 @@ print("\tWorking dir appended to Sys path.")
 
 
 class PdRccAllData:
-    def __init__(self, test_patient, x_dim, train=True,
+    """
+    this class will load the pkl pandas file from ../Step0_Data/data/
+    into a pandas df of raw counts and the last two columns are the 'patient' and 'cell_type'
+    strings
+    """
+    def __init__(self, train=True,
                  pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/200930_6pat_raw_counts.pkl'):
         self.pkl_path = pkl_path
-        self.test_patient = test_patient
         self.train = train
-        self.x_dim = x_dim
 
         self.init_time = time.time()
         self.data = self._load_data()
@@ -65,7 +68,7 @@ class PdRccAllData:
 
 if __name__ == "__main__":
 
-    data_obj = PdRccAllData(test_patient=5, x_dim=784)
+    data_obj = PdRccAllData()
     
     # readRDS = robjects.r['readRDS']
     # pandas2ri.activate()

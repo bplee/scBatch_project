@@ -17,6 +17,7 @@ readRDS = robjects.r['readRDS']
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 print("CHANGING PATH:")
 sys.path.append(WORKING_DIR)
+from Step0_Data.code.write_to_pd import PdRccAllData
 print("\tWorking dir appended to Sys path.")
 
 
@@ -48,15 +49,21 @@ class NewRccDatasetSemi(data_utils.Dataset):
         readRDS = robjects.r['readRDS']
         pandas2ri.activate()
 
-        print('Loading annotations...')
-        annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
-        annot = self._convert_Rdf_to_pd(annot)
-        print("Loading raw counts...")
-        # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
-        raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
-        raw_counts = self._convert_Rdf_to_pd(raw_counts)
+        # own data loader since R was being finicky
+        data_obj = PdRccAllData()
+        raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
+        patients = data_obj.data.patient
+        cell_types = data_obj.data.cell_type
 
-        cell_types = np.unique(annot.cluster_name)
+        # print('Loading annotations...')
+        # annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
+        # annot = self._convert_Rdf_to_pd(annot)
+        # print("Loading raw counts...")
+        # # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds')
+        # raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
+        # raw_counts = self._convert_Rdf_to_pd(raw_counts)
+
+        cell_type_names = np.unique(cell_types)
 
         n_data_all = raw_counts.shape[0]
         n_gene_all = raw_counts.shape[1]
@@ -64,23 +71,23 @@ class NewRccDatasetSemi(data_utils.Dataset):
         print('Re-writing indices')
 
         labels = np.zeros([n_data_all, 1])
-        for i, c in enumerate(cell_types):
-            idx = np.where(annot.cluster_name.values == c)[0]
+        for i, c in enumerate(cell_type_names):
+            idx = np.where(cell_types == c)[0]
             labels[idx] = i
         labels = labels.astype(int)
         n_labels = len(np.unique(labels))
 
-        patients = np.unique(annot.Sample)
+        patient_names = np.unique(patients)
         batch_indices = np.zeros([n_data_all, 1])
-        for i, b in enumerate(patients):
-            idx = np.where(annot.Sample.values == b)[0]
+        for i, b in enumerate(patient_names):
+            idx = np.where(patients == b)[0]
             batch_indices[idx] = i
         batch_indices = batch_indices.astype(int)
 
         gene_names = raw_counts.columns.values # np array
 
         n_each_cell_type = np.zeros(len(cell_types)).astype(int)
-        for i in range(len(cell_types)):
+        for i in range(len(cell_type_names)):
             n_each_cell_type[i] = np.sum(labels == i)
 
         print('Importing gene expression ds')
@@ -95,7 +102,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
             remap_attributes=False
         )
         del raw_counts
-        del annot
+        del data_obj
         gene_dataset.subsample_genes(self.x_dim)
 
         print('Making tensor batches')
