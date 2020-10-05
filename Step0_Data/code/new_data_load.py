@@ -38,6 +38,18 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
     @staticmethod
     def _convert_Rdf_to_pd(df):
+        """
+        Not working as intended because of pandas2riri2py() is buggy
+        Meant to be a function that's used to ensure that you return a pd.DataFrame()
+        Parameters
+        ----------
+        df: some data frame of data
+
+        Returns
+        -------
+        pd.DataFrame obj of the data we want
+
+        """
         if isinstance(df, pd.DataFrame):
             return df
         else:
@@ -171,9 +183,9 @@ class NewRccDatasetSemi(data_utils.Dataset):
         print(f"Total Load Time: {self.return_time - self.init_time}")
 
         if self.train:
-            return data_train.unsqueeze(1), labels_train, batch_train, cell_types, patients
+            return data_train.unsqueeze(1), labels_train, batch_train, cell_type_names, patient_names
         else:
-            return data_test.unsqueeze(1), labels_test, batch_test, cell_types, patients
+            return data_test.unsqueeze(1), labels_test, batch_test, cell_type_names, patient_names
 
     def __len__(self):
         if self.train:
