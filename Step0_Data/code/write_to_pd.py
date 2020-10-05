@@ -19,7 +19,7 @@ class PdRccAllData:
     strings
     """
     def __init__(self, train=True,
-                 pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/200930_6pat_raw_counts.pkl'):
+                 pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/201002_6pat_proto4_raw_counts.pkl'):
         self.pkl_path = pkl_path
         self.train = train
 
