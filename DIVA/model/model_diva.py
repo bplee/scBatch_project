@@ -72,6 +72,7 @@ class pzy(nn.Module):
         self.fc22[0].bias.data.zero_()
 
     def forward(self, y):
+        print(f"y.shape: {y.shape}")
         hidden = self.fc1(y)
         zy_loc = self.fc21(hidden)
         zy_scale = self.fc22(hidden) + 1e-7
