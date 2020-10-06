@@ -17,8 +17,8 @@ print("________CHANGING PATH_________")
 sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 
-from DIVA.model.model_diva import DIVA
-# from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
+from ForBrennan.DIVA.model.model_diva import DIVA
+#from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 #class _CustomDataParallel(nn.Module):
 #    def __init__(self, model):
@@ -74,7 +74,9 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
 
         # To device
         x, y, d = x.to(device), y.to(device), d.to(device)
-
+        print(f"x.shape: {x.shape}")
+        print(f"y.shape: {y.shape}")
+        print(f"d.shape: {d.shape}")
         # run the inference for each loss with supervised or un-supervised
         # data as arguments
         optimizer.zero_grad()
