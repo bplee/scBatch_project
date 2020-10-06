@@ -327,14 +327,16 @@ class DIVA(nn.Module):
             _, d_target = d.max(dim=1)
             CE_d = F.cross_entropy(d_hat, d_target, reduction='sum')
 
+            # num_labels = 16
+            num_labels = y.shape[1]
 
             # Create labels and repeats of zy_q and qzy
-            y_onehot = torch.eye(16)
+            y_onehot = torch.eye(num_labels)
             y_onehot = y_onehot.repeat(1, x.shape[0])
-            y_onehot = y_onehot.view(16 * x.shape[0], 16).cuda()
+            y_onehot = y_onehot.view(num_labels * x.shape[0], num_labels).cuda()
 
-            zy_q = zy_q.repeat(16, 1)
-            zy_q_loc, zy_q_scale = zy_q_loc.repeat(16, 1), zy_q_scale.repeat(16, 1)
+            zy_q = zy_q.repeat(num_labels, 1)
+            zy_q_loc, zy_q_scale = zy_q_loc.repeat(num_labels, 1), zy_q_scale.repeat(num_labels, 1)
             qzy = dist.Normal(zy_q_loc, zy_q_scale)
 
             # Do forward pass for everything involving y
@@ -355,7 +357,7 @@ class DIVA(nn.Module):
 
             marginal_zy_p_minus_zy_q = torch.sum(prob_qy * zy_p_minus_zy_q)
 
-            prior_y = torch.tensor(1/16).cuda()
+            prior_y = torch.tensor(1/num_labels).cuda()
             prior_y_minus_qy = torch.log(prior_y) - qy.log_prob(y_onehot)
             marginal_prior_y_minus_qy = torch.sum(prob_qy * prior_y_minus_qy)
 
