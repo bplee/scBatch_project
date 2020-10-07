@@ -124,6 +124,6 @@ Ready to train scnym
 """
 
 if __name__ == "__main__":
-    adata, data_obj = get_Rcc_adata(test_patient=5, train_patient=4)
+    adata, data_obj = get_Rcc_adata(test_patient=5)
     print(blurb)
 
