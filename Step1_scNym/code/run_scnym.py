@@ -18,61 +18,63 @@ import tensorboard as tb
 tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
 # changing directory to project dir
-print("________CHANGING WORKING DIR________")
 print(os.getcwd())
 WORKING_DIR = "/data/leslie/bplee/scBatch"
-os.chdir(WORKING_DIR)
-print("\tNew working dir: %s\n" % (os.getcwd()))
 
 # adding the project dir to the path to import relevant modules below
-print("________CHANGING PATH_________")
-sys.path.append(WORKING_DIR)
-print("\tWorking dir appended to Sys path.")
+if WORKING_DIR not in sys.path:
+    print("________CHANGING PATH_________")
+    sys.path.append(WORKING_DIR)
+    print("\tWorking dir appended to Sys path.")
 
-from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
+# from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
+from Step0_Data.code.pkl_load_data import PdRccAllData
+
+# this is not LOG NORMALIZED!
 
 # getting training and testing data
 TEST_PATIENT = 4
 X_DIM = 10000# 784 is the magic number for DIVA
 
 # getting training and testing data
-train = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, diva=False)
-test = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=False, diva=False)
+# train = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, diva=False)
+# test = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=False, diva=False)
+data_obj = PdRccAllData()
 
-cell_types = train.cell_types
+raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
+patient_labels = data_obj.data.patient
+cell_labels = data_obj.data.cell_type
+
+patients = np.unique(data_obj.data.patient)
+cell_types = np.unique(data_obj.data.cell_type)
 
 # need to select one patient to use as training domain:
 TRAIN_PATIENT = 3 #choose {0,...,5}
 
-# selecting all of the indices that mark our patient
-train_patient_inds = train.train_domain[:,TRAIN_PATIENT] == 1 
+# selecting all of the indices that mark our training patient
+train_patient_inds = patient_labels == patients[TRAIN_PATIENT]
 # using inds to select data for our patient
-train_patient_data = train.train_data[train_patient_inds] #doing log transformation here
+train_patient_data = raw_counts[train_patient_inds]
+
+# selecting all of the indices that mark our testing patient
+test_patient_inds = patient_labels == patients[TEST_PATIENT]
+# using inds to select data for our patient
+test_patient_data = raw_counts[test_patient_inds]
+
 
 # making the data obj for our training and test patient
 train_adata = anndata.AnnData(np.array(train_patient_data))
 # train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
-test_adata = anndata.AnnData(np.array(test.test_data))
-
-# converting 1 hot vectors into int labels
-train_int_labels = np.array(train.train_labels).dot(np.arange(len(train.train_labels[0]), dtype=int))
-test_int_labels = np.array(test.test_labels).dot(np.arange(len(test.test_labels[0]), dtype=int))
-
-# creating vectors of cell labels:
-train_cell_types = train.cell_types[train_int_labels]
-test_cell_types = test.cell_types[test_int_labels]
+test_adata = anndata.AnnData(np.array(test_patient_data))
 
 # setting gold labels: (using names and not indices)
-train_adata.obs['cell_type'] = train_cell_types[train_patient_inds] # there are cell types for multiple patients so we index for the one we care about
-test_adata.obs['cell_type'] = test_cell_types
+train_adata.obs['cell_type'] = cell_labels[train_patient_inds] # there are cell types for multiple patients so we index for the one we care about
+test_adata.obs['cell_type'] = cell_labels[test_patient_inds]
 
 # setting the semi_supervised labels:
-train_adata.obs['annotations'] = train_cell_types[train_patient_inds]
+train_adata.obs['annotations'] = cell_labels[train_patient_inds]
 test_adata.obs['annotations'] = 'Unlabeled'
 
-print('hey')
-print(type(train_int_labels))
-print(train_int_labels.dtype)
 
 # concatenating data
 #adata = train_adata.concatenate(test_adata)
@@ -100,10 +102,13 @@ def get_balanced_classes(adata):
         rtn.extend(n_inds)
     return adata[rtn,:]
 
+# TODO: shouldnt do this re naming, should just change the test/train patients
 balanced_train_adata = get_balanced_classes(test_adata)
-print("created balanced_adata from test_adata")
+print("created balanced_train_adata from test_adata")
 
 balanced_test_adata = get_balanced_classes(train_adata)
+print("created balanced_test_adata from train_adata")
+
 
 #fixing annotations because we switched the train and test sets
 balanced_train_adata.obs.annotations = balanced_train_adata.obs.cell_type
