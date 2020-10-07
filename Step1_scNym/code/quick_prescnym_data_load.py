@@ -84,11 +84,11 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     test_adata = anndata.AnnData(np.array(test_patient_data))
 
     # setting gold labels: (using names and not indices)
-    train_adata.obs['cell_type'] = cell_labels[train_patient_inds]  # there are cell types for multiple patients so we index for the one we care about
-    test_adata.obs['cell_type'] = cell_labels[test_patient_inds]
+    train_adata.obs['cell_type'] = np.array(cell_labels[train_patient_inds])  # there are cell types for multiple patients so we index for the one we care about
+    test_adata.obs['cell_type'] = np.array(cell_labels[test_patient_inds])
 
     # setting the semi_supervised labels:
-    train_adata.obs['annotations'] = cell_labels[train_patient_inds]
+    train_adata.obs['annotations'] = np.array(cell_labels[train_patient_inds])
     test_adata.obs['annotations'] = 'Unlabeled'
 
     # concatenating data
@@ -147,7 +147,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     # adata = train_adata.concatenate(test_adata)
 
     print("Returning adata and RccDatasetSemi loader obj")
-    print("Test Patient: %d" % TEST_PATIENT)
+    print(f"Test Patient: {TEST_PATIENT}")
     if TRAIN_PATIENT is not None:
         print("Train Patient: %d" % TRAIN_PATIENT)
     print("No. of Genes: %d" % X_DIM)
