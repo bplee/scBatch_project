@@ -17,7 +17,7 @@ from rpy2.robjects import pandas2ri
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 print("CHANGING PATH:")
 sys.path.append(WORKING_DIR)
-from Step0_Data.code.write_to_pd import PdRccAllData
+from Step0_Data.code.pkl_load_data import PdRccAllData
 print("\tWorking dir appended to Sys path.")
 
 
@@ -183,8 +183,15 @@ class NewRccDatasetSemi(data_utils.Dataset):
         print(f"Total Load Time: {self.return_time - self.init_time}")
 
         if self.train:
+            print(f"data_train.shape {data_train.shape}")
+            print(f"labels_train.shape {labels_train.shape}")
+            print(f"batch_train.shape {batch_train.shape}")
+
             return data_train.unsqueeze(1), labels_train, batch_train, cell_type_names, patient_names
         else:
+            print(f"data_test.shape {data_test.shape}")
+            print(f"labels_test.shape {labels_test.shape}")
+            print(f"batch_test.shape {batch_test.shape}")
             return data_test.unsqueeze(1), labels_test, batch_test, cell_type_names, patient_names
 
     def __len__(self):
