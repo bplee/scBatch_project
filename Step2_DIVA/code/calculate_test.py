@@ -20,10 +20,10 @@ sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 
 from DIVA.dataset.rcc_loader import RccDataset
-from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
+#from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import NewRccDatasetSemi as RccDatasetSemi
+from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
-
-def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_types):
+def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_types, num_labels=31):
     model.eval()
     """
     compute the accuracy over the supervised training set or the testing set
@@ -60,7 +60,7 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
         for pred, act in zip(predictions_y, actuals_y):
             for i in range(pred.size(0)):
                 v = torch.sum(pred[i] == act[i])
-                accurate_preds_y += (v.item() == 16)
+                accurate_preds_y += (v.item() == num_labels)
                 labels_pred.append(torch.argmax(pred[i]))
                 labels_true.append(torch.argmax(act[i]))
 
@@ -75,12 +75,14 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
         cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         accuracy_y_weighted = np.mean(np.diag(cm_norm))
 
+        print(f"cm.shape {cm.shape}")
+        print(f"len(cell_types): {len(cell_types)}")
         cm_norm_df = pd.DataFrame(cm_norm,index=cell_types,columns=cell_types)
         plt.figure(figsize = (20,20))
         ax = sn.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
                 linewidths=.5, annot=True, fmt='4.2f', square = True)
         ax.get_ylim()
-        ax.set_ylim(16, 0)
+        ax.set_ylim(num_labels, 0)
         plt.savefig('./figs_diva/fig_diva_cm_semi_sup_heldout_pat_'+str(test_patient)+'.pdf')
 
         return  accuracy_y, accuracy_y_weighted
@@ -93,14 +95,14 @@ if __name__ == "__main__":
     vae = 0
     #test_patient = 5
     seed = 0
-    main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/models_configs/'
+    main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
 
     for test_patient in range(6):
 
         if supervised:
-           model_name = main_dir + 'rcc_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
+           model_name = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
         else:
-           model_name = main_dir + 'rcc_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
+           model_name = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
 
         if vae:
            model_name = main_dir + 'rcc_vae_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
