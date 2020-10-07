@@ -66,17 +66,21 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     cell_types = np.unique(data_obj.data.cell_type)
 
     # need to select one patient to use as training domain:
-    TRAIN_PATIENT = 3  # choose {0,...,5}
-
-    # selecting all of the indices that mark our training patient
-    train_patient_inds = patient_labels == patients[TRAIN_PATIENT]
-    # using inds to select data for our patient
-    train_patient_data = raw_counts[train_patient_inds]
+    TRAIN_PATIENT = train_patient  # choose {0,...,5}
 
     # selecting all of the indices that mark our testing patient
     test_patient_inds = patient_labels == patients[TEST_PATIENT]
     # using inds to select data for our patient
     test_patient_data = raw_counts[test_patient_inds]
+
+    if TRAIN_PATIENT is None:
+        train_patient_inds = ~test_patient_inds
+        train_patient_data = raw_counts[train_patient_inds]
+    else:
+        # selecting all of the indices that mark our training patient
+        train_patient_inds = patient_labels == patients[TRAIN_PATIENT]
+        # using inds to select data for our patient
+        train_patient_data = raw_counts[train_patient_inds]
 
     # making the data obj for our training and test patient
     train_adata = anndata.AnnData(np.array(train_patient_data))
