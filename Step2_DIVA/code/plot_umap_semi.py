@@ -20,7 +20,7 @@ sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 #from paper_experiments.rotated_mnist.dataset.rcc_loader import RccDataset
 from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
-
+from Step0_Data.code.new_data
 
 def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_types, patients):
     model.eval()
@@ -371,7 +371,7 @@ if __name__ == "__main__":
 
     for test_patient in [5]:
 
-        model_name = './' + 'rcc_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
+        model_name = './' + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
 
         model = torch.load(model_name + '.model')
         args = torch.load(model_name + '.config')

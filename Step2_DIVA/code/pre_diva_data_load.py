@@ -17,9 +17,9 @@ print("________CHANGING PATH_________")
 sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 
-from DIVA.model.model_diva import DIVA
+from ForBrennan.DIVA.model.model_diva import DIVA
 from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
-
+from Step0_Data.code.new_data_load import NewRccDatasetSemi
 
 test_patient =5
 batch_size=100
@@ -29,6 +29,11 @@ batch_size=100
 train_loader_sup = RccDatasetSemi(test_patient,
                  train=True, x_dim=784)
 train_loader_unsup = RccDatasetSemi(test_patient,
+                 train=False, x_dim=784)
+
+new_train_loader_sup = NewRccDatasetSemi(test_patient,
+                 train=True, x_dim=784)
+new_train_loader_unsup = NewRccDatasetSemi(test_patient,
                  train=False, x_dim=784)
 
 data_loaders = {}

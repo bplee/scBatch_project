@@ -57,6 +57,7 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
         accurate_preds_y = 0
         labels_true = []
         labels_pred = []
+        print(np.array(predictions_y).shape)
         for pred, act in zip(predictions_y, actuals_y):
             for i in range(pred.size(0)):
                 v = torch.sum(pred[i] == act[i])
@@ -97,7 +98,7 @@ if __name__ == "__main__":
     seed = 0
     main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
 
-    for test_patient in range(6):
+    for test_patient in range(5):
 
         if supervised:
            model_name = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
