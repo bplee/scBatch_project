@@ -117,6 +117,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         del raw_counts
         del data_obj
         gene_dataset.subsample_genes(self.x_dim)
+        #gene_dataset.filter_cells_by_count()
 
         print('Making tensor batches')
 
