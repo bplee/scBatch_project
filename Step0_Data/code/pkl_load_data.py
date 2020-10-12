@@ -16,16 +16,18 @@ class PdRccAllData:
     this class will load the pkl pandas file from ../Step0_Data/data/
     into a pandas df of raw counts and the last two columns are the 'patient' and 'cell_type'
     strings
+
+    same_cell_types is used for only getting cells such that each patient has the same label set
     """
-    def __init__(self, train=True, same_cell_types = True,
+    def __init__(self, train=True, take_cell_label_intersection=True,
                  pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/201002_6pat_proto4_raw_counts.pkl'):
         self.pkl_path = pkl_path
         self.train = train
-        self.same_cell_types = same_cell_types
+        self.take_cell_label_intersection = take_cell_label_intersection
 
         self.init_time = time.time()
         self.data = self._load_data()
-        if self.same_cell_types:
+        if self.take_cell_type_intersection:
             print("Subsetting for labels that are present in every patient")
             self.data = self.ssl_label_data_clean(self.data)
         self.load_time = time.time()
@@ -83,8 +85,10 @@ class PdRccAllData:
         """
         patients = np.unique(data_df.patient)
         cell_types_to_keep = set(data_df.cell_type)
+        init_num_labels = len(cell_types_to_keep)
         for pat, pat_df in data_df.groupby("patient"):
             cell_types_to_keep = cell_types_to_keep.intersection(set(pat_df.cell_type))
+        print(f"Reducing total number of labels from {init_num_labels} to {len(cell_types_to_keep)}.")
         bool_subset = data_df.cell_type.isin(cell_types_to_keep)
         return data_df[bool_subset]
 
