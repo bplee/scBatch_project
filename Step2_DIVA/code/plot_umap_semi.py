@@ -20,12 +20,12 @@ sys.path.append(WORKING_DIR)
 print("\tWorking dir appended to Sys path.")
 #from paper_experiments.rotated_mnist.dataset.rcc_loader import RccDataset
 from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
-from Step0_Data.code.new_data
+from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
 def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_types, patients):
     model.eval()
     """
-    get the latent factors and plot the TSNE plots
+    get the latent factors and plot the UMAP plots
     """
     actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
 
@@ -68,79 +68,13 @@ def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_t
         for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
             _.obs['batch'] = labels_d
             _.obs['cell_type'] = labels_y
-            save_name_pat = '_diva_semi_sup_train_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
-            save_name_cell_type = '_diva_semi_sup_train_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
+            save_name_pat = '_diva_new_semi_sup_train_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
+            save_name_cell_type = '_diva_new_semi_sup_train_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color='batch', size=15, alpha=.8, save=save_name_pat)
             sc.pl.umap(_, color='cell_type', size=15, alpha=.8, save=save_name_pat)
         
-        # compute the number of accurate predictions
-        #zy_tsne = TSNE(n_components=2).fit_transform(zy)
-        #zd_tsne = TSNE(n_components=2).fit_transform(zd)
-        #zx_tsne = TSNE(n_components=2).fit_transform(zx)
-
-        ## TSNE plots
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zy_tsne[labels_y == i, 0], zy_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zy_tsne[labels_y == i, 0], zy_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train_zy_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, batch in zip(range(len(patients_train)), patients_train):
-        #    if i < 10:
-        #       plt.scatter(zy_tsne[labels_d == i, 0], zy_tsne[labels_d == i, 1], c = colors[i], label = batch)
-        #    else:
-        #       plt.scatter(zy_tsne[labels_d == i, 0], zy_tsne[labels_d == i, 1], c = colors[i%10], label = batch, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train_zy_by_batches_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zd_tsne[labels_y == i, 0], zd_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zd_tsne[labels_y == i, 0], zd_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train_zd_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, batch in zip(range(len(patients_train)), patients_train):
-        #    if i < 10:
-        #       plt.scatter(zd_tsne[labels_d == i, 0], zd_tsne[labels_d == i, 1], c = colors[i], label = batch)
-        #    else:
-        #       plt.scatter(zd_tsne[labels_d == i, 0], zd_tsne[labels_d == i, 1], c = colors[i%10], label = batch, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train_zd_by_batches_heldout_pat_'+str(test_patient)+'.pdf')
-        
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))                                                                                                   
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zx_tsne[labels_y == i, 0], zx_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zx_tsne[labels_y == i, 0], zx_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train_zx_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
-    
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, batch in zip(range(len(patients_train)), patients_train):
-        #    if i < 10:
-        #       plt.scatter(zx_tsne[labels_d == i, 0], zx_tsne[labels_d == i, 1], c = colors[i], label = batch)
-        #    else:
-        #       plt.scatter(zx_tsne[labels_d == i, 0], zx_tsne[labels_d == i, 1], c = colors[i%10], label = batch, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train_zx_by_batches_heldout_pat_'+str(test_patient)+'.pdf')
 
         ## Test
         
@@ -175,10 +109,6 @@ def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_t
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
 
-        # compute the number of accurate predictions
-        #zy_tsne = TSNE(n_components=2).fit_transform(zy)
-        #zd_tsne = TSNE(n_components=2).fit_transform(zd)
-        #zx_tsne = TSNE(n_components=2).fit_transform(zx)
         
         zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
 
@@ -186,44 +116,14 @@ def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_t
         for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
             _.obs['batch'] = labels_d
             _.obs['cell_type'] = labels_y
-            save_name_pat = '_diva_semi_sup_test_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
-            save_name_cell_type = '_diva_semi_sup_test_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
+            save_name_pat = '_diva_new_semi_sup_test_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
+            save_name_cell_type = '_diva_new_semi_sup_test_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color='batch', size=15, alpha=.8, save=save_name_pat)
             sc.pl.umap(_, color='cell_type', size=15, alpha=.8, save=save_name_cell_type)
 
 
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zy_tsne[labels_y == i, 0], zy_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zy_tsne[labels_y == i, 0], zy_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_test_zy_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zd_tsne[labels_y == i, 0], zd_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zd_tsne[labels_y == i, 0], zd_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_test_zd_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zx_tsne[labels_y == i, 0], zx_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zx_tsne[labels_y == i, 0], zx_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_test_zx_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
 
         ## Train + Test
 
@@ -283,93 +183,20 @@ def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_t
         for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
             _.obs['batch'] = labels_d
             _.obs['cell_type'] = labels_y
-            save_name_pat = '_diva_semi_sup_train+test_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
-            save_name_cell_type = '_diva_semi_sup_train+test_' + name[i] + '_by_labels_heldout_pat_' + str(test_patient) + '.png'
+            save_name_pat = '_diva_new_semi_sup_train+test_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
+            save_name_cell_type = '_diva_new_semi_sup_train+test_' + name[i] + '_by_labels_heldout_pat_' + str(test_patient) + '.png'
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color='batch', size=15, alpha=.8, save=save_name_pat)
             sc.pl.umap(_, color='cell_type', size=15, alpha=.8, save=save_name_cell_type)
 
 
-        # compute the number of accurate predictions
-        #zy_tsne = TSNE(n_components=2).fit_transform(zy)
-        #zd_tsne = TSNE(n_components=2).fit_transform(zd)
-        #zx_tsne = TSNE(n_components=2).fit_transform(zx)
-
-        ## TSNE plots
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zy_tsne[labels_y == i, 0], zy_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zy_tsne[labels_y == i, 0], zy_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train+test_zy_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #print('labels_d', labels_d)
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, batch in zip(range(len(patients)), patients):
-        #    print('patients', patients)
-        #    print('i', i)
-        #    print('batch', batch)
-        #    if i < 10:
-        #       plt.scatter(zy_tsne[labels_d == i, 0], zy_tsne[labels_d == i, 1], c = colors[i], label = batch)
-        #    else:
-        #       plt.scatter(zy_tsne[labels_d == i, 0], zy_tsne[labels_d == i, 1], c = colors[i%10], label = batch, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train+test_zy_by_batches_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zd_tsne[labels_y == i, 0], zd_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zd_tsne[labels_y == i, 0], zd_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train+test_zd_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, batch in zip(range(len(patients)), patients):
-        #    if i < 10:
-        #       plt.scatter(zd_tsne[labels_d == i, 0], zd_tsne[labels_d == i, 1], c = colors[i], label = batch)
-        #    else:
-        #       plt.scatter(zd_tsne[labels_d == i, 0], zd_tsne[labels_d == i, 1], c = colors[i%10], label = batch, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train+test_zd_by_batches_heldout_pat_'+str(test_patient)+'.pdf')
-        
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, cell_type in zip(range(len(cell_types)), cell_types):
-        #    if i < 10:
-        #       plt.scatter(zx_tsne[labels_y == i, 0], zx_tsne[labels_y == i, 1], c = colors[i], label = cell_type)
-        #    else:
-        #       plt.scatter(zx_tsne[labels_y == i, 0], zx_tsne[labels_y == i, 1], c = colors[i%10], label = cell_type, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train+test_zx_by_labels_heldout_pat_'+str(test_patient)+'.pdf')
-
-        #plt.figure(figsize = (20,14))
-        #colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-        #for i, batch in zip(range(len(patients)), patients):
-        #    if i < 10:
-        #       plt.scatter(zx_tsne[labels_d == i, 0], zx_tsne[labels_d == i, 1], c = colors[i], label = batch)
-        #    else:
-        #       plt.scatter(zx_tsne[labels_d == i, 0], zx_tsne[labels_d == i, 1], c = colors[i%10], label = batch, marker='x')
-        #plt.legend()
-        #plt.savefig('./figs_diva/fig_diva_tsne_semi_sup_train+test_zx_by_batches_heldout_pat_'+str(test_patient)+'.pdf')
-
- 
-
 if __name__ == "__main__":
     #test_patient = 5
     supervised = False
     seed = 0
 
-    for test_patient in [5]:
+    for test_patient in range(6):
 
         model_name = './' + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
 

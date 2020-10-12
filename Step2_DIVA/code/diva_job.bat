@@ -5,7 +5,7 @@
 #BSUB -n 10
 #BSUB -gpu "num=1"
 #BSUB -R "rusage[mem=10GB]"
-#BSUB -W 5:00
+#BSUB -W 7:00
 #BSUB -o diva_test.stdout
 #BSUB -e diva_test.stderr
 

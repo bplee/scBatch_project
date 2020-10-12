@@ -57,7 +57,6 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
         accurate_preds_y = 0
         labels_true = []
         labels_pred = []
-        print(np.array(predictions_y).shape)
         for pred, act in zip(predictions_y, actuals_y):
             for i in range(pred.size(0)):
                 v = torch.sum(pred[i] == act[i])
@@ -75,9 +74,10 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
         cm = confusion_matrix(labels_true, labels_pred)
         cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         accuracy_y_weighted = np.mean(np.diag(cm_norm))
-
+        print(f"cm_norm diag: {np.diag(cm_norm)}")
+        print(f"np.mean(np.diag(cm_norm)) {accuracy_y_weighted}")
+        print(f"sum/num for cm {np.sum(np.diag(cm_norm))/float(len(cm_norm))}")
         print(f"cm.shape {cm.shape}")
-        print(f"len(cell_types): {len(cell_types)}")
         cm_norm_df = pd.DataFrame(cm_norm,index=cell_types,columns=cell_types)
         plt.figure(figsize = (20,20))
         ax = sn.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
@@ -98,8 +98,8 @@ if __name__ == "__main__":
     seed = 0
     main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
 
-    for test_patient in range(5):
-
+    for test_patient in range(6):
+    #for test_patient in [0,4]:
         if supervised:
            model_name = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
         else:
