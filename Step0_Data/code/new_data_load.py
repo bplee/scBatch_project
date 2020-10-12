@@ -4,13 +4,13 @@ import os
 import sys
 import numpy as np
 import pandas as pd
-import pyreadr
+# import pyreadr
 import torch
 import torch.utils.data as data_utils
-from torchvision import datasets, transforms
+# from torchvision import datasets, transforms
 from scvi.dataset import GeneExpressionDataset
 # import rpy2.robjects as robjects
-from rpy2.robjects import pandas2ri
+# from rpy2.robjects import pandas2ri
 # pandas2ri.activate()
 # readRDS = robjects.r['readRDS']
 
