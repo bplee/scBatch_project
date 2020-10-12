@@ -22,7 +22,7 @@ print("\tWorking dir appended to Sys path.")
 from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
-def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_types, patients):
+def plot_umap(train_loader, test_loader, model, batch_size, test_patient, cell_types, patients):
     model.eval()
     """
     get the latent factors and plot the UMAP plots
@@ -66,8 +66,8 @@ def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_t
 
         name = ['zy', 'zd', 'zx']
         for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
-            _.obs['batch'] = labels_d
-            _.obs['cell_type'] = labels_y
+            _.obs['batch'] = patients[labels_d]
+            _.obs['cell_type'] = cell_types[labels_y]
             save_name_pat = '_diva_new_semi_sup_train_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
             save_name_cell_type = '_diva_new_semi_sup_train_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
@@ -114,16 +114,14 @@ def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_t
 
         name = ['zy', 'zd', 'zx'] 
         for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
-            _.obs['batch'] = labels_d
-            _.obs['cell_type'] = labels_y
+            _.obs['batch'] = patients[labels_d]
+            _.obs['cell_type'] = cell_types[labels_y]
             save_name_pat = '_diva_new_semi_sup_test_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
             save_name_cell_type = '_diva_new_semi_sup_test_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color='batch', size=15, alpha=.8, save=save_name_pat)
             sc.pl.umap(_, color='cell_type', size=15, alpha=.8, save=save_name_cell_type)
-
-
 
         ## Train + Test
 
@@ -181,8 +179,8 @@ def plot_tsne(train_loader, test_loader, model, batch_size, test_patient, cell_t
 
         name = ['zy', 'zd', 'zx']
         for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
-            _.obs['batch'] = labels_d
-            _.obs['cell_type'] = labels_y
+            _.obs['batch'] = patients[labels_d]
+            _.obs['cell_type'] = cell_types[labels_y]
             save_name_pat = '_diva_new_semi_sup_train+test_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
             save_name_cell_type = '_diva_new_semi_sup_train+test_' + name[i] + '_by_labels_heldout_pat_' + str(test_patient) + '.png'
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
@@ -229,4 +227,4 @@ if __name__ == "__main__":
         torch.backends.cudnn.benchmark = False
         np.random.seed(args.seed)
 
-        plot_tsne(train_loader, test_loader, model, args.batch_size, test_patient, cell_types, patients)
+        plot_umap(train_loader, test_loader, model, args.batch_size, test_patient, cell_types, patients)
