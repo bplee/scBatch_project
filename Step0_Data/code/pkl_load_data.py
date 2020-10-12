@@ -27,7 +27,7 @@ class PdRccAllData:
 
         self.init_time = time.time()
         self.data = self._load_data()
-        if self.take_cell_type_intersection:
+        if self.take_cell_label_intersection:
             print("Subsetting for labels that are present in every patient")
             self.data = self.ssl_label_data_clean(self.data)
         self.load_time = time.time()
