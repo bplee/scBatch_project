@@ -17,13 +17,17 @@ class PdRccAllData:
     into a pandas df of raw counts and the last two columns are the 'patient' and 'cell_type'
     strings
     """
-    def __init__(self, train=True,
+    def __init__(self, train=True, same_cell_types = True,
                  pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/201002_6pat_proto4_raw_counts.pkl'):
         self.pkl_path = pkl_path
         self.train = train
+        self.same_cell_types = same_cell_types
 
         self.init_time = time.time()
         self.data = self._load_data()
+        if self.same_cell_types:
+            print("Subsetting for labels that are present in every patient")
+            self.data = self.ssl_label_data_clean(self.data)
         self.load_time = time.time()
         print(f"Loading time: {self.load_time - self.init_time}")
 
@@ -62,6 +66,27 @@ class PdRccAllData:
         else:
             rtn = pd.read_pickle(self.pkl_path)
             return rtn
+
+    @staticmethod
+    def ssl_label_data_clean(data_df):
+        """
+        Removes data such that every SSL training/test set have the same labels
+            ie. taking the
+
+        Parameters
+        ----------
+        data_df
+
+        Returns
+        -------
+        pandas df, where the above condition is true
+        """
+        patients = np.unique(data_df.patient)
+        cell_types_to_keep = set(data_df.cell_type)
+        for pat, pat_df in data_df.groupby("patient"):
+            cell_types_to_keep = cell_types_to_keep.intersection(set(pat_df.cell_type))
+        bool_subset = data_df.cell_type.isin(cell_types_to_keep)
+        return data_df[bool_subset]
 
 
 
