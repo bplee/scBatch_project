@@ -73,7 +73,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, cell_t
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color='batch', size=15, alpha=.8, save=save_name_pat)
-            sc.pl.umap(_, color='cell_type', size=15, alpha=.8, save=save_name_pat)
+            sc.pl.umap(_, color='cell_type', size=15, alpha=.8, save=save_name_cell_type)
         
 
         # ## Test
