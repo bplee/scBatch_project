@@ -17,17 +17,12 @@ import tensorflow as tf
 import tensorboard as tb
 tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
-# changing directory to project dir
-# print("________CHANGING WORKING DIR________")
-# print(os.getcwd())
 WORKING_DIR = "/data/leslie/bplee/scBatch"
-# os.chdir(WORKING_DIR)
-# print("\tNew working dir: %s\n" % (os.getcwd()))
-
 # adding the project dir to the path to import relevant modules below
-print("________CHANGING PATH_________")
-sys.path.append(WORKING_DIR)
-print("\tWorking dir appended to Sys path.")
+if WORKING_DIR not in sys.path:
+    print("________CHANGING PATH_________")
+    sys.path.append(WORKING_DIR)
+    print("\tWorking dir appended to Sys path.")
 
 from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 

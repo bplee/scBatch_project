@@ -4,13 +4,12 @@ import sys
 import numpy as np
 import pandas as pd
 
-
-
 WORKING_DIR = "/data/leslie/bplee/scBatch"
-print("CHANGING PATH:")
-sys.path.append(WORKING_DIR)
-print("\tWorking dir appended to Sys path.")
-
+# adding the project dir to the path to import relevant modules below
+if WORKING_DIR not in sys.path:
+    print("CHANGING PATH")
+    sys.path.append(WORKING_DIR)
+    print("\tWorking dir appended to Sys path.")
 
 class PdRccAllData:
     """

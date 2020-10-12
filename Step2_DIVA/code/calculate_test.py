@@ -13,11 +13,11 @@ from sklearn.metrics import confusion_matrix
 import torch
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
-
 # adding the project dir to the path to import relevant modules below
-print("________CHANGING PATH_________")
-sys.path.append(WORKING_DIR)
-print("\tWorking dir appended to Sys path.")
+if WORKING_DIR not in sys.path:
+    print("________CHANGING PATH_________")
+    sys.path.append(WORKING_DIR)
+    print("\tWorking dir appended to Sys path.")
 
 from DIVA.dataset.rcc_loader import RccDataset
 #from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import NewRccDatasetSemi as RccDatasetSemi

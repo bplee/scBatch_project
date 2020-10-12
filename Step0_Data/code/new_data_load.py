@@ -15,10 +15,13 @@ from rpy2.robjects import pandas2ri
 # readRDS = robjects.r['readRDS']
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
-print("CHANGING PATH:")
-sys.path.append(WORKING_DIR)
+# adding the project dir to the path to import relevant modules below
+if WORKING_DIR not in sys.path:
+    print("CHANGING PATH:")
+    sys.path.append(WORKING_DIR)
+    print("\tWorking dir appended to Sys path.")
+
 from Step0_Data.code.pkl_load_data import PdRccAllData
-print("\tWorking dir appended to Sys path.")
 
 
 class NewRccDatasetSemi(data_utils.Dataset):

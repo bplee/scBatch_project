@@ -11,11 +11,11 @@ import torch.optim as optim
 import torch.utils.data as data_utils
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
-
 # adding the project dir to the path to import relevant modules below
-print("________CHANGING PATH_________")
-sys.path.append(WORKING_DIR)
-print("\tWorking dir appended to Sys path.")
+if WORKING_DIR not in sys.path:
+    print("________CHANGING PATH_________")
+    sys.path.append(WORKING_DIR)
+    print("\tWorking dir appended to Sys path.")
 
 from ForBrennan.DIVA.model.model_diva import DIVA
 #from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
