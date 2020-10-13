@@ -80,7 +80,6 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
                                     batch_indices=patient_indices,
                                     labels=cell_type_indices)
     gene_dataset.subsample_genes(x_dim)
-    subsampled_counts = gene_dataset.X
 
     # selecting all of the indices that mark our testing patient
     test_patient_inds = unwrap_list(gene_dataset.batch_indices == [test_patient])
@@ -105,7 +104,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
 
     # setting gold labels: (using names and not indices)
     cell_labels = cell_type_names[unwrap_list(gene_dataset.labels)]
-    
+
     train_adata.obs['cell_type'] = np.array(cell_labels[train_patient_inds])  # there are cell types for multiple patients so we index for the one we care about
     test_adata.obs['cell_type'] = np.array(cell_labels[test_patient_inds])
 
@@ -171,8 +170,8 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     print("Returning adata and RccDatasetSemi loader obj")
     print(f"Test Patient: {test_patient}")
     if train_patient is not None:
-        print("Train Patient: %d" % train_patient)
-    print("No. of Genes: %d" % X_DIM)
+        print(f"Train Patient: {train_patient}")
+    print(f"No. of Genes: {xdim}")
 
     return adata, data_obj
 
@@ -186,6 +185,6 @@ Ready to train scnym
 """
 
 if __name__ == "__main__":
-    adata, data_obj = get_Rcc_adata(test_patient=5, train_patient=4)
+    adata, data_obj = get_Rcc_adata(test_patient=5, train_patient=4, x_dim=784)
     print(blurb)
 
