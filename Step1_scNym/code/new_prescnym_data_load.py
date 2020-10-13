@@ -31,6 +31,11 @@ from Step0_Data.code.pkl_load_data import PdRccAllData
 
 # this is not LOG NORMALIZED!
 
+def unwrap_list(lst):
+    try:
+        return np.array([row[0] for row in lst])
+    except:
+        return lst
 
 def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     """
@@ -61,34 +66,37 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     patient_labels = data_obj.data.patient
     cell_labels = data_obj.data.cell_type
 
-    patient_names = np.unique(data_obj.data.patient)
-    cell_type_names = np.unique(data_obj.data.cell_type)
+    # patient_names = np.unique(data_obj.data.patient)
+    # cell_type_names = np.unique(data_obj.data.cell_type)
     gene_names = raw_counts.columns
 
     # getting categorical indices for patients and cell_types
-    # patient_indices, patient_names = pd.factorize(data_obj.data.patient)
-    # cell_type_indices, cell_type_names = pd.factorize(data_obj.data.cell_type)
+    patient_indices, patient_names = pd.factorize(data_obj.data.patient)
+    cell_type_indices, cell_type_names = pd.factorize(data_obj.data.cell_type)
 
     gene_dataset = GeneExpressionDataset()
-    gene_dataset.populate_from_data(X=np.array(raw_counts), gene_names=gene_names)
+    gene_dataset.populate_from_data(X=np.array(raw_counts),
+                                    gene_names=gene_names,
+                                    batch_indices=patient_indices,
+                                    labels=cell_type_indices)
     gene_dataset.subsample_genes(x_dim)
     subsampled_counts = gene_dataset.X
 
     # selecting all of the indices that mark our testing patient
-    test_patient_inds = patient_labels == patient_names[test_patient]
+    test_patient_inds = unwrap_list(gene_dataset.batch_indices == [test_patient])
     # using inds to select data for our patient
-    test_patient_data = raw_counts[test_patient_inds]
+    test_patient_data = gene_dataset.X[test_patient_inds]
 
     # if there was no training patient
     if train_patient is None:
         # training set will be all other patients
         train_patient_inds = ~test_patient_inds
-        train_patient_data = subsampled_counts[train_patient_inds]
+        train_patient_data = gene_dataset.X[train_patient_inds]
     else:
         # selecting all of the indices that mark our training patient
-        train_patient_inds = patient_labels == patient_names[train_patient]
+        train_patient_inds = unwrap_list(gene_dataset.batch_indices == [train_patient])
         # using inds to select data for our patient
-        train_patient_data = subsampled_counts[train_patient_inds]
+        train_patient_data = gene_dataset.X[train_patient_inds]
 
     # making the data obj for our training and test patient
     train_adata = anndata.AnnData(np.array(train_patient_data))
@@ -96,6 +104,8 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     test_adata = anndata.AnnData(np.array(test_patient_data))
 
     # setting gold labels: (using names and not indices)
+    cell_labels = cell_type_names[unwrap_list(gene_dataset.labels)]
+    
     train_adata.obs['cell_type'] = np.array(cell_labels[train_patient_inds])  # there are cell types for multiple patients so we index for the one we care about
     test_adata.obs['cell_type'] = np.array(cell_labels[test_patient_inds])
 
