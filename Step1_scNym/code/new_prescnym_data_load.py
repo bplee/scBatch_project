@@ -2,12 +2,15 @@ from scnym.api import scnym_api
 import torch
 import os
 import numpy as np
+import pandas as pd
 import anndata
 import sys
 import scnym
 
 import urllib
 import json
+
+from scvi.dataset import GeneExpressionDataset
 
 # allow tensorboard outputs even though TF2 is installed
 # broke the tensorboard/pytorch API
@@ -49,8 +52,6 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
             - annotations   (Same as `cell type` but all test points are 'Unlabeled')
             - batch         (boolean vector of training vs. test set)
     """
-    # getting training and testing data
-    TEST_PATIENT = test_patient
     X_DIM = x_dim # 784 is the magic number for DIVA; 16323 is the max
 
     # getting training and testing data
@@ -60,27 +61,34 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     patient_labels = data_obj.data.patient
     cell_labels = data_obj.data.cell_type
 
-    patients = np.unique(data_obj.data.patient)
-    cell_types = np.unique(data_obj.data.cell_type)
+    patient_names = np.unique(data_obj.data.patient)
+    cell_type_names = np.unique(data_obj.data.cell_type)
+    gene_names = raw_counts.columns
 
-    # need to select one patient to use as training domain:
-    TRAIN_PATIENT = train_patient  # choose {0,...,5}
+    # getting categorical indices for patients and cell_types
+    # patient_indices, patient_names = pd.factorize(data_obj.data.patient)
+    # cell_type_indices, cell_type_names = pd.factorize(data_obj.data.cell_type)
+
+    gene_dataset = GeneExpressionDataset()
+    gene_dataset.populate_from_data(X=np.array(raw_counts), gene_names=gene_names)
+    gene_dataset.subsample_genes(x_dim)
+    subsampled_counts = gene_dataset.X
 
     # selecting all of the indices that mark our testing patient
-    test_patient_inds = patient_labels == patients[TEST_PATIENT]
+    test_patient_inds = patient_labels == patient_names[test_patient]
     # using inds to select data for our patient
     test_patient_data = raw_counts[test_patient_inds]
 
     # if there was no training patient
-    if TRAIN_PATIENT is None:
+    if train_patient is None:
         # training set will be all other patients
         train_patient_inds = ~test_patient_inds
-        train_patient_data = raw_counts[train_patient_inds]
+        train_patient_data = subsampled_counts[train_patient_inds]
     else:
         # selecting all of the indices that mark our training patient
-        train_patient_inds = patient_labels == patients[TRAIN_PATIENT]
+        train_patient_inds = patient_labels == patient_names[train_patient]
         # using inds to select data for our patient
-        train_patient_data = raw_counts[train_patient_inds]
+        train_patient_data = subsampled_counts[train_patient_inds]
 
     # making the data obj for our training and test patient
     train_adata = anndata.AnnData(np.array(train_patient_data))
@@ -100,17 +108,17 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
 
 
     # getting training and testing data
-    # data_obj = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, test=True, diva=False)
+    # data_obj = RccDatasetSemi(test_patient=test_patient, x_dim=X_DIM, train=True, test=True, diva=False)
     #
     # patients = data_obj.patients
     # cell_types = data_obj.cell_types
     #
     # # need to select one patient to use as training domain:
-    # TRAIN_PATIENT = train_patient #choose {0,...,5}
+    # train_patient = train_patient #choose {0,...,5}
     #
-    # # if TRAIN_PATIENT is not None:
+    # # if train_patient is not None:
     # #     # selecting all of the indices that mark our patient of interest
-    # #     train_patient_inds = data_obj.train_domain[:,TRAIN_PATIENT] == 1
+    # #     train_patient_inds = data_obj.train_domain[:,train_patient] == 1
     # #     # using inds to select data for our patient
     # #     train_patient_data = data_obj.train_data[train_patient_inds]
     # # else:
@@ -144,16 +152,16 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     # train_adata.obs['annotations'] = train_cell_types
     # test_adata.obs['annotations'] = 'Unlabeled'
     #
-    # if TRAIN_PATIENT is not None:
-    #     train_adata = train_adata[train_adata.obs.patient == patients[TRAIN_PATIENT]]
+    # if train_patient is not None:
+    #     train_adata = train_adata[train_adata.obs.patient == patients[train_patient]]
     #
     # # concatenating data
     # adata = train_adata.concatenate(test_adata)
 
     print("Returning adata and RccDatasetSemi loader obj")
-    print(f"Test Patient: {TEST_PATIENT}")
-    if TRAIN_PATIENT is not None:
-        print("Train Patient: %d" % TRAIN_PATIENT)
+    print(f"Test Patient: {test_patient}")
+    if train_patient is not None:
+        print("Train Patient: %d" % train_patient)
     print("No. of Genes: %d" % X_DIM)
 
     return adata, data_obj
@@ -168,6 +176,6 @@ Ready to train scnym
 """
 
 if __name__ == "__main__":
-    adata, data_obj = get_Rcc_adata(test_patient=5)
+    adata, data_obj = get_Rcc_adata(test_patient=5, train_patient=4)
     print(blurb)
 
