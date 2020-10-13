@@ -78,7 +78,8 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     gene_dataset.populate_from_data(X=np.array(raw_counts),
                                     gene_names=gene_names,
                                     batch_indices=patient_indices,
-                                    labels=cell_type_indices)
+                                    labels=cell_type_indices,
+                                    remap_attributes=False)
     gene_dataset.subsample_genes(x_dim)
 
     # selecting all of the indices that mark our testing patient
@@ -171,7 +172,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     print(f"Test Patient: {test_patient}")
     if train_patient is not None:
         print(f"Train Patient: {train_patient}")
-    print(f"No. of Genes: {xdim}")
+    print(f"No. of Genes: {x_dim}")
 
     return adata, data_obj
 
