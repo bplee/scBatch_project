@@ -4,8 +4,6 @@ import os
 import numpy as np
 import anndata
 import sys
-import scanpy as sc
-import pandas as pd
 import scnym
 
 import urllib
@@ -73,7 +71,9 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     # using inds to select data for our patient
     test_patient_data = raw_counts[test_patient_inds]
 
+    # if there was no training patient
     if TRAIN_PATIENT is None:
+        # training set will be all other patients
         train_patient_inds = ~test_patient_inds
         train_patient_data = raw_counts[train_patient_inds]
     else:
