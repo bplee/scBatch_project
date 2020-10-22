@@ -29,15 +29,13 @@ from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.pkl_load_data import PdRccAllData
 
 
-# this is not LOG NORMALIZED!
-
 def unwrap_list(lst):
     try:
         return np.array([row[0] for row in lst])
     except:
         return lst
 
-def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
+def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True):
     """
 
     Parameters
@@ -57,14 +55,18 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
             - annotations   (Same as `cell type` but all test points are 'Unlabeled')
             - batch         (boolean vector of training vs. test set)
     """
-    X_DIM = x_dim # 784 is the magic number for DIVA; 16323 is the max
+    # 784 is the magic x_dim number for DIVA; 16323 is the max
 
     # getting training and testing data
     data_obj = PdRccAllData()
 
     raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
+    raw_counts = np.array(raw_counts)
     patient_labels = data_obj.data.patient
     cell_labels = data_obj.data.cell_type
+
+    if log_norm:
+        raw_counts = np.log(raw_counts + 1)
 
     # patient_names = np.unique(data_obj.data.patient)
     # cell_type_names = np.unique(data_obj.data.cell_type)
@@ -75,7 +77,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323):
     cell_type_indices, cell_type_names = pd.factorize(data_obj.data.cell_type)
 
     gene_dataset = GeneExpressionDataset()
-    gene_dataset.populate_from_data(X=np.array(raw_counts),
+    gene_dataset.populate_from_data(X=raw_counts,
                                     gene_names=gene_names,
                                     batch_indices=patient_indices,
                                     labels=cell_type_indices,

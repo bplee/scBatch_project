@@ -84,7 +84,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         n_data_all = raw_counts.shape[0]
         n_gene_all = raw_counts.shape[1]
 
-        print('Re-writing indices')
+        print('Re-writing labels and patients as indices')
 
         labels = np.zeros([n_data_all, 1])
         for i, c in enumerate(cell_type_names):
