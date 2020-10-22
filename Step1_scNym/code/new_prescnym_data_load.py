@@ -61,16 +61,17 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True):
     data_obj = PdRccAllData()
 
     raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
-    raw_counts = np.array(raw_counts)
+
     patient_labels = data_obj.data.patient
     cell_labels = data_obj.data.cell_type
-
-    if log_norm:
-        raw_counts = np.log(raw_counts + 1)
 
     # patient_names = np.unique(data_obj.data.patient)
     # cell_type_names = np.unique(data_obj.data.cell_type)
     gene_names = raw_counts.columns
+
+    raw_counts = np.array(raw_counts)
+    if log_norm:
+        raw_counts = np.log(raw_counts + 1)
 
     # getting categorical indices for patients and cell_types
     patient_indices, patient_names = pd.factorize(data_obj.data.patient)
