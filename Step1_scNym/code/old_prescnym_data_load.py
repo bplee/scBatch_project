@@ -93,3 +93,57 @@ Ready to train scnym
 print(blurb)
 print("Test patient: %d" %TEST_PATIENT)
 print("Train patient: %d" %TRAIN_PATIENT)
+
+# THE FOLLOWING IS CODE FROM new_prescnym_data_load.py THAT I PROBABLY WON'T USE ANY MORE
+# BUT DIDN'T WANT TO DITCH
+
+# getting training and testing data
+# data_obj = RccDatasetSemi(test_patient=test_patient, x_dim=X_DIM, train=True, test=True, diva=False)
+#
+# patients = data_obj.patients
+# cell_types = data_obj.cell_types
+#
+# # need to select one patient to use as training domain:
+# train_patient = train_patient #choose {0,...,5}
+#
+# # if train_patient is not None:
+# #     # selecting all of the indices that mark our patient of interest
+# #     train_patient_inds = data_obj.train_domain[:,train_patient] == 1
+# #     # using inds to select data for our patient
+# #     train_patient_data = data_obj.train_data[train_patient_inds]
+# # else:
+# #     train_patient_data = data_obj.train_data
+#
+# # making the data obj for our training and test patient
+# train_adata = anndata.AnnData(np.array(data_obj.train_data))
+# test_adata = anndata.AnnData(np.array(data_obj.test_data))
+#
+# # converting 1 hot patient vectors into ints
+# train_int_patients = np.array(data_obj.train_domain).dot(np.arange(len(data_obj.train_domain[0]))).astype(int)
+# test_int_patients = np.array(data_obj.test_domain).dot(np.arange(len(data_obj.test_domain[0]))).astype(int)
+# # creating vectors of patient names (strings):
+# train_patients = patients[train_int_patients]
+# test_patients = patients[test_int_patients]
+# # setting patient names: (using names and not indices)
+# train_adata.obs['patient'] = train_patients
+# test_adata.obs['patient'] = test_patients
+#
+# # converting 1 hot vectors into int labels (for cell types)
+# train_int_labels = np.array(data_obj.train_labels).dot(np.arange(len(data_obj.train_labels[0]), dtype=int))
+# test_int_labels = np.array(data_obj.test_labels).dot(np.arange(len(data_obj.test_labels[0]), dtype=int))
+# # creating vectors of cell types (strings):
+# train_cell_types = cell_types[train_int_labels]
+# test_cell_types = cell_types[test_int_labels]
+# # setting gold labels: (using names and not indices)
+# train_adata.obs['cell_type'] = train_cell_types
+# test_adata.obs['cell_type'] = test_cell_types
+#
+# # setting the semi_supervised labels:
+# train_adata.obs['annotations'] = train_cell_types
+# test_adata.obs['annotations'] = 'Unlabeled'
+#
+# if train_patient is not None:
+#     train_adata = train_adata[train_adata.obs.patient == patients[train_patient]]
+#
+# # concatenating data
+# adata = train_adata.concatenate(test_adata)
