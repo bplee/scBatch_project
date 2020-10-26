@@ -4,6 +4,7 @@ import os
 import numpy as np
 import anndata
 import sys
+from scvi.dataset import GeneExpressionDataset
 import scanpy as sc
 import pandas as pd
 import scnym
@@ -30,54 +31,7 @@ if WORKING_DIR not in sys.path:
 # from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.pkl_load_data import PdRccAllData
 
-# this is not LOG NORMALIZED!
-
-# getting training and testing data
-TEST_PATIENT = 4
-X_DIM = 10000# 784 is the magic number for DIVA
-
-# getting training and testing data
-# train = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=True, diva=False)
-# test = RccDatasetSemi(test_patient=TEST_PATIENT, x_dim=X_DIM, train=False, diva=False)
-data_obj = PdRccAllData()
-
-raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
-patient_labels = data_obj.data.patient
-cell_labels = data_obj.data.cell_type
-
-patients = np.unique(data_obj.data.patient)
-cell_types = np.unique(data_obj.data.cell_type)
-
-# need to select one patient to use as training domain:
-TRAIN_PATIENT = 3 #choose {0,...,5}
-
-# selecting all of the indices that mark our training patient
-train_patient_inds = patient_labels == patients[TRAIN_PATIENT]
-# using inds to select data for our patient
-train_patient_data = raw_counts[train_patient_inds]
-
-# selecting all of the indices that mark our testing patient
-test_patient_inds = patient_labels == patients[TEST_PATIENT]
-# using inds to select data for our patient
-test_patient_data = raw_counts[test_patient_inds]
-
-
-# making the data obj for our training and test patient
-train_adata = anndata.AnnData(np.array(train_patient_data))
-# train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
-test_adata = anndata.AnnData(np.array(test_patient_data))
-
-# setting gold labels: (using names and not indices)
-train_adata.obs['cell_type'] = cell_labels[train_patient_inds] # there are cell types for multiple patients so we index for the one we care about
-test_adata.obs['cell_type'] = cell_labels[test_patient_inds]
-
-# setting the semi_supervised labels:
-train_adata.obs['annotations'] = cell_labels[train_patient_inds]
-test_adata.obs['annotations'] = 'Unlabeled'
-
-
-# concatenating data
-#adata = train_adata.concatenate(test_adata)
+from new_prescnym_data_load import get_Rcc_adata
 
 # to balance the test distribution
 def get_balanced_classes(adata):
@@ -102,41 +56,139 @@ def get_balanced_classes(adata):
         rtn.extend(n_inds)
     return adata[rtn,:]
 
-# TODO: shouldnt do this re naming, should just change the test/train patients
-balanced_train_adata = get_balanced_classes(test_adata)
-print("created balanced_train_adata from test_adata")
 
-balanced_test_adata = get_balanced_classes(train_adata)
-print("created balanced_test_adata from train_adata")
+def train_scnym_model(adata, outpath,
+                config='no_new_identity',
+                groupby='annotations'):
+    """
+    Runs scnym training procedure
+
+    Parameters
+    ----------
+    adata : AnnData obj
+        data object holding LOG NORMALIZED counts, labels, and domain (patient, binary labels)
+    outpath : str
+        file path to directory to save output to (doesn't have to exist) (e.g. `./201025_scnym_test_output')
+    config : str, optional
+        allows user to change different modes
+        (default is 'no_new_identity', ie. not expecting any unseen cell types)
+    groupby : str, optional
+        column in adata.obs where training labels are specified, and test labels are set to 'Unlabeled'
+        (default is 'annotations')
+
+    Returns
+    -------
+    None, trains an scnym model and saves output to outpath
+    """
+
+    scnym_api(adata=adata,
+              task='train',
+              config=config,
+              out_path=outpath,
+              groupby=groupby)
+
+def predict_from_scnym_model(adata, trained_model,
+                     key_added='scNym',
+                     config='no_new_identity'):
+    """
+    Makes cell type predictions for a matrix of counts from previously trained scnym model
+
+    Parameters
+    ----------
+    adata : AnnData obj
+        matrix of counts stored in adata.X with
+    trained_model : str
+        filepath to directory with a previously trained model
+    key_added : str, optional
+        name of column to be added to adata with predictions
+        (default is 'scNym')
+    config : str, optional
+        allows user to change different modes
+        (default is 'no_new_identity', ie. not expecting any unseen cell types)
+
+    Returns
+    -------
+    None,
+        adds new column to adata object with column name `key_added`
+
+    """
+
+    scnym_api(
+        adata=adata,
+        task='predict',
+        key_added=key_added,
+        config=config,
+        trained_model=trained_model
+    )
+
+def plot_scnym_umap(adata, use_rep='X_scnym', color_labeling='scNym'):
+    """
+    Plots umap embedding, colored by choice of labling
+
+    Parameters
+    ----------
+    adata : AnnData obj
+        post prediction, ie. `X_scnym`
+    use_rep : str, optional
+        raw vector data that you want to create a umap embedding for (needs to be in
+    color_labeling : str, optional
+
+    Returns
+    -------
+
+    """
+    sc.pp.neighbors(adata, use_rep=use_rep, n_neighbors=30)
+    sc.tl.umap(adata, min_dist=.3)
+    # the following are the scnym internal embeddings colored by batch and cell type
+    sc.pl.umap(adata, color=color_labeling, size=5, alpha=.2, save='scnym_embedding_batch.png')
+
+if __name__ == "__main__":
+    print(f"Current Working Dir: {os.getcwd()}")
+    outpath = "./201025_scnym_temp_output"
+
+    adata, data_obj = get_Rcc_adata(test_patient=5, train_patient=4, x_dim=784)
+    train_scnym_model(adata, outpath)
+    predict_from_scnym_model(adata, outpath)
+    
+
+# old balancing classes for scnym code
+# TODO: shouldnt do this re naming, should just change the test/train patients
+# balanced_train_adata = get_balanced_classes(test_adata)
+# print("created balanced_train_adata from test_adata")
+#
+# balanced_test_adata = get_balanced_classes(train_adata)
+# print("created balanced_test_adata from train_adata")
 
 
 #fixing annotations because we switched the train and test sets
-balanced_train_adata.obs.annotations = balanced_train_adata.obs.cell_type
-balanced_test_adata.obs.annotations = "Unlabeled"
+# balanced_train_adata.obs.annotations = balanced_train_adata.obs.cell_type
+# balanced_test_adata.obs.annotations = "Unlabeled"
+#
+# adata = balanced_train_adata.concatenate(balanced_test_adata)
 
-adata = balanced_train_adata.concatenate(balanced_test_adata)
-
+# old hand coded training code
 # training scnym
-scnym_api(adata=adata,
-          task='train',
-          config='no_new_identity',
-          out_path='./scnym_test_output',  # this is going in WORKING DIR
-          groupby='annotations')
-print("Done training. Now for prediction")
-scnym_api(
-    adata=adata,
-    task='predict',
-    key_added='scNym',
-    config='no_new_identity',
-    trained_model='./scnym_test_output'
-)
+# scnym_api(adata=adata,
+#           task='train',
+#           config='no_new_identity',
+#           out_path='./scnym_test_output',  # this is going in WORKING DIR
+#           groupby='annotations')
+# print("Done training. Now for prediction")
+# scnym_api(
+#     adata=adata,
+#     task='predict',
+#     key_added='scNym',
+#     config='no_new_identity',
+#     trained_model='./scnym_test_output'
+# )
 
-sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
-sc.tl.umap(adata, min_dist=.3)
-# the following are the scnym internal embeddings colored by batch and cell type
-sc.pl.umap(adata, color='batch', size=5, alpha=.2, save='scnym_embedding_batch.png') 
-sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='scnym_embedding_celltypes.png')
-
-sc.pp.neighbors(adata, use_rep='X', n_neighbors=30)
-sc.tl.umap(adata, min_dist=.3)
-sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='scnym_og_data_umap_celltype.png')
+# sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
+# sc.tl.umap(adata, min_dist=.3)
+# # the following are the scnym internal embeddings colored by batch and cell type
+# sc.pl.umap(adata, color='batch', size=5, alpha=.2, save='scnym_embedding_batch.png')
+# sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='scnym_embedding_celltypes.png')
+# # sc.pl.umap(adata, color='X_scnym', size=5, alpha=.2, save='201022_scnym_embedding_celltypes.png')
+#
+# sc.pp.neighbors(adata, use_rep='X', n_neighbors=30)
+# sc.tl.umap(adata, min_dist=.3)
+# sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='scnym_og_data_umap_celltype.png')
