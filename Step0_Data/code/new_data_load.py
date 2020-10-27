@@ -25,11 +25,12 @@ from Step0_Data.code.pkl_load_data import PdRccAllData
 
 
 class NewRccDatasetSemi(data_utils.Dataset):
-    def __init__(self, test_patient, x_dim, train=True):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
         self.init_time = time.time()
+        self.train_patient = train_patient
 
         if self.train:
             self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
@@ -124,7 +125,10 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         print('Making tensor batches')
 
-        idx_batch_train = ~(gene_dataset.batch_indices == self.test_patient).ravel()
+        if self.train_patient is None:
+            idx_batch_train = ~(gene_dataset.batch_indices == self.test_patient).ravel()
+        else:
+            idx_batch_train = (gene_dataset.batch_indices == self.train_patient).ravel()
         idx_batch_test = (gene_dataset.batch_indices == self.test_patient).ravel()
 
         batch_train = gene_dataset.batch_indices[idx_batch_train].ravel()

@@ -42,9 +42,14 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True):
     ----------
     test_patient: int
         integer in {0,..,5} (for old version of data)
-    train_patient: int
-        (default: None) int in {0,...,5} specifying which patient you want
+    train_patient: int, optional
+        (default is None) int in {0,...,5} specifying which patient you want
         default is all
+    x_dim : int, optional
+        (default is 16323, max number of genes)
+    log_norm : bool, optional
+        (default is True) whether or not you want to log normalize the data
+        (always should for scNym)
 
     Returns
     -------
@@ -77,6 +82,8 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True):
     patient_indices, patient_names = pd.factorize(data_obj.data.patient)
     cell_type_indices, cell_type_names = pd.factorize(data_obj.data.cell_type)
 
+    # subsampling genes before selecting patient indices
+    # TODO: I actually think I might want to do this in the other way, but the diva data load works in this way
     gene_dataset = GeneExpressionDataset()
     gene_dataset.populate_from_data(X=raw_counts,
                                     gene_names=gene_names,
