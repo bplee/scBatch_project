@@ -72,8 +72,6 @@ class pzy(nn.Module):
         self.fc22[0].bias.data.zero_()
 
     def forward(self, y):
-        print("\nmodel_diva.py line 75\n")
-        print(f"y.type(): {y.type()}")
         hidden = self.fc1(y)
         zy_loc = self.fc21(hidden)
         zy_scale = self.fc22(hidden) + 1e-7
@@ -261,10 +259,6 @@ class DIVA(nn.Module):
         if self.zx_dim != 0:
             zx_p_loc, zx_p_scale = torch.zeros(zd_p_loc.size()[0], self.zx_dim).cuda(),\
                                    torch.ones(zd_p_loc.size()[0], self.zx_dim).cuda()
-        print("\nmodel_diva.py line 264:\ny.type():", y.type())
-        print("d:", d.shape, d.type())
-        print("x:", x.shape, x.type())
-        print("y:", y.shape, y.type())
         zy_p_loc, zy_p_scale = self.pzy(y) # threw an error for float vs. long here
 
         # Reparameterization trick
