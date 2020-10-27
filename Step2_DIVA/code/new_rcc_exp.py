@@ -181,7 +181,7 @@ if __name__ == "__main__":
                         help='number of classes')
     parser.add_argument('--x-dim', type=int, default=784,
                         help='input size after flattening')
-    parser.add_argument('--y-dim', type=int, default=31, # was 16 for old data
+    parser.add_argument('--y-dim', type=int, default=29, # was 16 for old data
                         help='number of classes')
     parser.add_argument('--zd-dim', type=int, default=64,
                         help='size of latent space 1')
@@ -263,6 +263,7 @@ if __name__ == "__main__":
     unsup_num = len(data_loaders['unsup'].dataset)
 
     # setup the VAE
+    # TODO: fix the y-dim arg to be whatever the input data y_dim size is
     model = DIVA(args).to(device)
     #model = MyDataParallel(model,device_ids=[0,1,2,3]).cuda()
     #model = _CustomDataParallel(model)
