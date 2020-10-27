@@ -220,8 +220,11 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = args.outpath + 'rcc_new_test_domain_' + str(args.test_patient) + '_semi_sup_seed_' + str(
-        args.seed)
+    # model_name = args.outpath + 'rcc_new_test_domain_' + str(args.test_patient) + '_semi_sup_seed_' + str(args.seed)
+    if args.train_patient is not None:
+        model_name = f"{args.outpath}rcc_new_test_domain_{args.test_patient}_train_domain_{args.train_patient}_semi_sup_seed_{args.seed}"
+    else:
+        model_name = f"{args.outpath}rcc_new_test_domain_{args.test_patient}_train_domain_ALL_semi_sup_seed_{args.seed}"
     print(model_name)
 
     # Choose training domains
@@ -233,7 +236,7 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = False
     np.random.seed(args.seed)
 
-    # Empty data loader dict
+    # Empty data loader dict763gv
     data_loaders = {}
 
     # Load supervised training
