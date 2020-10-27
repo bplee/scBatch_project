@@ -119,14 +119,14 @@ if __name__ == "__main__":
         
         # Load test
         if supervised:
-           my_dataset = RccDataset(args.test_patient, args.x_dim, train=False)
+           my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
            test_loader_sup = data_utils.DataLoader(
                      my_dataset,
                      batch_size=args.batch_size,
                      shuffle=True)
            cell_types, _ = my_dataset.cell_types_batches() 
         else:
-           my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train=False) 
+           my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
            test_loader_sup = data_utils.DataLoader(
                      my_dataset,
                      batch_size=args.batch_size,
