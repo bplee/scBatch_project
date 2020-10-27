@@ -68,8 +68,11 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, cell_t
         for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
-            save_name_pat = '_diva_new_semi_sup_train_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
-            save_name_cell_type = '_diva_new_semi_sup_train_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
+            # save_name_pat = '_diva_new_semi_sup_train_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
+            # save_name_cell_type = '_diva_new_semi_sup_train_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
+            save_name_pat = f"_diva_new_semi_sup_train_{name[i]}_by_batches_heldout_pat_{test_patient}_train_pat_{train_patient}.png"
+            save_name_cell_type = f"_diva_new_semi_sup_train_{name[i]}_by_label_heldout_pat_{test_patient}_train_pat_{train_patient}.png"
+
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color='batch', size=15, alpha=.8, save=save_name_pat)
@@ -77,13 +80,14 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, cell_t
 
 
 if __name__ == "__main__":
-    #test_patient = 5
+    test_patient = 5
     supervised = False
     seed = 0
 
-    for test_patient in range(6):
+    for train_patient in range(5):
 
-        model_name = './' + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
+        # model_name = './' + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
+        model_name = f"./rcc_new_test_domain_{test_patient}_train_domain_{train_patient}_semi_sup_seed_{seed}"
 
         model = torch.load(model_name + '.model')
         args = torch.load(model_name + '.config')
