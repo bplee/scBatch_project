@@ -173,6 +173,8 @@ if __name__ == "__main__":
     #                    help='domain used during testing')
     parser.add_argument('--test_patient', type=int, default=5,
                         help='test domain')
+    parser.add_argument('--train_patient', type=int, default=None,
+                        help='train domain')
 
     # Model
     parser.add_argument('--d-dim', type=int, default=6,
@@ -236,14 +238,14 @@ if __name__ == "__main__":
 
     # Load supervised training
     train_loader_sup = data_utils.DataLoader(
-        RccDatasetSemi(args.test_patient,
+        RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
                      train=True, x_dim=784),
         batch_size=args.batch_size,
         shuffle=True)
 
     # Load unsupervised training
     train_loader_unsup = data_utils.DataLoader(
-        RccDatasetSemi(args.test_patient,
+        RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
                      train=False, x_dim=784),
         batch_size=args.batch_size,
         shuffle=True)
