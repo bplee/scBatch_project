@@ -322,7 +322,7 @@ class DIVA(nn.Module):
             _, d_target = d.max(dim=1)
             CE_d = F.cross_entropy(d_hat, d_target, reduction='sum')
 
-            num_labels = 31
+            num_labels = self.y_dim
             # num_labels = y.shape[1]
 
             # Create labels and repeats of zy_q and qzy
