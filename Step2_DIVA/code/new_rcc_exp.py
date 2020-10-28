@@ -47,6 +47,18 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     unsup_batches = len(data_loaders["unsup"])
     batches_per_epoch = sup_batches + unsup_batches
 
+    # if sup_batches > unsup_batches:
+    #     more_batches = data_loaders["sup"]
+    #     less_batches = data_loaders["unsup"]
+    #     sup_greater = True
+    # elif unsup_batches < sup_batches:
+    #     more_batches = data_loaders["unsup"]
+    #     less_batches = data_loaders["sup"]
+    #     sup_greater = False
+    #
+    # # this will always be >= 1
+    # periodic_interval_batches = int(np.around(len(more_batches)/len(less_batches)))
+
     print("new_rcc_exp.py line 50")
     print(f"batches_per_epoch: {batches_per_epoch}")
     print(f"number of sup_batches: {sup_batches}")
@@ -69,7 +81,7 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     for i in range(batches_per_epoch):
 
         # whether this batch is supervised or not
-        is_unsupervised = (i % periodic_interval_batches == 1) and ctr_unsup < unsup_batches
+        is_unsupervised = (i % periodic_interval_batches + 1 == 0) and ctr_unsup < unsup_batches
         print(f"is_unsupervised: {is_unsupervised}")
         print(i % periodic_interval_batches)
 
