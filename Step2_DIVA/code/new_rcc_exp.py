@@ -47,6 +47,7 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     unsup_batches = len(data_loaders["unsup"])
     batches_per_epoch = sup_batches + unsup_batches
 
+    # TODO: this code expects sup_batches > unsup_batches, write to code to expect the opposite
     # if sup_batches > unsup_batches:
     #     more_batches = data_loaders["sup"]
     #     less_batches = data_loaders["unsup"]
@@ -81,7 +82,7 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     for i in range(batches_per_epoch):
 
         # whether this batch is supervised or not
-        is_unsupervised = (i % periodic_interval_batches + 1 == 0) and ctr_unsup < unsup_batches
+        is_unsupervised = (i % (periodic_interval_batches + 1) == 0) and ctr_unsup < unsup_batches
         print(f"is_unsupervised: {is_unsupervised}")
         print(i % periodic_interval_batches)
 
