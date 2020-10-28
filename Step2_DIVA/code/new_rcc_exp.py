@@ -47,6 +47,12 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     unsup_batches = len(data_loaders["unsup"])
     batches_per_epoch = sup_batches + unsup_batches
 
+    print("new_rcc_exp.py line 50")
+    print(f"batches_per_epoch: {batches_per_epoch}")
+    print(f"number of sup_batches: {sup_batches}")
+    print(f"number of unsup_batches: {unsup_batches}")
+
+
     # initialize variables to store loss values
     epoch_losses_sup = 0
     epoch_losses_unsup = 0
@@ -58,6 +64,7 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
 
     # count the number of supervised batches seen in this epoch
     ctr_unsup = 0
+    ctr_sup = 0
     for i in range(batches_per_epoch):
 
         # whether this batch is supervised or not
@@ -66,10 +73,17 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
 
         # extract the corresponding batch
         if is_unsupervised:
-            (x, y, d) = next(unsup_iter)
             ctr_unsup += 1
+            if ctr_unsup > unsup_batches:
+                print("hey we're going over, im breaking this loop")
+                break
+            (x, y, d) = next(unsup_iter)
 
         else:
+            ctr_sup += 1
+            if ctr_sup > sup_batches:
+                print("hey we're going over, im breaking this loop")
+                break
             (x, y, d) = next(sup_iter)
 
         # To device
@@ -246,7 +260,7 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
         shuffle=True)
 
-    # Load unsupervised training
+    # Load unsupervised training (test set with no labels)
     train_loader_unsup = data_utils.DataLoader(
         RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
                      train=False, x_dim=784),
