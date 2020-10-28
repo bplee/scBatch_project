@@ -51,6 +51,7 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     print(f"batches_per_epoch: {batches_per_epoch}")
     print(f"number of sup_batches: {sup_batches}")
     print(f"number of unsup_batches: {unsup_batches}")
+    print(f"periodic_interval_batches: {periodic_interval_batches}")
 
 
     # initialize variables to store loss values
@@ -69,14 +70,15 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
 
         # whether this batch is supervised or not
         is_unsupervised = (i % periodic_interval_batches == 1) and ctr_unsup < unsup_batches
-
+        print(f"is_unsupervised: {is_unsupervised}")
+        print(i % periodic_interval_batches)
 
         # extract the corresponding batch
         if is_unsupervised:
             ctr_unsup += 1
             if ctr_unsup > unsup_batches:
                 print(f"ctr_unsup > unsup_batches, {ctr_unsup} > {unsup_batches}")
-                print(f"i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
+                print(f" i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
                 break
             (x, y, d) = next(unsup_iter)
 
@@ -84,7 +86,7 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
             ctr_sup += 1
             if ctr_sup > sup_batches:
                 print(f"ctr_sup > sup_batches, {ctr_sup} > {sup_batches}")
-                print(f"i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
+                print(f" i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
                 break
             (x, y, d) = next(sup_iter)
 
