@@ -257,7 +257,7 @@ if __name__ == "__main__":
     test_patient = 5
 
     train_loader = data_utils.DataLoader(
-        RccDataset(test_patient, train=True),
+        RccDatasetSemi(test_patient, train=True),
         batch_size=100,
         shuffle=False)
 
@@ -269,7 +269,7 @@ if __name__ == "__main__":
 
 
     test_loader = data_utils.DataLoader(
-        RccDataset(test_patient, train=False),
+        RccDatasetSemi(test_patient, train=False),
         batch_size=100,
         shuffle=False)
 

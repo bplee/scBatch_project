@@ -171,6 +171,7 @@ class RccDataset(data_utils.Dataset):
 if __name__ == "__main__":
 
     seed = 1
+    x_dim = 784
 
     torch.manual_seed(seed)
     torch.backends.cudnn.benchmark = False
@@ -179,7 +180,7 @@ if __name__ == "__main__":
     test_patient = 5
 
     train_loader = data_utils.DataLoader(
-        RccDataset(test_patient, train=True),
+        RccDataset(test_patient, x_dim, train=True),
         batch_size=100,
         shuffle=False)
 
@@ -191,7 +192,7 @@ if __name__ == "__main__":
 
 
     test_loader = data_utils.DataLoader(
-        RccDataset(test_patient, train=False),
+        RccDataset(test_patient, x_dim, train=False),
         batch_size=100,
         shuffle=False)
 
