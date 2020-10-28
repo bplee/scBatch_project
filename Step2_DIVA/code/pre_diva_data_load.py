@@ -31,10 +31,10 @@ train_patient = 2
 # train_loader_unsup = RccDatasetSemi(test_patient,
 #                  train=False, x_dim=784)
 
-new_train_loader_sup = NewRccDatasetSemi(test_patient, train_patient=train_patient
+new_train_loader_sup = NewRccDatasetSemi(test_patient, train_patient=train_patient,
                  train=True, x_dim=784)
-new_train_loader_unsup = NewRccDatasetSemi(test_patient, train_patient=train_patient
+new_train_loader_unsup = NewRccDatasetSemi(test_patient, train_patient=train_patient,
                  train=False, x_dim=784)
 
 data_loaders = {}
-data_loaders['sup'], data_loaders['unsup'] = data_utils.DataLoader(train_loader_sup, batch_size=1), data_utils.DataLoader(train_loader_unsup, batch_size=1)
+data_loaders['sup'], data_loaders['unsup'] = data_utils.DataLoader(new_train_loader_sup, batch_size=100), data_utils.DataLoader(new_train_loader_unsup, batch_size=100)
