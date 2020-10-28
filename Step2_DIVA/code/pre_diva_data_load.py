@@ -23,17 +23,17 @@ from Step0_Data.code.new_data_load import NewRccDatasetSemi
 
 test_patient =5
 batch_size=100
+train_patient = 2
 
 
+# train_loader_sup = RccDatasetSemi(test_patient,
+#                  train=True, x_dim=784)
+# train_loader_unsup = RccDatasetSemi(test_patient,
+#                  train=False, x_dim=784)
 
-train_loader_sup = RccDatasetSemi(test_patient,
+new_train_loader_sup = NewRccDatasetSemi(test_patient, train_patient=train_patient
                  train=True, x_dim=784)
-train_loader_unsup = RccDatasetSemi(test_patient,
-                 train=False, x_dim=784)
-
-new_train_loader_sup = NewRccDatasetSemi(test_patient,
-                 train=True, x_dim=784)
-new_train_loader_unsup = NewRccDatasetSemi(test_patient,
+new_train_loader_unsup = NewRccDatasetSemi(test_patient, train_patient=train_patient
                  train=False, x_dim=784)
 
 data_loaders = {}
