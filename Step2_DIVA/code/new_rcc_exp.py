@@ -60,13 +60,6 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     # # this will always be >= 1
     # periodic_interval_batches = int(np.around(len(more_batches)/len(less_batches)))
 
-    print("new_rcc_exp.py line 50")
-    print(f"batches_per_epoch: {batches_per_epoch}")
-    print(f"number of sup_batches: {sup_batches}")
-    print(f"number of unsup_batches: {unsup_batches}")
-    print(f"periodic_interval_batches: {periodic_interval_batches}")
-
-
     # initialize variables to store loss values
     epoch_losses_sup = 0
     epoch_losses_unsup = 0
@@ -83,8 +76,6 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
 
         # whether this batch is supervised or not
         is_unsupervised = (i % (periodic_interval_batches + 1) == 0) and ctr_unsup < unsup_batches
-        print(f"is_unsupervised: {is_unsupervised}")
-        print(i % periodic_interval_batches)
 
         # extract the corresponding batch
         if is_unsupervised:
