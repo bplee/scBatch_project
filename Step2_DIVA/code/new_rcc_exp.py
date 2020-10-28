@@ -75,14 +75,16 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
         if is_unsupervised:
             ctr_unsup += 1
             if ctr_unsup > unsup_batches:
-                print("hey we're going over, im breaking this loop")
+                print(f"ctr_unsup > unsup_batches, {ctr_unsup} > {unsup_batches}")
+                print(f"i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
                 break
             (x, y, d) = next(unsup_iter)
 
         else:
             ctr_sup += 1
             if ctr_sup > sup_batches:
-                print("hey we're going over, im breaking this loop")
+                print(f"ctr_sup > sup_batches, {ctr_sup} > {sup_batches}")
+                print(f"i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
                 break
             (x, y, d) = next(sup_iter)
 
