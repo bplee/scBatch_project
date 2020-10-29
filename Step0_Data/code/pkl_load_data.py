@@ -93,8 +93,8 @@ class PdRccAllData:
         return data_df[bool_subset]
 
     def get_label_counts(self):
-        return data_obj.data[["patient", "cell_type"]].value_counts(sort=False).to_frame().pivot_table(index="patient",
-                                                                                                columns="cell_type")
+        return self.data[["patient", "cell_type"]].value_counts(sort=False).to_frame().pivot_table(index="patient",
+                                                                                                columns="cell_type").T
 
 if __name__ == "__main__":
 
