@@ -92,7 +92,9 @@ class PdRccAllData:
         bool_subset = data_df.cell_type.isin(cell_types_to_keep)
         return data_df[bool_subset]
 
-
+    def get_label_counts(self):
+        return data_obj.data[["patient", "cell_type"]].value_counts(sort=False).to_frame().pivot_table(index="patient",
+                                                                                                columns="cell_type")
 
 if __name__ == "__main__":
 
