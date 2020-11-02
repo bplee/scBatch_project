@@ -22,7 +22,7 @@ print("\tWorking dir appended to Sys path.")
 from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
-def plot_umap(train_loader, test_loader, model, batch_size, test_patient, cell_types, patients):
+def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_patient, cell_types, patients):
     model.eval()
     """
     get the latent factors and plot the UMAP plots
@@ -70,8 +70,13 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, cell_t
             _.obs['cell_type'] = cell_types[labels_y]
             # save_name_pat = '_diva_new_semi_sup_train_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
             # save_name_cell_type = '_diva_new_semi_sup_train_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
-            save_name_pat = f"_diva_new_semi_sup_train_{name[i]}_by_batches_heldout_pat_{test_patient}_train_pat_{train_patient}.png"
-            save_name_cell_type = f"_diva_new_semi_sup_train_{name[i]}_by_label_heldout_pat_{test_patient}_train_pat_{train_patient}.png"
+            if train_patient is not None:
+                save_name_pat = f"_diva_new_semi_sup_train_{name[i]}_by_batches_heldout_pat_{test_patient}_train_pat_{train_patient}.png"
+                save_name_cell_type = f"_diva_new_semi_sup_train_{name[i]}_by_label_heldout_pat_{test_patient}_train_pat_{train_patient}.png"
+            else:
+                save_name_pat = f"_diva_new_semi_sup_train_{name[i]}_by_batches_heldout_pat_{test_patient}_train_pat_ALL.png"
+                save_name_cell_type = f"_diva_new_semi_sup_train_{name[i]}_by_label_heldout_pat_{test_patient}_train_pat_ALL.png"
+
 
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
@@ -118,4 +123,4 @@ if __name__ == "__main__":
         torch.backends.cudnn.benchmark = False
         np.random.seed(args.seed)
 
-        plot_umap(train_loader, test_loader, model, args.batch_size, test_patient, cell_types, patients)
+        plot_umap(train_loader, test_loader, model, args.batch_size, test_patient, train_patient, cell_types, patients)
