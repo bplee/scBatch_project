@@ -114,7 +114,11 @@ class PdRccAllData:
         pandas df with specified cell types removed
 
         """
-
+        for type in lst[:]:
+            if type not in np.unique(df.data.cell_type):
+                print(f"{type} not found in data frame, ignoring.")
+                lst.remove(type)
+        print("Removing {lst} cell types from data")
         bool_subset = ~df.cell_type.isin(lst)  # getting all the indices that are NOT in the lst
         return df[bool_subset]
 
