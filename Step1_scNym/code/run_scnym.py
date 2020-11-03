@@ -125,6 +125,7 @@ def predict_from_scnym_model(adata, trained_model,
 
 def get_accuracies(adata, key_added="scNym"):
     """
+    Used to get the accuracy and weighted accuracy of scnym predictions
 
     Parameters
     ----------
@@ -142,7 +143,7 @@ def get_accuracies(adata, key_added="scNym"):
     """
     cell_types = np.unique(adata.obs.cell_type)
     test_indices = adata.obs.batch == "1"
-    preds = adata.obs.key_added[test_indices]
+    preds = adata.obs[key_added][test_indices]
     golden_labels = adata.obs.cell_type[test_indices]
 
     preds_ints = np.empty(len(preds))
