@@ -8,6 +8,8 @@ from scvi.dataset import GeneExpressionDataset
 import scanpy as sc
 import pandas as pd
 import scnym
+from sklearn.metrics import confusion_matrix
+
 
 import urllib
 import json
@@ -121,17 +123,64 @@ def predict_from_scnym_model(adata, trained_model,
         trained_model=trained_model
     )
 
-def plot_scnym_umap(adata, use_rep='X_scnym', color_labeling='scNym'):
+def get_accuracies(adata, key_added="scNym"):
+    """
+
+    Parameters
+    ----------
+    adata : annData object
+        assumes already run a prediction
+
+    key_added : str
+        default is "scNym"
+        this is the name of the column in adata.obs with the annotations
+
+    Returns
+    -------
+    tuple: accuracy and weighted accuracy of the predictions
+
+    """
+    cell_types = np.unique(adata.obs.cell_type)
+    test_indices = adata.obs.batch == "1"
+    preds = adata.obs.key_added[test_indices]
+    golden_labels = adata.obs.cell_type[test_indices]
+
+    preds_ints = np.empty(len(preds))
+    golden_labels_ints = np.empty(len(golden_labels))
+
+    for i, c in enumerate(cell_types):
+        idx_preds = np.where(preds == c)[0]
+        preds_ints[idx_preds] = i
+        idx_labels = np.where(golden_labels == c)
+        golden_labels_ints[idx_labels] = i
+
+    accuracy = sum(preds_ints == golden_labels_ints)/len(preds)
+    cm = confusion_matrix(golden_labels_ints, preds_ints)
+    cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    weighted_accuracy = np.mean(np.diag(cm_norm))
+
+    return accuracy, weighted_accuracy
+
+
+
+def plot_scnym_umap(adata, save_name='_test_scnym_embedding.png', use_rep='X_scnym', color_labeling='scNym'):
     """
     Plots umap embedding, colored by choice of labling
 
     Parameters
     ----------
     adata : AnnData obj
-        post prediction, ie. `X_scnym`
+        needs to be post prediction, ie. `X_scnym` is stored in adata
     use_rep : str, optional
-        raw vector data that you want to create a umap embedding for (needs to be in
+        raw vector data that you want to create a umap embedding for (needs to be in adata)
+        default is X_scnym (the embedding representation of the log normalized counts
     color_labeling : str, optional
+        color that needs t
+        default is 'scNym' as `predict_from_scnym_model` has 'scNym' as default for `key_added` param
+    save_name : str, optional
+        default is 'scnym_embedding.png'
+        should change name to represent the labeling color
+        this saves automatically to ./figures/umapscnym_embedding.png [sic]
 
     Returns
     -------
@@ -139,17 +188,24 @@ def plot_scnym_umap(adata, use_rep='X_scnym', color_labeling='scNym'):
     """
     sc.pp.neighbors(adata, use_rep=use_rep, n_neighbors=30)
     sc.tl.umap(adata, min_dist=.3)
-    # the following are the scnym internal embeddings colored by batch and cell type
-    sc.pl.umap(adata, color=color_labeling, size=5, alpha=.2, save='scnym_embedding_batch.png')
+    sc.pl.umap(adata, color=color_labeling, size=5, alpha=.2, save='_test_scnym_embedding_batch.png')
 
 if __name__ == "__main__":
     print(f"Current Working Dir: {os.getcwd()}")
     outpath = "./201025_scnym_temp_output"
 
-    adata, data_obj = get_Rcc_adata(test_patient=5, train_patient=4, x_dim=784)
+    train_pat = 4
+    test_pat = 5
+
+    adata, data_obj = get_Rcc_adata(test_patient=test_pat, train_patient=train_pat, x_dim=784)
+    print(f"Training scNym model off training patient {train_pat}, with test patient {test_pat}")
     train_scnym_model(adata, outpath)
-    predict_from_scnym_model(adata, outpath)
-    
+    print(f"Saved model to {outpath}")
+    print(f"Predicting training and testing set")
+    predict_from_scnym_model(adata, trained_model=outpath)
+    plot_scnym_umap(adata, )
+    #TODO: finish coding up the umap save fig stuff
+
 
 # old balancing classes for scnym code
 # TODO: shouldnt do this re naming, should just change the test/train patients
