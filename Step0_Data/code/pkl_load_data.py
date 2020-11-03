@@ -19,17 +19,21 @@ class PdRccAllData:
 
     same_cell_types is used for only getting cells such that each patient has the same label set
     """
-    def __init__(self, train=True, take_cell_label_intersection=True,
+    def __init__(self, take_cell_label_intersection=True, labels_to_remove=None,
                  pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/201002_6pat_proto4_raw_counts.pkl'):
         self.pkl_path = pkl_path
-        self.train = train
         self.take_cell_label_intersection = take_cell_label_intersection
+        self.labels_to_remove = labels_to_remove
 
         self.init_time = time.time()
         self.data = self._load_data()
         if self.take_cell_label_intersection:
             print("Subsetting for labels that are present in every patient")
             self.data = self.ssl_label_data_clean(self.data)
+
+        if self.labels_to_remove is not None:
+            print(f"Attempting to remove {len(self.labels_to_remove)} specified labels")
+            self.data = self.remove_cell_types(self.data, self.labels_to_remove)
         self.load_time = time.time()
         print(f"Loading time: {self.load_time - self.init_time}")
 
@@ -77,7 +81,8 @@ class PdRccAllData:
 
         Parameters
         ----------
-        data_df
+        data_df : pandas df
+            assumes certain columns specific to the construction of this data obj
 
         Returns
         -------
@@ -91,6 +96,28 @@ class PdRccAllData:
         print(f"Reducing total number of labels from {init_num_labels} to {len(cell_types_to_keep)}.")
         bool_subset = data_df.cell_type.isin(cell_types_to_keep)
         return data_df[bool_subset]
+
+    @staticmethod
+    def remove_cell_types(df, lst):
+        """
+
+        Parameters
+        ----------
+        df : pandas df
+            assumes certain columns specific to the construction of this data obj
+
+        lst : list
+            list of cell type strings to remove from the dataset
+
+        Returns
+        -------
+        pandas df with specified cell types removed
+
+        """
+
+        bool_subset = ~df.cell_type.isin(lst)  # getting all the indices that are NOT in the lst
+        return df[bool_subset]
+
 
     def get_label_counts(self):
         return self.data[["patient", "cell_type"]].value_counts(sort=False).to_frame().pivot_table(index="patient",
