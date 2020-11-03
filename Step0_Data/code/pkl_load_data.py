@@ -115,7 +115,7 @@ class PdRccAllData:
 
         """
         for type in lst[:]:
-            if type not in np.unique(df.data.cell_type):
+            if type not in np.unique(df.cell_type):
                 print(f"{type} not found in data frame, ignoring.")
                 lst.remove(type)
         print("Removing {lst} cell types from data")
