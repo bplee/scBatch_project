@@ -94,7 +94,7 @@ class PdRccAllData:
         init_num_labels = len(cell_types_to_keep)
         for pat, pat_df in data_df.groupby("patient"):
             cell_types_to_keep = cell_types_to_keep.intersection(set(pat_df.cell_type))
-        print(f"Reducing total number of labels from {init_num_labels} to {len(cell_types_to_keep)}.")
+        print(f"  Reducing total number of labels from {init_num_labels} to {len(cell_types_to_keep)}.")
         bool_subset = data_df.cell_type.isin(cell_types_to_keep)
         return data_df[bool_subset]
 
@@ -115,11 +115,12 @@ class PdRccAllData:
         pandas df with specified cell types removed
 
         """
+        cell_types = np.unique(df.cell_type)
         for type in lst[:]:
-            if type not in np.unique(df.cell_type):
+            if type not in cell_types:
                 print(f" {type} not found in data frame, ignoring.")
                 lst.remove(type)
-        print(f"Removing {lst} cell types from data")
+        print(f"  Removing {lst} cell types from data ({len(cell_types) - len(lst)} will remain)")
         bool_subset = ~df.cell_type.isin(lst)  # getting all the indices that are NOT in the lst
         return df[bool_subset]
 
