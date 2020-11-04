@@ -76,6 +76,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True):
 
     raw_counts = np.array(raw_counts)
     if log_norm:
+        print("Taking log norm of data")
         raw_counts = np.log(raw_counts + 1)
 
     # getting categorical indices for patients and cell_types
