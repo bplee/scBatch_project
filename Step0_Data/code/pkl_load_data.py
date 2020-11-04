@@ -19,7 +19,8 @@ class PdRccAllData:
 
     same_cell_types is used for only getting cells such that each patient has the same label set
     """
-    def __init__(self, take_cell_label_intersection=True, labels_to_remove=None,
+    def __init__(self, take_cell_label_intersection=True, 
+                 labels_to_remove=["Ambiguous", "Megakaryocyte"],
                  pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/201002_6pat_proto4_raw_counts.pkl'):
         self.pkl_path = pkl_path
         self.take_cell_label_intersection = take_cell_label_intersection

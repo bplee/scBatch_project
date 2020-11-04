@@ -29,15 +29,12 @@ class NewRccDatasetSemi(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, test_patient, x_dim, train=True, train_patient=None,
-                 take_cell_label_intersection=True, labels_to_remove=None):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
         self.init_time = time.time()
         self.train_patient = train_patient
-        self.labels_to_remove = labels_to_remove
-        self.take_cell_label_intersection = take_cell_label_intersection
 
         if self.train:
             self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
@@ -74,8 +71,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         print("Loading data from pkl...")
         # own data loader since R was being finicky
-        data_obj = PdRccAllData(take_cell_label_intersection=self.take_cell_label_intersection,
-                                labels_to_remove=self.labels_to_remove)
+        data_obj = PdRccAllData()  # default args for this function will give me what I want
         raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
         patients = data_obj.data.patient
         cell_types = data_obj.data.cell_type
