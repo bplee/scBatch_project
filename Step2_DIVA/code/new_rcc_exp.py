@@ -83,10 +83,10 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
             if ctr_unsup > unsup_batches:
                 print(f"ctr_unsup > unsup_batches, {ctr_unsup} > {unsup_batches}")
                 print(f" i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
-                break
+                is_unsupervised = False
             (x, y, d) = next(unsup_iter)
 
-        else:
+        if not is_unsupervised:
             ctr_sup += 1
             if ctr_sup > sup_batches:
                 print(f"ctr_sup > sup_batches, {ctr_sup} > {sup_batches}")
@@ -248,9 +248,9 @@ if __name__ == "__main__":
     print(args.outpath)
     # model_name = args.outpath + 'rcc_new_test_domain_' + str(args.test_patient) + '_semi_sup_seed_' + str(args.seed)
     if args.train_patient is not None:
-        model_name = f"{args.outpath}rcc_new_test_domain_{args.test_patient}_train_domain_{args.train_patient}_semi_sup_seed_{args.seed}"
+        model_name = f"{args.outpath}rcc_new_test_domain_{args.test_patient}_train_domain_{args.train_patient}_semi_sup_seed_{args.seed}_temp"
     else:
-        model_name = f"{args.outpath}rcc_new_test_domain_{args.test_patient}_train_domain_ALL_semi_sup_seed_{args.seed}"
+        model_name = f"{args.outpath}rcc_new_test_domain_{args.test_patient}_train_domain_ALL_semi_sup_seed_{args.seed}_temp"
     print(model_name)
 
     # Choose training domains
