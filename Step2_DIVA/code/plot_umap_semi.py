@@ -211,16 +211,32 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
 
 if __name__ == "__main__":
-    train_patient = 0
+    # this file is meant to be able to grab all valid models in a dir and running on all of them
+    files = os.listdir()
+    model_file_exts = set(("model", "config"))
+    name_exts = [f.split(".") for f in files if f.split(".")[-1] in model_file_exts]
+    # print(name_exts)
+    model_names = []
+    while name_exts:
+        curr = name_exts.pop()
+        for i, f in enumerate(name_exts):
+            # if the model names are the same
+            if f[0] == curr[0]:
+                # if there is both the ".model" and ".config" extension
+                if set((f[-1], curr[-1])) == model_file_exts:
+                    model_names.append(curr[0])
+
+
+    # train_patient = 0
     supervised = False
     seed = 0
 
-    for test_patient in range(6):
-        if test_patient == train_patient:
-            continue
-
+    # for test_patient in range(6):
+    #     if test_patient == train_patient:
+    #         continue
+    for model_name in model_names:
         # model_name = './' + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
-        model_name = f"./rcc_new_test_domain_{test_patient}_train_domain_{train_patient}_semi_sup_seed_{seed}"
+        # model_name = f"./rcc_new_test_domain_{test_patient}_train_domain_{train_patient}_semi_sup_seed_{seed}"
 
         model = torch.load(model_name + '.model')
         args = torch.load(model_name + '.config')
@@ -251,4 +267,4 @@ if __name__ == "__main__":
         torch.backends.cudnn.benchmark = False
         np.random.seed(args.seed)
 
-        plot_umap(train_loader, test_loader, model, args.batch_size, test_patient, train_patient, cell_types, patients)
+        plot_umap(train_loader, test_loader, model, args.batch_size, args.test_patient, args.train_patient, cell_types, patients)
