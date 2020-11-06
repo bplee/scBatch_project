@@ -211,12 +211,14 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
 
 if __name__ == "__main__":
-    test_patient = 5
+    train_patient = 0
     supervised = False
     seed = 0
 
-    for train_patient in range(5):
-
+    for test_patient in range(6):
+        if test_patient == train_patient:
+            continue
+            
         # model_name = './' + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
         model_name = f"./rcc_new_test_domain_{test_patient}_train_domain_{train_patient}_semi_sup_seed_{seed}"
 
