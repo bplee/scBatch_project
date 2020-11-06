@@ -116,6 +116,9 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             zx = np.vstack((zx, zx_[i]))
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
+
+        zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
+
         name = ['zy', 'zd', 'zx']
         for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
             _.obs['batch'] = patients[labels_d]
@@ -185,6 +188,8 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
                 zx = np.vstack((zx, zx_[i]))
                 labels_y = np.hstack((labels_y, actuals_y[i]))
                 labels_d = np.hstack((labels_d, actuals_d[i]))
+
+            zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
 
             name = ['zy', 'zd', 'zx']
             for i, _ in enumerate([zy_adata, zd_adata, zx_adata]):
