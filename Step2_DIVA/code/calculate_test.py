@@ -101,8 +101,10 @@ if __name__ == "__main__":
     scnym_exp = True
     main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
 
-    for test_patient in [5]:
+    for test_patient in range(6):
         for train_patient in [4]:
+            if train_patient == test_patient:
+                continue
     #for test_patient in [0,4]:
             if supervised:
                model_name = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
