@@ -75,9 +75,6 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
         cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         accuracy_y_weighted = np.mean(np.diag(cm_norm))
         print(f"cm_norm diag: {np.diag(cm_norm)}")
-        print(f"np.mean(np.diag(cm_norm)) {accuracy_y_weighted}")
-        print(f"sum/num for cm {np.sum(np.diag(cm_norm))/float(len(cm_norm))}")
-        print(f"cm.shape {cm.shape}")
         cm_norm_df = pd.DataFrame(cm_norm,index=cell_types,columns=cell_types)
         plt.figure(figsize = (20,20))
         ax = sn.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
@@ -99,22 +96,24 @@ if __name__ == "__main__":
     #test_patient = 5
     seed = 0
     scnym_exp = True
-    main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
-
+#    main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
+    main_dir = os.getcwd()
+    if main_dir[:5] == "/lila":
+        main_dir = main_dir[5:]
     for test_patient in range(6):
-        for train_patient in [4]:
+        for train_patient in [0]:
             if train_patient == test_patient:
                 continue
     #for test_patient in [0,4]:
             if supervised:
-               model_name = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
+                f = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
             else:
-               model_name = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
+                f = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
             if vae:
-               model_name = main_dir + 'rcc_vae_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
+                f = main_dir + 'rcc_vae_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
             if scnym_exp:
-                model_name = f"{main_dir}rcc_new_test_domain_{test_patient}_train_domain_{train_patient}_semi_sup_seed_{seed}"
-
+                f = f"rcc_new_test_domain_{test_patient}_train_domain_{train_patient}_semi_sup_seed_{seed}"
+            model_name = os.path.join(main_dir, f)
             model = torch.load(model_name + '.model')
             args = torch.load(model_name + '.config')
             print(model_name)
@@ -123,7 +122,6 @@ if __name__ == "__main__":
             args.cuda = not args.no_cuda and torch.cuda.is_available()
             device = torch.device("cuda" if args.cuda else "cpu")
             kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
-
             # Load test
             if supervised:
                 my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
@@ -145,9 +143,9 @@ if __name__ == "__main__":
             torch.backends.cudnn.benchmark = False
             np.random.seed(args.seed)
 
-            test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types, args.y_dim, args.train_patient, model_name)
+            test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types, args.y_dim, f)
             test_accuracy_y_list.append(test_accuracy_y)
             test_accuracy_y_list_weighted.append(test_accuracy_y_weighted)
-        print("patient %d" %test_patient)
-        print(test_accuracy_y_list)
-        print(test_accuracy_y_list_weighted)
+    print(f"Test patient {test_patient}")
+    print(f"Accuracies: {test_accuracy_y_list}")
+    print(f"Weighted Accuracies: {test_accuracy_y_list_weighted}")
