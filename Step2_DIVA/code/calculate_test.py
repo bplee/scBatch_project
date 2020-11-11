@@ -23,8 +23,8 @@ from DIVA.dataset.rcc_loader import RccDataset
 #from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import NewRccDatasetSemi as RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
-def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_types, num_labels=31):
-    model.eval()
+def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_types, num_labels, model_name):
+    # model.eval()
     """
     compute the accuracy over the supervised training set or the testing set
     """
@@ -84,9 +84,11 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
                 linewidths=.5, annot=True, fmt='4.2f', square = True)
         ax.get_ylim()
         ax.set_ylim(num_labels, 0)
-        plt.savefig('./figs_diva/fig_diva_cm_semi_sup_heldout_pat_'+str(test_patient)+'.pdf')
+        save_name = f"./cm_figs/cm_{model_name}.png"
+        # plt.savefig('./figs_diva/fig_diva_cm_semi_sup_heldout_pat_'+str(test_patient)+'.pdf')
+        plt.savefig(save_name)
 
-        return  accuracy_y, accuracy_y_weighted
+        return accuracy_y, accuracy_y_weighted
 
 
 if __name__ == "__main__":
@@ -122,12 +124,12 @@ if __name__ == "__main__":
 
             # Load test
             if supervised:
-               my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
-               test_loader_sup = data_utils.DataLoader(
+                my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
+                test_loader_sup = data_utils.DataLoader(
                          my_dataset,
                          batch_size=args.batch_size,
                          shuffle=True)
-               cell_types, _ = my_dataset.cell_types_batches()
+                cell_types, _ = my_dataset.cell_types_batches()
             else:
                my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
                test_loader_sup = data_utils.DataLoader(
@@ -141,7 +143,7 @@ if __name__ == "__main__":
             torch.backends.cudnn.benchmark = False
             np.random.seed(args.seed)
 
-            test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types)
+            test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types, args.y_dim, args.train_patient, model_name)
             test_accuracy_y_list.append(test_accuracy_y)
             test_accuracy_y_list_weighted.append(test_accuracy_y_weighted)
         print("patient %d" %test_patient)
