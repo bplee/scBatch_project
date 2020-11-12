@@ -211,7 +211,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
 
 if __name__ == "__main__":
-    # this file is meant to be able to grab all valid models in a dir and running on all of them
+    # this file is meant to be able to grab all valid models in a dir and run it on all of them
     files = os.listdir()
     model_file_exts = set(("model", "config"))
     name_exts = [f.split(".") for f in files if f.split(".")[-1] in model_file_exts]
