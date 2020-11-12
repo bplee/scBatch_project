@@ -98,10 +98,21 @@ if __name__ == "__main__":
     scnym_exp = True
 #    main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
     main_dir = os.getcwd()
+    
+    out_dir = 'cm_figs'
+    
+    # getting the name of the directory
     if main_dir[:5] == "/lila":
         main_dir = main_dir[5:]
+
+    # if the folder to save cm figs to doesn't exist, then create it:
+    if not os.path.exists(out_dir):
+        print('Directory {out_dir} does not exist. Creating directory in {main_dir}.')
+        os.makedirs(out_dir)
+    
+    # Starting loop
     for test_patient in range(6):
-        for train_patient in [0]:
+        for train_patient in [4]:
             if train_patient == test_patient:
                 continue
     #for test_patient in [0,4]:
@@ -146,6 +157,6 @@ if __name__ == "__main__":
             test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types, args.y_dim, f)
             test_accuracy_y_list.append(test_accuracy_y)
             test_accuracy_y_list_weighted.append(test_accuracy_y_weighted)
-        print(f"Test patient {test_patient}")
-        print(f"Accuracies: {test_accuracy_y_list}")
-        print(f"Weighted Accuracies: {test_accuracy_y_list_weighted}")
+    print(f"Train patient {train_patient}")
+    print(f"Accuracies: {test_accuracy_y_list}")
+    print(f"Weighted Accuracies: {test_accuracy_y_list_weighted}")
