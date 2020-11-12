@@ -19,6 +19,9 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 
+#getting starter code
+from Step0_Data.code.starter import *
+
 from DIVA.dataset.rcc_loader import RccDataset
 #from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import NewRccDatasetSemi as RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
@@ -92,11 +95,11 @@ if __name__ == "__main__":
     test_accuracy_y_list = []
     test_accuracy_y_list_weighted = []
     supervised = 0
-    vae = 0
-    #test_patient = 5
-    seed = 0
-    scnym_exp = True
-#    main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
+    # vae = 0
+    # test_patient = 5
+    # seed = 0
+    # scnym_exp = True
+    # main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
     main_dir = os.getcwd()
     
     out_dir = 'cm_figs'
@@ -115,48 +118,52 @@ if __name__ == "__main__":
         for train_patient in [4]:
             if train_patient == test_patient:
                 continue
+    diva_models = get_valid_diva_models()
+    for f in diva_models:
     #for test_patient in [0,4]:
-            if supervised:
-                f = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
-            else:
-                f = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
-            if vae:
-                f = main_dir + 'rcc_vae_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
-            if scnym_exp:
-                f = f"rcc_new_test_domain_{test_patient}_train_domain_{train_patient}_semi_sup_seed_{seed}"
-            model_name = os.path.join(main_dir, f)
-            model = torch.load(model_name + '.model')
-            args = torch.load(model_name + '.config')
-            print(model_name)
-            print(args)
+            # if supervised:
+            #     f = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
+            # else:
+            #     f = main_dir + 'rcc_new_test_domain_' + str(test_patient) + '_semi_sup_seed_' + str(seed)
+            # if vae:
+            #     f = main_dir + 'rcc_vae_test_domain_' + str(test_patient) + '_sup_only_seed_' + str(seed)
+            # if scnym_exp:
+            #     f = f"rcc_new_test_domain_{test_patient}_train_domain_{train_patient}_semi_sup_seed_{seed}"
 
-            args.cuda = not args.no_cuda and torch.cuda.is_available()
-            device = torch.device("cuda" if args.cuda else "cpu")
-            kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
-            # Load test
-            if supervised:
-                my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
-                test_loader_sup = data_utils.DataLoader(
-                         my_dataset,
-                         batch_size=args.batch_size,
-                         shuffle=True)
-                cell_types, _ = my_dataset.cell_types_batches()
-            else:
-               my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
-               test_loader_sup = data_utils.DataLoader(
-                         my_dataset,
-                         batch_size=args.batch_size,
-                         shuffle=True)
-               cell_types, _ = my_dataset.cell_types_batches()
+        # f has no directory structure or a file extension
+        model_name = os.path.join(main_dir, f)
+        model = torch.load(model_name + '.model')
+        args = torch.load(model_name + '.config')
+        print(model_name)
+        print(args)
 
-            # Set seed
-            torch.manual_seed(args.seed)
-            torch.backends.cudnn.benchmark = False
-            np.random.seed(args.seed)
+        args.cuda = not args.no_cuda and torch.cuda.is_available()
+        device = torch.device("cuda" if args.cuda else "cpu")
+        kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
+        # Load test
+        if supervised:
+            my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
+            test_loader_sup = data_utils.DataLoader(
+                     my_dataset,
+                     batch_size=args.batch_size,
+                     shuffle=True)
+            cell_types, _ = my_dataset.cell_types_batches()
+        else:
+           my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
+           test_loader_sup = data_utils.DataLoader(
+                     my_dataset,
+                     batch_size=args.batch_size,
+                     shuffle=True)
+           cell_types, _ = my_dataset.cell_types_batches()
 
-            test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types, args.y_dim, f)
-            test_accuracy_y_list.append(test_accuracy_y)
-            test_accuracy_y_list_weighted.append(test_accuracy_y_weighted)
-    print(f"Train patient {train_patient}")
+        # Set seed
+        torch.manual_seed(args.seed)
+        torch.backends.cudnn.benchmark = False
+        np.random.seed(args.seed)
+
+        test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types, args.y_dim, f)
+        test_accuracy_y_list.append(test_accuracy_y)
+        test_accuracy_y_list_weighted.append(test_accuracy_y_weighted)
+    print(f"Train patient {args.train_patient}")
     print(f"Accuracies: {test_accuracy_y_list}")
     print(f"Weighted Accuracies: {test_accuracy_y_list_weighted}")
