@@ -6,6 +6,7 @@ from inspect import getsource
 def get_valid_diva_models(dir="./"):
     """
     Collects the names of DIVA models in `dir`
+    These are NOT filepaths or file names.
 
     Parameters
     ----------

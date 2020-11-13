@@ -29,17 +29,24 @@ class NewRccDatasetSemi(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, test_patient, x_dim, train=True, train_patient=None):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None, starspace=False):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
         self.init_time = time.time()
         self.train_patient = train_patient
+        self.starspace = starspace
 
-        if self.train:
-            self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
+        if self.starspace:
+            # returns everything from one run, main difference is that it doesn't change the shape or convert to tensors
+            self.train_data, self.train_labels, self.train_domain,\
+            self.test_data, self.test_labels, self.test_domain,\
+            self.cell_types, self.patients = self._get_data()
         else:
-            self.test_data, self.test_labels, self.test_domain, self.cell_types, self.patients = self._get_data()
+            if self.train:
+                self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = self._get_data()
+            else:
+                self.test_data, self.test_labels, self.test_domain, self.cell_types, self.patients = self._get_data()
 
     def cell_types_batches(self):
         return self.cell_types, self.patients
@@ -147,66 +154,88 @@ class NewRccDatasetSemi(data_utils.Dataset):
         data_train = np.log(data_train + 1)
         data_test = np.log(data_test + 1)
 
+        # what is the point of this line?
         data_train = data_train / np.max(data_train)
         data_test = data_test / np.max(data_test)
-
-        data_train = np.reshape(data_train, [data_train.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
-        data_test = np.reshape(data_test, [data_test.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
 
         n_train = len(labels_train)
         n_test = len(labels_test)
 
-        print('Run transformers')
+        if self.starspace == True:
+            # Shuffle everything one more time
+            inds = np.arange(n_train)
+            np.random.shuffle(inds)
+            data_train = data_train[inds]
+            labels_train = labels_train[inds]
+            batch_train = batch_train[inds]
 
-        # Run transforms
-        data_train = torch.as_tensor(data_train)
-        data_test = torch.as_tensor(data_test)
+            inds = np.arange(n_test)
+            np.random.shuffle(inds)
+            data_test = data_test[inds]
+            labels_test = labels_test[inds]
+            batch_test = batch_test[inds]
 
-        labels_train = torch.as_tensor(labels_train.astype(int))
-        labels_test = torch.as_tensor(labels_test.astype(int))
+            return data_train, labels_train, batch_train, data_test, labels_test, batch_test, cell_type_names, patient_names
 
-        batch_train = torch.as_tensor(batch_train.astype(int))
-        batch_test = torch.as_tensor(batch_test.astype(int))
 
-        # Shuffle everything one more time
-        inds = np.arange(n_train)
-        np.random.shuffle(inds)
-        data_train = data_train[inds]
-        labels_train = labels_train[inds]
-        batch_train = batch_train[inds]
 
-        inds = np.arange(n_test)
-        np.random.shuffle(inds)
-        data_test = data_test[inds]
-        labels_test = labels_test[inds]
-        batch_test = batch_test[inds]
-
-        # Convert to onehot
-        y = torch.eye(n_labels)
-        labels_train = y[labels_train]
-        labels_test = y[labels_test]
-
-        # Convert to onehot
-        d = torch.eye(6)
-        batch_train = d[batch_train]
-        batch_test = d[batch_test]
-
-        self.return_time = time.time()
-        print(f"Total Load Time: {self.return_time - self.init_time}")
-
-        if self.train:
-            print(f"train patient: {self.train_patient}")
-            print(f"data_train.shape: {data_train.shape}")
-            print(f"labels_train.shape: {labels_train.shape}")
-            print(f"batch_train.shape: {batch_train.shape}")
-
-            return data_train.unsqueeze(1), labels_train, batch_train, cell_type_names, patient_names
+        # if we're running diva and not starspace we do other jazz
         else:
-            print(f"test patient: {self.test_patient}")
-            print(f"data_test.shape: {data_test.shape}")
-            print(f"labels_test.shape: {labels_test.shape}")
-            print(f"batch_test.shape: {batch_test.shape}")
-            return data_test.unsqueeze(1), labels_test, batch_test, cell_type_names, patient_names
+
+            data_train = np.reshape(data_train, [data_train.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
+            data_test = np.reshape(data_test, [data_test.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
+
+            print('Run transformers')
+
+            # Run transforms
+            data_train = torch.as_tensor(data_train)
+            data_test = torch.as_tensor(data_test)
+
+            labels_train = torch.as_tensor(labels_train.astype(int))
+            labels_test = torch.as_tensor(labels_test.astype(int))
+
+            batch_train = torch.as_tensor(batch_train.astype(int))
+            batch_test = torch.as_tensor(batch_test.astype(int))
+
+            # Shuffle everything one more time
+            inds = np.arange(n_train)
+            np.random.shuffle(inds)
+            data_train = data_train[inds]
+            labels_train = labels_train[inds]
+            batch_train = batch_train[inds]
+
+            inds = np.arange(n_test)
+            np.random.shuffle(inds)
+            data_test = data_test[inds]
+            labels_test = labels_test[inds]
+            batch_test = batch_test[inds]
+
+            # Convert to onehot
+            y = torch.eye(n_labels)
+            labels_train = y[labels_train]
+            labels_test = y[labels_test]
+
+            # Convert to onehot
+            d = torch.eye(6)
+            batch_train = d[batch_train]
+            batch_test = d[batch_test]
+
+            self.return_time = time.time()
+            print(f"Total Load Time: {self.return_time - self.init_time}")
+
+            if self.train:
+                print(f"train patient: {self.train_patient}")
+                print(f"data_train.shape: {data_train.shape}")
+                print(f"labels_train.shape: {labels_train.shape}")
+                print(f"batch_train.shape: {batch_train.shape}")
+
+                return data_train.unsqueeze(1), labels_train, batch_train, cell_type_names, patient_names
+            else:
+                print(f"test patient: {self.test_patient}")
+                print(f"data_test.shape: {data_test.shape}")
+                print(f"labels_test.shape: {labels_test.shape}")
+                print(f"batch_test.shape: {batch_test.shape}")
+                return data_test.unsqueeze(1), labels_test, batch_test, cell_type_names, patient_names
 
     def __len__(self):
         if self.train:
