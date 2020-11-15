@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     print("Done loading data (line 159 run_starspace.py")
 
-    filepath_to_train = "../train_files/trainfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
+    filepath_to_train = "./train_files/trainfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
     print(os.getcwd())
     with open(filepath_to_train, 'w+') as fw:
         for i in range(0,n_train):
@@ -97,7 +97,7 @@ if __name__ == "__main__":
             fw.write(line)
             fw.write('\n')
 
-    filepath_to_test = "../train_files/testfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
+    filepath_to_test = "./train_files/testfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
     with open(filepath_to_test, 'w') as fw:
         for i in range(0,n_test):
             data_test_norm = data_test[i]/data_test[i].sum()
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     # Save the model:
     # added in the prior folder path, since were operating out of bplee/scBatch/ccRCC
     # changing folder to  /bplee/scBatch/starspace_models
-    os.chdir("/data/leslie/bplee/scBatch/starspace_models")
+    os.chdir("/data/leslie/bplee/scBatch/Step3_STARSPACE/code/starspace_models")
     
     sp.saveModel('starspace_model_'+str(args_starspace.test_patient))
     sp.saveModelTsv('starspace_model_'+str(args_starspace.test_patient)+'.tsv')
