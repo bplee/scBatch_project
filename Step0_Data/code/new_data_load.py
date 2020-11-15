@@ -114,7 +114,6 @@ class NewRccDatasetSemi(data_utils.Dataset):
         batch_indices = batch_indices.astype(int)
 
         gene_names = raw_counts.columns.values # np array
-        self.gene_names = gene_names
 
         n_each_cell_type = np.zeros(len(cell_types)).astype(int)
         for i in range(len(cell_type_names)):
@@ -135,6 +134,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
         del data_obj
         gene_dataset.subsample_genes(self.x_dim)
         #gene_dataset.filter_cells_by_count()
+
+        self.gene_names = gene_dataset.gene_names
 
         print('Making tensor batches')
 
