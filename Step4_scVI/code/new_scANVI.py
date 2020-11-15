@@ -1,4 +1,5 @@
 import os
+import sys
 try:
         os.chdir("/data/leslie/alireza/scRNAseq_ccRCC")
         print(os.getcwd())
@@ -12,7 +13,6 @@ n_epochs_all = None
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
-import starwrap as sw
 import time
 import torch
 import pyreadr
@@ -27,64 +27,80 @@ from scvi.dataset import CsvDataset, GeneExpressionDataset
 from scvi.models import SCANVI, VAE
 from scvi.inference import UnsupervisedTrainer, JointSemiSupervisedTrainer, SemiSupervisedTrainer
 
+WORKING_DIR = "/data/leslie/bplee/scBatch"
+# adding the project dir to the path to import relevant modules below
+if WORKING_DIR not in sys.path:
+    print("CHANGING PATH:")
+    sys.path.append(WORKING_DIR)
+    print("\tWorking dir appended to Sys path.")
+
+from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
+from Step0_Data.code.starter import ensure_dir
 
 ### Annotating a dataset from another datasets 
 
-annot_tam = pyreadr.read_r('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tams_annotations.rds')
-df_annot_tam = annot_tam[None]
-annot_tcell = pyreadr.read_r('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tcells_annotations.rds')
-df_annot_tcell = annot_tcell[None]
-df_annot_all_6_pat = df_annot_tcell.append(df_annot_tam, ignore_index=True)
-cell_type_tcell = np.unique(df_annot_tcell.cluster_name.values)
-cell_type_tam = np.unique(df_annot_tam.cluster_name.values)
-del annot_tam, df_annot_tam, annot_tcell, df_annot_tcell
-pandas2ri.activate()
-readRDS = robjects.r['readRDS']
-rawdata_tam = np.array(readRDS('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tams_rawcounts.rds'))
-rawdata_tam = rawdata_tam.T
-rawdata_tcell = np.array(readRDS('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tcells_rawcounts.rds'))
-rawdata_tcell = rawdata_tcell.T
-rawdata_all_6_pat = np.vstack((rawdata_tcell,rawdata_tam))
-rawdata_all_6_pat = rawdata_all_6_pat.astype(int)
-del rawdata_tam, rawdata_tcell
+# annot_tam = pyreadr.read_r('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tams_annotations.rds')
+# df_annot_tam = annot_tam[None]
+# annot_tcell = pyreadr.read_r('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tcells_annotations.rds')
+# df_annot_tcell = annot_tcell[None]
+# df_annot_all_6_pat = df_annot_tcell.append(df_annot_tam, ignore_index=True)
+# cell_type_tcell = np.unique(df_annot_tcell.cluster_name.values)
+# cell_type_tam = np.unique(df_annot_tam.cluster_name.values)
+# del annot_tam, df_annot_tam, annot_tcell, df_annot_tcell
+# pandas2ri.activate()
+# readRDS = robjects.r['readRDS']
+# rawdata_tam = np.array(readRDS('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tams_rawcounts.rds'))
+# rawdata_tam = rawdata_tam.T
+# rawdata_tcell = np.array(readRDS('/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/pat6_tcells_rawcounts.rds'))
+# rawdata_tcell = rawdata_tcell.T
+# rawdata_all_6_pat = np.vstack((rawdata_tcell,rawdata_tam))
+# rawdata_all_6_pat = rawdata_all_6_pat.astype(int)
+# del rawdata_tam, rawdata_tcell
+#
+# n_data_all = rawdata_all_6_pat.shape[0]
+# n_gene_all = rawdata_all_6_pat.shape[1]
+#
+# cell_types = np.hstack((cell_type_tcell,cell_type_tam))
+# #cell_types = cell_types.reshape([len(cell_types), 1])
+# labels = np.zeros([n_data_all,1])
+# for i, c in enumerate(cell_types):
+#     idx = np.where(df_annot_all_6_pat.cluster_name.values == c)[0]
+#     labels[idx] = i
+# labels = labels.astype(int)
+#
+# patients = np.unique(df_annot_all_6_pat.Sample.values)
+# batch_indices = np.zeros([n_data_all,1])
+# for i, b in enumerate(patients):
+#     idx = np.where(df_annot_all_6_pat.Sample.values == b)[0]
+#     batch_indices[idx] = i
+# batch_indices = batch_indices.astype(int)
+#
+# df = pd.read_csv("/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/gene_names.csv", header=0, index_col=0)
+# gene_names = pd.Index(df.x.values)
+# del df
+#
+# n_each_cell_type = np.zeros(len(cell_types)).astype(int)
+# for i in range(len(cell_types)):
+#     n_each_cell_type[i] = np.sum(labels == i)
+#
+# gene_dataset = GeneExpressionDataset()
+# gene_dataset.populate_from_data(
+#              X=rawdata_all_6_pat,
+#              batch_indices=batch_indices,
+#              labels=labels,
+#              gene_names=gene_names,
+#              cell_types=cell_types,
+#              remap_attributes=False)
+# del rawdata_all_6_pat
+# del df_annot_all_6_pat
+# gene_dataset.subsample_genes(1000)
 
-n_data_all = rawdata_all_6_pat.shape[0]
-n_gene_all = rawdata_all_6_pat.shape[1]
+data_obj = RccDatasetSemi(test_patient=None, x_dim=784, scanvi=True)
 
-cell_types = np.hstack((cell_type_tcell,cell_type_tam))
-#cell_types = cell_types.reshape([len(cell_types), 1])
-labels = np.zeros([n_data_all,1])
-for i, c in enumerate(cell_types):
-    idx = np.where(df_annot_all_6_pat.cluster_name.values == c)[0]
-    labels[idx] = i
-labels = labels.astype(int)
-
-patients = np.unique(df_annot_all_6_pat.Sample.values)
-batch_indices = np.zeros([n_data_all,1])
-for i, b in enumerate(patients):
-    idx = np.where(df_annot_all_6_pat.Sample.values == b)[0]
-    batch_indices[idx] = i
-batch_indices = batch_indices.astype(int)
-
-df = pd.read_csv("/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC/gene_names.csv", header=0, index_col=0)
-gene_names = pd.Index(df.x.values)
-del df
-
-n_each_cell_type = np.zeros(len(cell_types)).astype(int)
-for i in range(len(cell_types)):
-    n_each_cell_type[i] = np.sum(labels == i)
-
-gene_dataset = GeneExpressionDataset()
-gene_dataset.populate_from_data(
-             X=rawdata_all_6_pat,
-             batch_indices=batch_indices,
-             labels=labels,
-             gene_names=gene_names,
-             cell_types=cell_types,
-             remap_attributes=False)
-del rawdata_all_6_pat
-del df_annot_all_6_pat
-gene_dataset.subsample_genes(1000)
+gene_dataset = data_obj.GeneExpressionDataset
+batch_indices = data_obj.batch_indices
+cell_types, patients = data_obj.cell_types_batches()
+n_data_all = len(gene_dataset)
 
 test_patient = 0
 n_epochs = 100 if n_epochs_all is None else n_epochs_all
