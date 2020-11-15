@@ -36,6 +36,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         self.init_time = time.time()
         self.train_patient = train_patient
         self.starspace = starspace
+        self.gene_names = None  # this is set in _get_data
 
         if self.starspace:
             # returns everything from one run, main difference is that it doesn't change the shape or convert to tensors
@@ -113,6 +114,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         batch_indices = batch_indices.astype(int)
 
         gene_names = raw_counts.columns.values # np array
+        self.gene_names = gene_names
 
         n_each_cell_type = np.zeros(len(cell_types)).astype(int)
         for i in range(len(cell_type_names)):
