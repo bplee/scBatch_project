@@ -23,7 +23,9 @@ if WORKING_DIR not in sys.path:
     print("CHANGING PATH:")
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
+
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
+from Step0_Data.code.starter import ensure_dir
 
 
 if __name__ == "__main__":
@@ -81,13 +83,16 @@ if __name__ == "__main__":
 
     print("Done loading data (line 159 run_starspace.py")
 
+    # making sure the saving directory exists, if not, then create it
+    ensure_dir("./train_files")
+
     filepath_to_train = "./train_files/trainfile_starspace_test_pat_"+str(args_starspace.test_patient)+".txt"
     print(os.getcwd())
     with open(filepath_to_train, 'w+') as fw:
         for i in range(0,n_train):
             data_train_norm = data_train[i]/data_train[i].sum()
             sample_train = np.random.choice(len(gene_names),
-                        args_starspace.n_gene_sample_train, p = data_train_norm)
+                        args_starspace.n_gene_sample_train, p=data_train_norm)
             sample_train = sample_train.astype(int)
             gene_names_selected = list(gene_names[sample_train])
             line = ["{}".format(g) for g in gene_names_selected]
