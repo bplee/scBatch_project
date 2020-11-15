@@ -3,6 +3,8 @@ import sys
 from inspect import getsource
 
 
+# diva specific commands
+
 def get_valid_diva_models(dir="./"):
     """
     Collects the names of DIVA models in `dir`
@@ -33,3 +35,25 @@ def get_valid_diva_models(dir="./"):
                 if set((f[-1], curr[-1])) == model_file_exts:
                     model_names.append(curr[0])
     return model_names
+
+
+# logistical commands
+
+def ensure_dir(filepath):
+    """
+    Makes sure directory at `filepath` exists, if not, then it creates it
+
+    Parameters
+    ----------
+    filepath : str
+        filepath to a directory that you want to check
+
+    Returns
+    -------
+    None
+        creates directory
+
+    """
+    if not os.path.exists(filepath):
+        print('Directory {out_dir} does not exist. Creating directory in {main_dir}.')
+        os.makedirs(filepath)
