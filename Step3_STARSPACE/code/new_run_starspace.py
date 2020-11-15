@@ -81,7 +81,7 @@ if __name__ == "__main__":
     n_labels = len(cell_types)
 
 
-    print("Done loading data (line 159 run_starspace.py")
+    print("Done loading data (line 84 new_run_starspace.py")
 
     # making sure the saving directory exists, if not, then create it
     ensure_dir("./train_files")
@@ -144,21 +144,23 @@ if __name__ == "__main__":
     # Save the model:
     # added in the prior folder path, since were operating out of bplee/scBatch/ccRCC
     # changing folder to  /bplee/scBatch/starspace_models
-    os.chdir("/data/leslie/bplee/scBatch/Step3_STARSPACE/code/starspace_models")
+
+    ensure_dir("/data/leslie/bplee/scBatch/Step3_STARSPACE/code/starspace_models")
+    # os.chdir("/data/leslie/bplee/scBatch/Step3_STARSPACE/code/starspace_models")
     
-    sp.saveModel('starspace_model_'+str(args_starspace.test_patient))
-    sp.saveModelTsv('starspace_model_'+str(args_starspace.test_patient)+'.tsv')
+    sp.saveModel('./starspace_models/starspace_model_'+str(args_starspace.test_patient))
+    sp.saveModelTsv('./starspace_models/starspace_model_'+str(args_starspace.test_patient)+'.tsv')
 
     # Reload the model
-    sp.initFromSavedModel('starspace_model_'+str(args_starspace.test_patient))
-    sp.initFromTsv('starspace_model_'+str(args_starspace.test_patient)+'.tsv')
+    sp.initFromSavedModel('./starspace_models/starspace_model_'+str(args_starspace.test_patient))
+    sp.initFromTsv('./starspace_models/starspace_model_'+str(args_starspace.test_patient)+'.tsv')
 
     # Test the model and create the file './predictfile_starspace.txt'
     sp.evaluate()
     #sp.nearestNeighbor()
 
     # Convert TSV model (embeded space) to a matrix
-    df = pd.read_csv('starspace_model_'+str(args_starspace.test_patient)+'.tsv', sep='\t', header=None, index_col=0)
+    df = pd.read_csv('./starspace_models/starspace_model_'+str(args_starspace.test_patient)+'.tsv', sep='\t', header=None, index_col=0)
     embeded_space = df.values
     embeded_genes = df.index[:-n_labels]
 
@@ -187,7 +189,7 @@ if __name__ == "__main__":
         top_genes.append(embeded_genes[idx_top_genes])
     top_genes = np.array(top_genes)
     df_top_genes = pd.DataFrame(top_genes)
-    df_top_genes.to_csv('top_genes_starspace_test_is_pat_'+str(args_starspace.test_patient)+'.csv')
+    df_top_genes.to_csv('./starspace_models/top_genes_starspace_test_is_pat_'+str(args_starspace.test_patient)+'.csv')
 
     # Calculate the accuracy of prediction
     predict_labels = np.array(predict)
@@ -201,13 +203,15 @@ if __name__ == "__main__":
     print('Unweighted accuracy of StarSpace is :', np.diag(cm).sum()/cm.sum())
     cm_norm_df = pd.DataFrame(cm_norm,index=cell_types,columns=cell_types)
 
+    ensure_dir("cm_figs")
+
     #get_ipython().run_line_magic('matplotlib', 'inline')
     plt.figure(figsize = (20,20))
     ax = sn.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
                 linewidths=.5, annot=True, fmt='4.2f', square = True)
     ax.get_ylim()
     ax.set_ylim(16, 0)
-    plt.savefig('fig_starspace_cm_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
+    plt.savefig('cm_figs/fig_starspace_cm_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
 
     # TSNE plot
     X_latent_train = np.zeros([n_train, arg.dim])
@@ -222,29 +226,30 @@ if __name__ == "__main__":
     X_starspace_sampled = X_starspace[idx_random]
     labels_starspace_sampled = labels_starspace[idx_random]
     batches_starspace_sampled = batches_starspace[idx_random]
-    X_embedded = TSNE(n_components=2).fit_transform(X_starspace_sampled)
-
-    plt.figure(figsize = (20,14))
-    colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-    for i, cell_type in zip(range(n_labels), cell_types):
-        if i < 10:
-            plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c=colors[i], label=cell_type)
-        else:
-            plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c=colors[i%10], label=cell_type, marker='x')
-    plt.legend()
-    plt.savefig('fig_starspace_tsne_by_labels_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
-
-    plt.figure(figsize = (20,14))
-    colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-    for i, batch in zip(range(len(patients)), patients):
-        if i < 10:
-            plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c=colors[i], label=batch)
-        else:
-            plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c=colors[i%10], label=batch, marker='x')
-    plt.legend()
-    plt.savefig('fig_starspace_tsne_by_batches_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
+    # X_embedded = TSNE(n_components=2).fit_transform(X_starspace_sampled)
+    #
+    # plt.figure(figsize = (20,14))
+    # colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
+    # for i, cell_type in zip(range(n_labels), cell_types):
+    #     if i < 10:
+    #         plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c=colors[i], label=cell_type)
+    #     else:
+    #         plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c=colors[i%10], label=cell_type, marker='x')
+    # plt.legend()
+    # plt.savefig('fig_starspace_tsne_by_labels_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
+    #
+    # plt.figure(figsize = (20,14))
+    # colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
+    # for i, batch in zip(range(len(patients)), patients):
+    #     if i < 10:
+    #         plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c=colors[i], label=batch)
+    #     else:
+    #         plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c=colors[i%10], label=batch, marker='x')
+    # plt.legend()
+    # plt.savefig('fig_starspace_tsne_by_batches_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
 
     # UMAP plot
+    ensure_dir('umap_figs')
     reducer = umap.UMAP()
     umap_embedding = reducer.fit_transform(X_starspace_sampled)
 
@@ -258,7 +263,7 @@ if __name__ == "__main__":
             plt.scatter(umap_embedding[labels_starspace_sampled == i, 0], umap_embedding[labels_starspace_sampled == i, 1],
                         c=colors[i % 10], label=cell_type, marker='x')
     plt.legend()
-    plt.savefig('fig_starspace_umap_by_labels_test_is_pat_' + str(args_starspace.test_patient) + '.pdf')
+    plt.savefig('./umap_figs/fig_starspace_umap_by_labels_test_is_pat_' + str(args_starspace.test_patient) + '.pdf')
 
     plt.figure(figsize=(20, 14))
     colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
@@ -270,5 +275,5 @@ if __name__ == "__main__":
             plt.scatter(umap_embedding[batches_starspace_sampled == i, 0], umap_embedding[batches_starspace_sampled == i, 1],
                         c=colors[i % 10], label=batch, marker='x')
     plt.legend()
-    plt.savefig('fig_starspace_umap_by_batches_test_is_pat_' + str(args_starspace.test_patient) + '.pdf')
+    plt.savefig('./umap_figs/fig_starspace_umap_by_batches_test_is_pat_' + str(args_starspace.test_patient) + '.pdf')
 
