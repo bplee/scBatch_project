@@ -29,7 +29,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, test_patient, x_dim, train=True, train_patient=None, starspace=False):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None, starspace=False, scanvi=False):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
@@ -37,8 +37,13 @@ class NewRccDatasetSemi(data_utils.Dataset):
         self.train_patient = train_patient
         self.starspace = starspace
         self.gene_names = None  # this is set in _get_data
+        self.scanvi = scanvi
+        self.batch_indices = None # used for scANVI
 
-        if self.starspace:
+        if self.scanvi:
+            self.GeneExpressionDataset, self.batch_indices, self.cell_types, self.patients = self._get_data()
+
+        elif self.starspace:
             # returns everything from one run, main difference is that it doesn't change the shape or convert to tensors
             self.train_data, self.train_labels, self.train_domain,\
             self.test_data, self.test_labels, self.test_domain,\
@@ -136,6 +141,11 @@ class NewRccDatasetSemi(data_utils.Dataset):
         #gene_dataset.filter_cells_by_count()
 
         self.gene_names = gene_dataset.gene_names
+
+        if self.scanvi == True:
+            # returning data before any subselecting for patients
+            print("Returning GeneExpressionDataset obj for scANVI")
+            return gene_dataset, batch_indices, cell_type_names, patient_names
 
         print('Making tensor batches')
 
