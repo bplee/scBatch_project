@@ -8,6 +8,8 @@ import sys
 import starwrap as sw
 import time
 import torch
+import anndata
+import scanpy as sc
 import matplotlib.pyplot as plt
 import umap
 from sklearn.manifold import TSNE
@@ -213,7 +215,7 @@ if __name__ == "__main__":
     # ax.set_ylim(16, 0)
     plt.savefig('cm_figs/fig_starspace_cm_test_is_pat_'+str(args_starspace.test_patient)+'.png')
 
-    # TSNE plot
+    # UMAP plot
     X_latent_train = np.zeros([n_train, arg.dim])
     with open(arg.trainFile) as fp:
         for cnt, line in enumerate(fp):
@@ -222,58 +224,48 @@ if __name__ == "__main__":
     X_starspace = np.vstack((X_latent_train, X_latent_test))
     labels_starspace = np.hstack((labels_train, labels_test))
     batches_starspace = np.hstack((batch_train, batch_test))
-    idx_random = np.random.choice(n_train+n_test, 5000, replace=False)
-    X_starspace_sampled = X_starspace[idx_random]
-    labels_starspace_sampled = labels_starspace[idx_random]
-    batches_starspace_sampled = batches_starspace[idx_random]
-    # X_embedded = TSNE(n_components=2).fit_transform(X_starspace_sampled)
+    # idx_random = np.random.choice(n_train+n_test, 5000, replace=False)
+    # X_starspace_sampled = X_starspace[idx_random]
+    # labels_starspace_sampled = labels_starspace[idx_random]
+    # batches_starspace_sampled = batches_starspace[idx_random]
+
+    umap_adata = anndata.AnnData(X_starspace)
+    umap_adata.obs['batches'] = batches_starspace
+    umap_adata.obs['cell_type'] = labels_starspace
+
+    sc.pp.neighbors(umap_adata, n_neighbors=30)
+    sc.tl.umap(umap_adata)
+    save_name_batch = f"_starspace_embedding_by_batches_test_pat_{args_starspace.test_patient}.png"
+    save_name_label = f"_starspace_embedding_by_label_test_pat_{args_starspace.test_patient}.png"
+    sc.pl.umap(umap_adata, color='batch', size=10, alpha=.5, save=save_name_batch)
+    sc.pl.umap(umap_adata, color='label', size=10, alpha=.5, save=save_name_label)
+
+    # UMAP plot
+    # ensure_dir('umap_figs')
+    # reducer = umap.UMAP()
+    # umap_embedding = reducer.fit_transform(X_starspace_sampled)
     #
-    # plt.figure(figsize = (20,14))
+    # plt.figure(figsize=(20, 14))
     # colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
     # for i, cell_type in zip(range(n_labels), cell_types):
     #     if i < 10:
-    #         plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c=colors[i], label=cell_type)
+    #         plt.scatter(umap_embedding[labels_starspace_sampled == i, 0], umap_embedding[labels_starspace_sampled == i, 1],
+    #                     c=colors[i], label=cell_type)
     #     else:
-    #         plt.scatter(X_embedded[labels_starspace_sampled == i, 0], X_embedded[labels_starspace_sampled == i, 1], c=colors[i%10], label=cell_type, marker='x')
+    #         plt.scatter(umap_embedding[labels_starspace_sampled == i, 0], umap_embedding[labels_starspace_sampled == i, 1],
+    #                     c=colors[i % 10], label=cell_type, marker='x')
     # plt.legend()
-    # plt.savefig('fig_starspace_tsne_by_labels_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
+    # plt.savefig('./umap_figs/fig_starspace_umap_by_labels_test_is_pat_' + str(args_starspace.test_patient) + '.png')
     #
-    # plt.figure(figsize = (20,14))
+    # plt.figure(figsize=(20, 14))
     # colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
     # for i, batch in zip(range(len(patients)), patients):
     #     if i < 10:
-    #         plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c=colors[i], label=batch)
+    #         plt.scatter(umap_embedding[batches_starspace_sampled == i, 0], umap_embedding[batches_starspace_sampled == i, 1],
+    #                     c=colors[i], label=batch)
     #     else:
-    #         plt.scatter(X_embedded[batches_starspace_sampled == i, 0], X_embedded[batches_starspace_sampled == i, 1], c=colors[i%10], label=batch, marker='x')
+    #         plt.scatter(umap_embedding[batches_starspace_sampled == i, 0], umap_embedding[batches_starspace_sampled == i, 1],
+    #                     c=colors[i % 10], label=batch, marker='x')
     # plt.legend()
-    # plt.savefig('fig_starspace_tsne_by_batches_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
-
-    # UMAP plot
-    ensure_dir('umap_figs')
-    reducer = umap.UMAP()
-    umap_embedding = reducer.fit_transform(X_starspace_sampled)
-
-    plt.figure(figsize=(20, 14))
-    colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-    for i, cell_type in zip(range(n_labels), cell_types):
-        if i < 10:
-            plt.scatter(umap_embedding[labels_starspace_sampled == i, 0], umap_embedding[labels_starspace_sampled == i, 1],
-                        c=colors[i], label=cell_type)
-        else:
-            plt.scatter(umap_embedding[labels_starspace_sampled == i, 0], umap_embedding[labels_starspace_sampled == i, 1],
-                        c=colors[i % 10], label=cell_type, marker='x')
-    plt.legend()
-    plt.savefig('./umap_figs/fig_starspace_umap_by_labels_test_is_pat_' + str(args_starspace.test_patient) + '.png')
-
-    plt.figure(figsize=(20, 14))
-    colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
-    for i, batch in zip(range(len(patients)), patients):
-        if i < 10:
-            plt.scatter(umap_embedding[batches_starspace_sampled == i, 0], umap_embedding[batches_starspace_sampled == i, 1],
-                        c=colors[i], label=batch)
-        else:
-            plt.scatter(umap_embedding[batches_starspace_sampled == i, 0], umap_embedding[batches_starspace_sampled == i, 1],
-                        c=colors[i % 10], label=batch, marker='x')
-    plt.legend()
-    plt.savefig('./umap_figs/fig_starspace_umap_by_batches_test_is_pat_' + str(args_starspace.test_patient) + '.png')
+    # plt.savefig('./umap_figs/fig_starspace_umap_by_batches_test_is_pat_' + str(args_starspace.test_patient) + '.png')
 
