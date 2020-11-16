@@ -3,3 +3,4 @@
 *.model
 *.config
 *.pyc
+*.DS_Store
