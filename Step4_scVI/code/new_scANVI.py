@@ -1,10 +1,6 @@
 import os
 import sys
-try:
-        os.chdir("/data/leslie/alireza/scRNAseq_ccRCC")
-        print(os.getcwd())
-except:
-        pass
+
 from IPython import get_ipython
 
 save_path = 'data/ccRCC'
@@ -114,7 +110,7 @@ trainer.unlabelled_set.to_monitor = ['reconstruction_error', 'accuracy']
 # The accuracy
 t0 = time.time()
 trainer.train(n_epochs=n_epochs)
-print('Training time of ScanVI: {} mins'.format((time.time() - t0)/60))
+print('Training time of scANVI: {} mins'.format((time.time() - t0)/60))
 trainer.unlabelled_set.accuracy()
 
 accuracy_labelled_set = trainer.history["accuracy_labelled_set"]
@@ -123,7 +119,7 @@ x = np.linspace(0,n_epochs,(len(accuracy_labelled_set)))
 plt.figure(figsize = (10,10))
 plt.plot(x, accuracy_labelled_set, label="accuracy labelled")
 plt.plot(x, accuracy_unlabelled_set, label="accuracy unlabelled")
-plt.savefig('fig_monitor_accuracy_test_is_pat_'+str(test_patient)+'.pdf')
+plt.savefig('fig_monitor_accuracy_test_is_pat_'+str(test_patient)+'.png')
 
 # Confusion matrix and its heatmap
 labels_true, predicted_labels_scVI = trainer.unlabelled_set.compute_predictions()
@@ -137,7 +133,7 @@ ax = sn.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
               linewidths=.5, annot=True, fmt='4.2f', square = True)
 ax.get_ylim()
 ax.set_ylim(16, 0)
-plt.savefig('fig_scanvi_cm_test_is_pat_'+str(test_patient)+'.pdf')
+plt.savefig('fig_scanvi_cm_test_is_pat_'+str(test_patient)+'.png')
 
 #n_samples_tsne = 3000
 #trainer.full_dataset.show_t_sne(n_samples=n_samples_tsne, color_by='batches and labels', save_name='fig_tsne_plot_test_is_pat_'+str(test_patient)+'.pdf')
@@ -158,7 +154,7 @@ for i, cell_types in zip(range(gene_dataset.n_labels), gene_dataset.cell_types):
     else:
         plt.scatter(X_embedded[labels_latent_sampled == i, 0], X_embedded[labels_latent_sampled == i, 1], c = colors[i%10], label = cell_types, marker='x')
 plt.legend()
-plt.savefig('fig_scanvi_tsne_by_labels_test_is_pat_'+str(test_patient)+'.pdf')
+plt.savefig('fig_scanvi_tsne_by_labels_test_is_pat_'+str(test_patient)+'.png')
 
 plt.figure(figsize = (20,14))
 colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
@@ -168,7 +164,7 @@ for i, batch in zip(range(len(patients)), patients):
     else:
         plt.scatter(X_embedded[batches_sampled == i, 0], X_embedded[batches_sampled == i, 1], c = colors[i%10], label = batch, marker='x')
 plt.legend()
-plt.savefig('fig_scanvi_tsne_by_batches_test_is_pat_'+str(test_patient)+'.pdf')
+plt.savefig('fig_scanvi_tsne_by_batches_test_is_pat_'+str(test_patient)+'.png')
 
 
 
