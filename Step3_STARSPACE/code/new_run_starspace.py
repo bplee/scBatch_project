@@ -209,9 +209,9 @@ if __name__ == "__main__":
     plt.figure(figsize = (20,20))
     ax = sn.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
                 linewidths=.5, annot=True, fmt='4.2f', square = True)
-    ax.get_ylim()
-    ax.set_ylim(16, 0)
-    plt.savefig('cm_figs/fig_starspace_cm_test_is_pat_'+str(args_starspace.test_patient)+'.pdf')
+    # ax.get_ylim()
+    # ax.set_ylim(16, 0)
+    plt.savefig('cm_figs/fig_starspace_cm_test_is_pat_'+str(args_starspace.test_patient)+'.png')
 
     # TSNE plot
     X_latent_train = np.zeros([n_train, arg.dim])
@@ -263,7 +263,7 @@ if __name__ == "__main__":
             plt.scatter(umap_embedding[labels_starspace_sampled == i, 0], umap_embedding[labels_starspace_sampled == i, 1],
                         c=colors[i % 10], label=cell_type, marker='x')
     plt.legend()
-    plt.savefig('./umap_figs/fig_starspace_umap_by_labels_test_is_pat_' + str(args_starspace.test_patient) + '.pdf')
+    plt.savefig('./umap_figs/fig_starspace_umap_by_labels_test_is_pat_' + str(args_starspace.test_patient) + '.png')
 
     plt.figure(figsize=(20, 14))
     colors = plt.cm.get_cmap('tab10')(np.linspace(0, 1, 10))
@@ -275,5 +275,5 @@ if __name__ == "__main__":
             plt.scatter(umap_embedding[batches_starspace_sampled == i, 0], umap_embedding[batches_starspace_sampled == i, 1],
                         c=colors[i % 10], label=batch, marker='x')
     plt.legend()
-    plt.savefig('./umap_figs/fig_starspace_umap_by_batches_test_is_pat_' + str(args_starspace.test_patient) + '.pdf')
+    plt.savefig('./umap_figs/fig_starspace_umap_by_batches_test_is_pat_' + str(args_starspace.test_patient) + '.png')
 
