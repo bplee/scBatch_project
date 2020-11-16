@@ -71,7 +71,7 @@ if __name__ == "__main__":
     batch_train = data_obj.train_domain
 
     data_test = data_obj.test_data
-    labels_test = data_obj.train_labels
+    labels_test = data_obj.test_labels
     batch_test = data_obj.test_domain
 
     gene_names = data_obj.gene_names
