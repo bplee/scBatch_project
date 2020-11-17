@@ -89,8 +89,17 @@ if __name__ == "__main__":
     X_latent_scanvi, batches, labels_latent = trainer.full_dataset.get_latent()
 
     umap_adata = anndata.AnnData(X_latent_scanvi)
-    umap_adata.obs['batch'] = [patients[i[0]] for i in gene_dataset.batch_indices]
-    umap_adata.obs['cell_type'] = gene_dataset.cell_types
+    # umap_adata.obs['batch'] = [patients[i[0]] for i in gene_dataset.batch_indices]
+    # umap_adata.obs['cell_type'] = gene_dataset.cell_types
+
+    try:
+        umap_adata.obs['batch'] = [patients[i] for i in batches]
+        umap_adata.obs['cell_type'] = [cell_types[i] for i in labels_latent]
+    except:
+        print(f"Couldnt set both batches and cell types to the string labels")
+        umap_adata.obs['batch'] = batches
+        umap_adata.obs['cell_type'] = labels_latent
+
 
     sc.pp.neighbors(umap_adata, n_neighbors=30)
     sc.tl.umap(umap_adata)
