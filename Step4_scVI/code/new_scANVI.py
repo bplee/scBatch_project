@@ -90,5 +90,5 @@ sc.tl.umap(umap_adata)
 save_name_batch = f"_scANVI_embedding_by_batches_test_pat_{test_patient}.png"
 save_name_label = f"_scANVI_embedding_by_label_test_pat_{test_patient}.png"
 sc.pl.umap(umap_adata, color='batch', size=10, alpha=.5, save=save_name_batch)
-sc.pl.umap(umap_adata, color='label', size=10, alpha=.5, save=save_name_label)
+sc.pl.umap(umap_adata, color='cell_type', size=10, alpha=.5, save=save_name_label)
 
