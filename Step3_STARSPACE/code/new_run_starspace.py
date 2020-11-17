@@ -230,7 +230,7 @@ if __name__ == "__main__":
     # batches_starspace_sampled = batches_starspace[idx_random]
 
     umap_adata = anndata.AnnData(X_starspace)
-    umap_adata.obs['batches'] = batches_starspace
+    umap_adata.obs['batch'] = batches_starspace
     umap_adata.obs['cell_type'] = labels_starspace
 
     sc.pp.neighbors(umap_adata, n_neighbors=30)
