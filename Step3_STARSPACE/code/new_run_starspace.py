@@ -201,8 +201,8 @@ if __name__ == "__main__":
     # Create the confusion matrix and heatmap
     cm = confusion_matrix(labels_test, predict_labels)
     cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    print('Weighted accuracy of StarSpace is :', np.mean(np.diag(cm_norm)))
-    print('Unweighted accuracy of StarSpace is :', np.diag(cm).sum()/cm.sum())
+    print(f"Patient {args_starspace.test_patient} Weighted accuracy of StarSpace is : {np.mean(np.diag(cm_norm))}")
+    print(f"Patient {args_starspace.test_patient} Unweighted accuracy of StarSpace is : {np.diag(cm).sum()/cm.sum()}")
     cm_norm_df = pd.DataFrame(cm_norm,index=cell_types,columns=cell_types)
 
     ensure_dir("cm_figs")
