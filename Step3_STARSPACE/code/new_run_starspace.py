@@ -230,8 +230,17 @@ if __name__ == "__main__":
     # batches_starspace_sampled = batches_starspace[idx_random]
 
     umap_adata = anndata.AnnData(X_starspace)
-    umap_adata.obs['batch'] = [patients[i] for i in batches_starspace]
-    umap_adata.obs['cell_type'] = [cell_types[i] for i in labels_starspace]
+    try:
+        umap_adata.obs['batch'] = [patients[i] for i in batches_starspace]
+        umap_adata.obs['cell_type'] = [cell_types[i] for i in labels_starspace]
+        print("successfully turned int labels into strings")
+    except:
+        print("couldnt change the labels, sorry bro, trying to turn them into ints tho")
+        try:
+            umap_adata.obs['batch'] = np.array(batches_starspace, dtype=np.int32)
+            umap_adata.obs['cell_type'] = np.array(labels_starspace, dtype=np.int32)
+        except:
+            print("couldnt change them into ints even, big sorry bro")
 
     sc.pp.neighbors(umap_adata, n_neighbors=30)
     sc.tl.umap(umap_adata)
