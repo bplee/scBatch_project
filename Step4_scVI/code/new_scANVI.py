@@ -93,7 +93,7 @@ if __name__ == "__main__":
     # umap_adata.obs['cell_type'] = gene_dataset.cell_types
 
     try:
-        umap_adata.obs['batch'] = [patients[i] for i in batches]
+        umap_adata.obs['batch'] = [patients[i[0]] for i in batches] # indexing i because its a list of lists
         umap_adata.obs['cell_type'] = [cell_types[i] for i in labels_latent]
     except:
         print(f"Couldnt set both batches and cell types to the string labels")

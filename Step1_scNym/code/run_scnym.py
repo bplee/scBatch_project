@@ -2,6 +2,7 @@ from scnym.api import scnym_api
 import torch
 import os
 import numpy as np
+import argparse
 import anndata
 import sys
 from scvi.dataset import GeneExpressionDataset
@@ -142,7 +143,7 @@ def get_accuracies(adata, key_added="scNym"):
 
     """
     cell_types = np.unique(adata.obs.cell_type)
-    test_indices = adata.obs.batch == "1"
+    test_indices = adata.obs.annotations == "Unlabeled"
     preds = adata.obs[key_added][test_indices]
     golden_labels = adata.obs.cell_type[test_indices]
 
@@ -199,11 +200,20 @@ def plot_scnym_umap(adata, test_pat, train_pat=None, use_rep='X_scnym'):
     sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save=save_name_cell_type)
 
 if __name__ == "__main__":
-    print(f"Current Working Dir: {os.getcwd()}")
-    outpath = "./201025_scnym_temp_output"
+    parser = argparse.ArgumentParser(description='scANVI')
+    parser.add_argument('--test_patient', type=int, default=5,
+                        help='test domain')
+    parser.add_argument('--train_patient', type=int, default=None,
+                        help='test domain')
+    args_scnym = parser.parse_args()
+    print(args_scnym)
 
-    train_pat = 4
-    test_pat = 5
+    print(f"Current Working Dir: {os.getcwd()}")
+
+    train_pat = args_scnym.train_patient
+    test_pat = args_scnym.test_patient
+
+    outpath = f"201117_scnym_SSL_test_pat_{test_pat}"
 
     adata, data_obj = get_Rcc_adata(test_patient=test_pat, train_patient=train_pat, x_dim=784)
     print(f"Training scNym model off training patient {train_pat}, with test patient {test_pat}")
@@ -211,48 +221,6 @@ if __name__ == "__main__":
     print(f"Saved model to {outpath}")
     print(f"Predicting training and testing set")
     predict_from_scnym_model(adata, trained_model=outpath)
-    plot_scnym_umap(adata, )
-    #TODO: finish coding up the umap save fig stuff
-
-
-# old balancing classes for scnym code
-# TODO: shouldnt do this re naming, should just change the test/train patients
-# balanced_train_adata = get_balanced_classes(test_adata)
-# print("created balanced_train_adata from test_adata")
-#
-# balanced_test_adata = get_balanced_classes(train_adata)
-# print("created balanced_test_adata from train_adata")
-
-
-#fixing annotations because we switched the train and test sets
-# balanced_train_adata.obs.annotations = balanced_train_adata.obs.cell_type
-# balanced_test_adata.obs.annotations = "Unlabeled"
-#
-# adata = balanced_train_adata.concatenate(balanced_test_adata)
-
-# old hand coded training code
-# training scnym
-# scnym_api(adata=adata,
-#           task='train',
-#           config='no_new_identity',
-#           out_path='./scnym_test_output',  # this is going in WORKING DIR
-#           groupby='annotations')
-# print("Done training. Now for prediction")
-# scnym_api(
-#     adata=adata,
-#     task='predict',
-#     key_added='scNym',
-#     config='no_new_identity',
-#     trained_model='./scnym_test_output'
-# )
-
-# sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
-# sc.tl.umap(adata, min_dist=.3)
-# # the following are the scnym internal embeddings colored by batch and cell type
-# sc.pl.umap(adata, color='batch', size=5, alpha=.2, save='scnym_embedding_batch.png')
-# sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='scnym_embedding_celltypes.png')
-# # sc.pl.umap(adata, color='X_scnym', size=5, alpha=.2, save='201022_scnym_embedding_celltypes.png')
-#
-# sc.pp.neighbors(adata, use_rep='X', n_neighbors=30)
-# sc.tl.umap(adata, min_dist=.3)
-# sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save='scnym_og_data_umap_celltype.png')
+    accur, weighted_accur = get_accuracies(adata)
+    print(f"Accuracy: {accur}\nWeigted Accuracy: {weighted_accur}")
+    plot_scnym_umap(adata, test_pat)
