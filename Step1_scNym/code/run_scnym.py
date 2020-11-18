@@ -10,7 +10,8 @@ import scanpy as sc
 import pandas as pd
 import scnym
 from sklearn.metrics import confusion_matrix
-
+import matplotlib.pyplot as plt
+import seaborn as sn
 
 import urllib
 import json
@@ -33,6 +34,7 @@ if WORKING_DIR not in sys.path:
 
 # from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.pkl_load_data import PdRccAllData
+from Step0_Data.code.starter import *
 
 from new_prescnym_data_load import get_Rcc_adata
 
@@ -140,10 +142,20 @@ def get_accuracies(adata, key_added="scNym"):
     Returns
     -------
     tuple: accuracy and weighted accuracy of the predictions
+    saves cm matrix
 
     """
     cell_types = np.unique(adata.obs.cell_type)
+    patients = np.unique(adata.obs.batch)
     test_indices = adata.obs.annotations == "Unlabeled"
+    # this will be an int for single train domain tests and a string for multidomain train
+    test_patient_str = adata.obs.batch[test_indices][0]
+    if type(test_patient_str) == str:
+        # getting the index of the patient
+        test_patient = list(patients).index(test_patient_str)
+        # if its not a string then its a single domain test,
+        # and i dont know how to get test and train pat numbers for title
+        make_cm = True
     preds = adata.obs[key_added][test_indices]
     golden_labels = adata.obs.cell_type[test_indices]
 
@@ -160,6 +172,15 @@ def get_accuracies(adata, key_added="scNym"):
     cm = confusion_matrix(golden_labels_ints, preds_ints)
     cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
     weighted_accuracy = np.mean(np.diag(cm_norm))
+
+    if make_cm:
+        ensure_dir("cm_figs")
+
+        cm_norm_df = pd.DataFrame(cm_norm, index=cell_types, columns=cell_types)
+        plt.figure(figsize=(20, 20))
+        ax = sn.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
+                        linewidths=.5, annot=True, fmt='4.2f', square=True)
+        plt.savefig('cm_figs/fig_scnym_cm_test_pat_' + str(test_patient) + '.png')
 
     return accuracy, weighted_accuracy
 
