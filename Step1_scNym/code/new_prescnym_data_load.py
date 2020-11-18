@@ -6,6 +6,7 @@ import pandas as pd
 import anndata
 import sys
 import scnym
+import scanpy as sc
 
 import urllib
 import json
@@ -126,6 +127,9 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True):
 
     # concatenating data
     adata = train_adata.concatenate(test_adata)
+    if train_patient == None:
+        adata.obs['batch'] = np.array(data_obj.data.patient)
+        print(f"Setting batch indices for all patient training")
 
 
     print("Returning adata and RccDatasetSemi loader obj")
