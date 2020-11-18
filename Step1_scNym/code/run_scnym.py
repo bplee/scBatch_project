@@ -164,7 +164,7 @@ def get_accuracies(adata, key_added="scNym"):
 
 
 
-def plot_scnym_umap(adata, save_name='_test_scnym_embedding.png', use_rep='X_scnym', color_labeling='scNym'):
+def plot_scnym_umap(adata, test_pat, train_pat=None, use_rep='X_scnym'):
     """
     Plots umap embedding, colored by choice of labling
 
@@ -185,11 +185,18 @@ def plot_scnym_umap(adata, save_name='_test_scnym_embedding.png', use_rep='X_scn
 
     Returns
     -------
+    None
+        saves two figures
 
     """
+    if train_pat is None:
+        train_pat = "ALL"
     sc.pp.neighbors(adata, use_rep=use_rep, n_neighbors=30)
     sc.tl.umap(adata, min_dist=.3)
-    sc.pl.umap(adata, color=color_labeling, size=5, alpha=.2, save='_test_scnym_embedding_batch.png')
+    save_name_batch = f"_scnym_train_domain_{test_pat}_test_domain_{train_pat}_by_batches.png"
+    save_name_cell_type = f"_scnym_train_domain_{test_pat}_test_domain_{train_pat}_by_labels.png"
+    sc.pl.umap(adata, color='batch', size=5, alpha=.2, save=save_name_batch)
+    sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save=save_name_cell_type)
 
 if __name__ == "__main__":
     print(f"Current Working Dir: {os.getcwd()}")
