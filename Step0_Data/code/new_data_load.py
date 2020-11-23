@@ -195,9 +195,9 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         # if we're running diva and not starspace we do other jazz
         else:
-
-            data_train = np.reshape(data_train, [data_train.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
-            data_test = np.reshape(data_test, [data_test.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
+            if self.convolutions:
+                data_train = np.reshape(data_train, [data_train.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
+                data_test = np.reshape(data_test, [data_test.shape[0], int(np.sqrt(self.x_dim)), int(np.sqrt(self.x_dim))])
 
             print('Run transformers')
 
@@ -242,17 +242,13 @@ class NewRccDatasetSemi(data_utils.Dataset):
                 print(f"data_train.shape: {data_train.shape}")
                 print(f"labels_train.shape: {labels_train.shape}")
                 print(f"batch_train.shape: {batch_train.shape}")
-                if self.convolutions:
-                    data_train = data_train.unsqueeze(1)
-                return data_train, labels_train, batch_train, cell_type_names, patient_names
+                return data_train.unsqueeze(1), labels_train, batch_train, cell_type_names, patient_names
             else:
                 print(f"test patient: {self.test_patient}")
                 print(f"data_test.shape: {data_test.shape}")
                 print(f"labels_test.shape: {labels_test.shape}")
                 print(f"batch_test.shape: {batch_test.shape}")
-                if self.convolutions:
-                    data_test = data_test.unsqueeze(1)
-                return data_test, labels_test, batch_test, cell_type_names, patient_names
+                return data_test.unsqueeze(1), labels_test, batch_test, cell_type_names, patient_names
 
     def __len__(self):
         if self.train:
