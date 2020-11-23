@@ -107,7 +107,9 @@ class px(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
         super(px, self).__init__()
 
-        self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, 1024, bias=False), nn.BatchNorm1d(1024), nn.ReLU())
+#         self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, 1024, bias=False), nn.BatchNorm1d(1024), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, 1024, bias=False), nn.ReLU())
+
         # self.up1 = nn.Upsample(8)
         # self.de1 = nn.Sequential(nn.ConvTranspose2d(64, 128, kernel_size=5, stride=1, padding=0, bias=False), nn.BatchNorm2d(128), nn.ReLU())
         # self.up2 = nn.Upsample(24)
@@ -123,12 +125,12 @@ class px(nn.Module):
     def forward(self, zd, zx, zy):
         zdzxzy = torch.cat((zd, zx, zy), dim=-1)
         h = self.fc1(zdzxzy)
-        # h = h.view(-1, 64, 4, 4)
-        # h = self.up1(h)
-        # h = self.de1(h)
-        # h = self.up2(h)
-        # h = self.de2(h)
-        # loc_img = self.de3(h)
+#         h = h.view(-1, 64, 4, 4)
+#         h = self.up1(h)
+#         h = self.de1(h)
+#         h = self.up2(h)
+#         h = self.de2(h)
+#         loc_img = self.de3(h)
 
         return h
 
@@ -136,7 +138,9 @@ class px(nn.Module):
 class pzd(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
         super(pzd, self).__init__()
-        self.fc1 = nn.Sequential(nn.Linear(d_dim, zd_dim, bias=False), nn.BatchNorm1d(zd_dim), nn.ReLU())
+#         self.fc1 = nn.Sequential(nn.Linear(d_dim, zd_dim, bias=False), nn.BatchNorm1d(zd_dim), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Linear(d_dim, zd_dim, bias=False), nn.ReLU())
+
         self.fc21 = nn.Sequential(nn.Linear(zd_dim, zd_dim))
         self.fc22 = nn.Sequential(nn.Linear(zd_dim, zd_dim), nn.Softplus())
 
@@ -157,7 +161,9 @@ class pzd(nn.Module):
 class pzy(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
         super(pzy, self).__init__()
-        self.fc1 = nn.Sequential(nn.Linear(y_dim, zy_dim, bias=False), nn.BatchNorm1d(zy_dim), nn.ReLU())
+#         self.fc1 = nn.Sequential(nn.Linear(y_dim, zy_dim, bias=False), nn.BatchNorm1d(zy_dim), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Linear(d_dim, zd_dim, bias=False), nn.ReLU())
+
         self.fc21 = nn.Sequential(nn.Linear(zy_dim, zy_dim))
         self.fc22 = nn.Sequential(nn.Linear(zy_dim, zy_dim), nn.Softplus())
 
