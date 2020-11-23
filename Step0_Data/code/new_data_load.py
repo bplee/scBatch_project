@@ -29,7 +29,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, test_patient, x_dim, train=True, train_patient=None, starspace=False, scanvi=False):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None, starspace=False, scanvi=False, convoultions=True):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
@@ -39,6 +39,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         self.gene_names = None  # this is set in _get_data
         self.scanvi = scanvi
         self.batch_indices = None # used for scANVI
+        self.convolutions = convoultions
 
         if self.scanvi:
             self.GeneExpressionDataset, self.batch_indices, self.cell_types, self.patients = self._get_data()
@@ -241,14 +242,17 @@ class NewRccDatasetSemi(data_utils.Dataset):
                 print(f"data_train.shape: {data_train.shape}")
                 print(f"labels_train.shape: {labels_train.shape}")
                 print(f"batch_train.shape: {batch_train.shape}")
-
-                return data_train.unsqueeze(1), labels_train, batch_train, cell_type_names, patient_names
+                if self.convolutions:
+                    data_train = data_train.unsqueeze(1)
+                return data_train, labels_train, batch_train, cell_type_names, patient_names
             else:
                 print(f"test patient: {self.test_patient}")
                 print(f"data_test.shape: {data_test.shape}")
                 print(f"labels_test.shape: {labels_test.shape}")
                 print(f"batch_test.shape: {batch_test.shape}")
-                return data_test.unsqueeze(1), labels_test, batch_test, cell_type_names, patient_names
+                if self.convolutions:
+                    data_test = data_test.unsqueeze(1)
+                return data_test, labels_test, batch_test, cell_type_names, patient_names
 
     def __len__(self):
         if self.train:
