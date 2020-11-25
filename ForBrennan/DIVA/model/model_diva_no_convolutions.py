@@ -109,7 +109,7 @@ class px(nn.Module):
 
 #         self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, 1024, bias=False), nn.BatchNorm1d(1024), nn.ReLU())
         self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, 1024, bias=False), nn.ReLU())
-
+        self.fc2 = nn.Sequential(nn.Linear(1024, x_dim, bias=False), nn.ReLU())
         # self.up1 = nn.Upsample(8)
         # self.de1 = nn.Sequential(nn.ConvTranspose2d(64, 128, kernel_size=5, stride=1, padding=0, bias=False), nn.BatchNorm2d(128), nn.ReLU())
         # self.up2 = nn.Upsample(24)
@@ -327,8 +327,10 @@ class DIVA(nn.Module):
 
             x_recon = self.px(zd_q, zx_q, zy_q)
 
-            x_recon = x_recon.view(-1, 256)
-            x_target = (x.view(-1) * 255).long()
+            # x_recon = x_recon.view(-1, 256)
+            # x_target = (x.view(-1) * 255).long()
+
+            x_target = x
             CE_x = F.cross_entropy(x_recon, x_target, reduction='sum')
 
             zd_p_minus_zd_q = torch.sum(pzd.log_prob(zd_q) - qzd.log_prob(zd_q))
