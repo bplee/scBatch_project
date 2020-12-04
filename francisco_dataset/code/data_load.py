@@ -39,15 +39,18 @@ def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
     Parameters
     ----------
     directory : str
-        directory where francisco's data is
+        dir where francisco's data is
 
     Returns
     -------
     pandas df
         contains all counts and patient and cluster columms
     """
-    for i, f in enumerate(os.listdir(directory)):
-        df = read_data(f)
+    files = os.listdir(directory)
+    n = len(files)
+    for i, f in enumerate(files):
+        print(f"{i}/{n}")
+        df = read_data(os.path.join(directory,f))
         if i == 0:
             rtn = df
         else:
