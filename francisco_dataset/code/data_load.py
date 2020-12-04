@@ -49,7 +49,7 @@ def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
     files = os.listdir(directory)
     n = len(files)
     for i, f in enumerate(files):
-        print(f"{i}/{n}")
+        print(f"{i}/{n} files", end='\r')
         df = read_data(os.path.join(directory,f))
         if i == 0:
             rtn = df
