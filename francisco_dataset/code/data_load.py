@@ -46,15 +46,19 @@ def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
     pandas df
         contains all counts and patient and cluster columms
     """
+    print("Loading Francisco Data Files from folder:")
+    start_time = time.perf_counter()
     files = os.listdir(directory)
     n = len(files)
     for i, f in enumerate(files):
-        print(f"{i}/{n} files", end='\r')
+        print(f"  Completed {i}/{n} files", end='\r')
         df = read_data(os.path.join(directory,f))
         if i == 0:
             rtn = df
         else:
             rtn = pd.concat([rtn, df], axis=0)
+    delta_time = time.perf_counter() - start_time
+    print(f"Total Time: {delta_time}")
     return rtn
 
 if __name__ == "__main__":
