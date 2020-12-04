@@ -57,6 +57,7 @@ def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
             rtn = df
         else:
             rtn = pd.concat([rtn, df], axis=0)
+    print(f"  Completed {n}/{n} files")
     delta_time = time.perf_counter() - start_time
     print(f"Total Time: {delta_time}")
     return rtn
