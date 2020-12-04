@@ -11,6 +11,7 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 
+data_dir = "/data/leslie/bplee/scBatch/francisco_dataset/data/"
 
 def get_pat_id_from_filepath(f):
     return os.path.split(f)[-1].split("_")[0]
@@ -60,7 +61,23 @@ def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
     print(f"  Completed {n}/{n} files")
     delta_time = time.perf_counter() - start_time
     print(f"Total Time: {delta_time}")
+
+    # setting all NA vals to zero
+    rtn = rtn.fillna(0)
+
+    # reordering to put patients column first
+    cols = list(rtn)
+    # move the column to head of list using index, pop and insert
+    cols.insert(0, cols.pop(cols.index('PATIENT')))
+    rtn = rtn.ix[:, cols]
+
     return rtn
+
+def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/francisco_dataset/data/201204_CRC_data.pkl"):
+    print("Saving dataframe to pickle")
+    df.to_pickle(pkl_path, protocol=4)
+    print(f"Saved to {pkl_path}")
+
 
 if __name__ == "__main__":
 
