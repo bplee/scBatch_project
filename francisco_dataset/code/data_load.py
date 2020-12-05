@@ -69,7 +69,7 @@ def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
     cols = list(rtn)
     # move the column to head of list using index, pop and insert
     cols.insert(0, cols.pop(cols.index('PATIENT')))
-    rtn = rtn.ix[:, cols]
+    rtn = rtn.iloc[:, cols]
 
     return rtn
 
