@@ -73,7 +73,7 @@ def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
 
     return rtn
 
-def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/francisco_dataset/data/201204_CRC_data.pkl"):
+def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/francisco_dataset/pkl_files/201204_CRC_data.pkl"):
     print("Saving dataframe to pickle")
     df.to_pickle(pkl_path, protocol=4)
     print(f"Saved to {pkl_path}")
