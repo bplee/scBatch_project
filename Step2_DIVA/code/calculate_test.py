@@ -137,10 +137,10 @@ if __name__ == "__main__":
         print(model_name)
         print(args)
 
-        if "no_conv" in model_name:
-            conv = False
-        else:
+        if args.conv is None:
             conv = True
+        else:
+            conv = args.conv
 
         args.cuda = not args.no_cuda and torch.cuda.is_available()
         device = torch.device("cuda" if args.cuda else "cpu")

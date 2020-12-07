@@ -185,6 +185,8 @@ if __name__ == "__main__":
                         help='number of epochs to train (default: 10)')
     parser.add_argument('--lr', type=float, default=0.001,
                         help='learning rate (default: 0.01)')
+    parser.add_argument('--conv', type=bool, default=False,
+                        help='run DIVA with convolutional layers? (default: False)')
     # parser.add_argument('--num-supervised', default=1000, type=int,
     #                    help="number of supervised examples, /10 = samples per class")
 
@@ -268,14 +270,14 @@ if __name__ == "__main__":
     # Load supervised training
     train_loader_sup = data_utils.DataLoader(
         RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
-                       train=True, x_dim=784, convolutions=False),
+                       train=True, x_dim=784, convolutions=args.conv),
         batch_size=args.batch_size,
         shuffle=True)
 
     # Load unsupervised training (test set with no labels)
     train_loader_unsup = data_utils.DataLoader(
         RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
-                       train=False, x_dim=784, convolutions=False),
+                       train=False, x_dim=784, convolutions=args.conv),
         batch_size=args.batch_size,
         shuffle=True)
 
