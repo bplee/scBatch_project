@@ -29,7 +29,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, test_patient, x_dim, train=True, train_patient=None, starspace=False, scanvi=False, convoultions=True):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None, starspace=False, scanvi=False, convolutions=True):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
@@ -39,7 +39,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         self.gene_names = None  # this is set in _get_data
         self.scanvi = scanvi
         self.batch_indices = None # used for scANVI
-        self.convolutions = convoultions
+        self.convolutions = convolutions
 
         if self.scanvi:
             self.GeneExpressionDataset, self.batch_indices, self.cell_types, self.patients = self._get_data()

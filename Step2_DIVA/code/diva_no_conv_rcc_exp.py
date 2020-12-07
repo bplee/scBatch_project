@@ -268,14 +268,14 @@ if __name__ == "__main__":
     # Load supervised training
     train_loader_sup = data_utils.DataLoader(
         RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
-                       train=True, x_dim=784, convoultions=False),
+                       train=True, x_dim=784, convolutions=False),
         batch_size=args.batch_size,
         shuffle=True)
 
     # Load unsupervised training (test set with no labels)
     train_loader_unsup = data_utils.DataLoader(
         RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
-                       train=False, x_dim=784, convoultions=False),
+                       train=False, x_dim=784, convolutions=False),
         batch_size=args.batch_size,
         shuffle=True)
 
