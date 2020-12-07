@@ -125,6 +125,7 @@ class px(nn.Module):
     def forward(self, zd, zx, zy):
         zdzxzy = torch.cat((zd, zx, zy), dim=-1)
         h = self.fc1(zdzxzy)
+        h = self.fc2(h)
 #         h = h.view(-1, 64, 4, 4)
 #         h = self.up1(h)
 #         h = self.de1(h)
