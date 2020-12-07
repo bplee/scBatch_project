@@ -137,19 +137,24 @@ if __name__ == "__main__":
         print(model_name)
         print(args)
 
+        if "no_conv" in model_name:
+            conv = False
+        else:
+            conv = True
+
         args.cuda = not args.no_cuda and torch.cuda.is_available()
         device = torch.device("cuda" if args.cuda else "cpu")
         kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
         # Load test
         if supervised:
-            my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
+            my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False, convolutions=conv)
             test_loader_sup = data_utils.DataLoader(
                      my_dataset,
                      batch_size=args.batch_size,
                      shuffle=True)
             cell_types, _ = my_dataset.cell_types_batches()
         else:
-           my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
+           my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False, convolutions=conv)
            test_loader_sup = data_utils.DataLoader(
                      my_dataset,
                      batch_size=args.batch_size,
