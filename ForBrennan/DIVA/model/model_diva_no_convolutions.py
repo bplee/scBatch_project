@@ -163,8 +163,7 @@ class pzy(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
         super(pzy, self).__init__()
 #         self.fc1 = nn.Sequential(nn.Linear(y_dim, zy_dim, bias=False), nn.BatchNorm1d(zy_dim), nn.ReLU())
-        self.fc1 = nn.Sequential(nn.Linear(d_dim, zd_dim, bias=False), nn.ReLU())
-
+        self.fc1 = nn.Sequential(nn.Linear(y_dim, zy_dim, bias=False), nn.ReLU())
         self.fc21 = nn.Sequential(nn.Linear(zy_dim, zy_dim))
         self.fc22 = nn.Sequential(nn.Linear(zy_dim, zy_dim), nn.Softplus())
 
