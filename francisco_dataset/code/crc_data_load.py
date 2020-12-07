@@ -80,7 +80,7 @@ def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/francisco_dataset
 
 
 if __name__ == "__main__":
-
-    all_data = concat_data()
-
+    pkl_path = "/data/leslie/bplee/scBatch/francisco_dataset/pkl_files/201204_CRC_data.pkl"
+    # all_data = concat_data()
+    all_data = pd.read_pickle(pkl_path)
 
