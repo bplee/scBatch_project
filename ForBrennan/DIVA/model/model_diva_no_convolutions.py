@@ -390,9 +390,8 @@ class DIVA(nn.Module):
         else: # supervised
             x_recon, d_hat, y_hat, qzd, pzd, zd_q, qzx, pzx, zx_q, qzy, pzy, zy_q = self.forward(d, x, y)
 
-            x_recon = x_recon.view(-1, 256)
-            x_target = (x.view(-1) * 255).long()
-            CE_x = F.cross_entropy(x_recon, x_target, reduction='sum')
+            x_target = x
+            CE_x = torch.norm(x_recon - x_target)
 
             zd_p_minus_zd_q = torch.sum(pzd.log_prob(zd_q) - qzd.log_prob(zd_q))
             if self.zx_dim != 0:
