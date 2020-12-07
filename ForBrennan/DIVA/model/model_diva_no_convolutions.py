@@ -331,7 +331,9 @@ class DIVA(nn.Module):
             # x_target = (x.view(-1) * 255).long()
 
             x_target = x
-            CE_x = F.cross_entropy(x_recon, x_target, reduction='sum')
+            # CE_x = F.cross_entropy(x_recon, x_target, reduction='sum')
+            # using MSE instead
+            CE_x = torch.norm(x_recon - x_target)
 
             zd_p_minus_zd_q = torch.sum(pzd.log_prob(zd_q) - qzd.log_prob(zd_q))
             if self.zx_dim != 0:
@@ -340,7 +342,9 @@ class DIVA(nn.Module):
                 KL_zx = 0
 
             _, d_target = d.max(dim=1)
-            CE_d = F.cross_entropy(d_hat, d_target, reduction='sum')
+            # CE_d = F.cross_entropy(d_hat, d_target, reduction='sum')
+            # using MSE here too
+            CE_d = torch.norm(d_hat, d_target)
 
             num_labels = self.y_dim
             # num_labels = y.shape[1]
