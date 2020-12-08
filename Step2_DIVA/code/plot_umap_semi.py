@@ -21,6 +21,7 @@ print("\tWorking dir appended to Sys path.")
 #from paper_experiments.rotated_mnist.dataset.rcc_loader import RccDataset
 from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
+from Step0_Data.code.starter import get_valid_diva_models
 
 def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_patient, cell_types, patients):
     model.eval()
@@ -212,20 +213,9 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
 if __name__ == "__main__":
     # this file is meant to be able to grab all valid models in a dir and run it on all of them
-    files = os.listdir()
-    model_file_exts = set(("model", "config"))
-    name_exts = [f.split(".") for f in files if f.split(".")[-1] in model_file_exts]
-    # print(name_exts)
-    model_names = []
-    while name_exts:
-        curr = name_exts.pop()
-        for i, f in enumerate(name_exts):
-            # if the model names are the same
-            if f[0] == curr[0]:
-                # if there is both the ".model" and ".config" extension
-                if set((f[-1], curr[-1])) == model_file_exts:
-                    model_names.append(curr[0])
 
+    # function from starter code, returns list of model names (no file ext's), not filepaths
+    model_names = get_valid_diva_models()
 
     # train_patient = 0
     supervised = False
@@ -246,11 +236,16 @@ if __name__ == "__main__":
         args.cuda = not args.no_cuda and torch.cuda.is_available()
         device = torch.device("cuda" if args.cuda else "cpu")
         kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
-        
+
+        try:
+            conv = args.conv
+        except:
+            conv = True
+
         # Load test
         if ~supervised:
-           my_dataset_train = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=True)
-           my_dataset_test = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False)
+           my_dataset_train = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=True, convolutions=conv)
+           my_dataset_test = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False, convolutions=conv)
            train_loader = data_utils.DataLoader(
                      my_dataset_train,
                      batch_size=args.batch_size,
