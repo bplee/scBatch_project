@@ -27,6 +27,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
     model.eval()
     """
     get the latent factors and plot the UMAP plots
+    produces 18 plots/testpatient: [zy, zd, zx] x [patient label, cell type label] x [train, test, train+test]
     """
     actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
 
