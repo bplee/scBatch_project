@@ -11,7 +11,7 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 
-data_dir = "/data/leslie/bplee/scBatch/francisco_dataset/data/"
+data_dir = "/data/leslie/bplee/scBatch/CRC_dataset/data/raw_count_files"
 
 def get_pat_id_from_filepath(f):
     return os.path.split(f)[-1].split("_")[0]
@@ -22,7 +22,7 @@ def read_data(f):
     Parameters
     ----------
     f : str
-        filepath to francisco data file
+        filepath to CRC data file
 
     Returns
     -------
@@ -34,20 +34,20 @@ def read_data(f):
     rtn["PATIENT"] = get_pat_id_from_filepath(f)
     return rtn
 
-def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
+def concat_data(directory="/data/leslie/bplee/scBatch/CRC_dataset/data/raw_count_files"):
     """
 
     Parameters
     ----------
     directory : str
-        dir where francisco's data is
+        dir where CRC's data is
 
     Returns
     -------
     pandas df
         contains all counts and patient and cluster columms
     """
-    print("Loading Francisco Data Files from folder:")
+    print("Loading CRC Data Files from folder:")
     start_time = time.perf_counter()
     files = os.listdir(directory)
     n = len(files)
@@ -73,14 +73,31 @@ def concat_data(directory="/data/leslie/bplee/scBatch/francisco_dataset/data/"):
 
     return rtn
 
-def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/francisco_dataset/pkl_files/201204_CRC_data.pkl"):
+def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"):
     print("Saving dataframe to pickle")
     df.to_pickle(pkl_path, protocol=4)
     print(f"Saved to {pkl_path}")
 
 
 if __name__ == "__main__":
-    pkl_path = "/data/leslie/bplee/scBatch/francisco_dataset/pkl_files/201204_CRC_data.pkl"
+    pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     # all_data = concat_data()
     all_data = pd.read_pickle(pkl_path)
+    patient_subset = ["TS-101T",
+                      "TS-104T",
+                      "TS-105T",
+                      "TS-106T",
+                      "TS-108T",
+                      "TS-109T",
+                      "TS-117T",
+                      "TS-122T",
+                      "TS-123T",
+                      "TS-124T",
+                      "TS-125T",
+                      "TS-127T",
+                      "TS-128T",
+                      "TS-129T",
+                      "TS-131T",
+                      "TS-136T"]
+
 
