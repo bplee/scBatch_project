@@ -80,7 +80,7 @@ def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/CRC_dataset/pkl_f
     df.to_pickle(pkl_path, protocol=4)
     print(f"Saved to {pkl_path}")
 
-def get_ranked_marker_genes(df):
+def get_ranked_marker_genes(df, patient_name=None):
     """
     perform filtering and leiden clustering of cell count data for a pd
 
@@ -90,6 +90,9 @@ def get_ranked_marker_genes(df):
     ----------
     df : pandas df
         a counts matrix with 2 extra columns for PATIENT and for CLUSTER
+
+    patient_name : str
+        (default is None) name to label a figure. If set to None, will not produce a figure
 
     Returns
     -------
@@ -117,13 +120,22 @@ def get_ranked_marker_genes(df):
     adata.raw = adata
     adata = adata[:, adata.var.highly_variable]
     sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
+
+    # UMAP stuff
     sc.pp.scale(adata, max_value=10)
     sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
     sc.tl.umap(adata)
-    sc.pl.umap(adata, color=['batch', 'cluster'])
+
+    # leiden clustering
     sc.tl.leiden(adata)
+
+    # saving figure
+    save_name = f"_{patient_name}_filtered_leiden.png"
+    sc.pl.umap(adata, color=['batch', 'cluster', 'leiden'], save=save_name)
+
+    # Rank genes
     sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
-    sc.pl.rank_genes_groups(adata, n_genes=25, sharey=False)
+    # sc.pl.rank_genes_groups(adata, n_genes=25, sharey=False)
 
     return adata
 
