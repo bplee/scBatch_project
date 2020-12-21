@@ -99,5 +99,6 @@ if __name__ == "__main__":
                       "TS-129T",
                       "TS-131T",
                       "TS-136T"]
-
+    og_pat_inds = all_data['PATIENT'].isin(patient_subset)
+    all_data[og_pat_inds]
 
