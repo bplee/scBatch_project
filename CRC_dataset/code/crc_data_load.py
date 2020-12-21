@@ -3,6 +3,8 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import scanpy as sc
+import anndata
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 # adding the project dir to the path to import relevant modules below
@@ -78,6 +80,53 @@ def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/CRC_dataset/pkl_f
     df.to_pickle(pkl_path, protocol=4)
     print(f"Saved to {pkl_path}")
 
+def get_marker_genes(df):
+    """
+    perform filtering and leiden clustering of cell count data for a pd
+
+    expects data without batch effects
+
+    Parameters
+    ----------
+    df : pandas df
+        a counts matrix with 2 extra columns for PATIENT and for CLUSTER
+
+    Returns
+    -------
+    anndata obj
+        with new cluster labels
+
+    """
+    counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
+    pats = np.array(df['PATIENT'])
+    clust = np.array(df['CLUSTER']).astype(str)
+    adata = anndata.AnnData(counts)
+    adata.obs['batch'] = pats
+    adata.obs['cluster'] = clust
+    adata.obs_names_make_unique()
+    # sc.pl.highest_expr_genes(adata, n_top=20, )
+    sc.pp.filter_cells(adata, min_genes=200)
+    sc.pp.filter_genes(adata, min_cells=3)
+    adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
+    sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
+    adata = adata[adata.obs.n_genes_by_counts < 2500, :]
+    adata = adata[adata.obs.pct_counts_mt < 5, :]
+    sc.pp.normalize_total(adata, target_sum=1e4)
+    sc.pp.log1p(adata)
+    sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+    adata.raw = adata
+    adata = adata[:, adata.var.highly_variable]
+    sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
+    sc.pp.scale(adata, max_value=10)
+    sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
+    sc.tl.umap(adata)
+    sc.pl.umap(adata, color=['batch', 'cluster'])
+    sc.tl.leiden(adata)
+    sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
+    sc.pl.rank_genes_groups(adata, n_genes=25, sharey=False)
+
+    return adata
+
 
 if __name__ == "__main__":
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
@@ -100,5 +149,33 @@ if __name__ == "__main__":
                       "TS-131T",
                       "TS-136T"]
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
-    all_data[og_pat_inds]
+    og_data = all_data[og_pat_inds]
 
+    # counts = og_data.drop(['PATIENT','CLUSTER'], axis=1)
+    # pats = np.array(og_data['PATIENT'])
+    # clust = np.array(og_data['CLUSTER']).astype(str)
+    # adata = anndata.AnnData(counts)
+    # adata.obs['batch'] = pats
+    # adata.obs['cluster'] = clust
+    # adata.obs_names_make_unique()
+    # # sc.pl.highest_expr_genes(adata, n_top=20, )
+    # sc.pp.filter_cells(adata, min_genes=200)
+    # sc.pp.filter_genes(adata, min_cells=3)
+    # adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
+    # sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
+    # adata = adata[adata.obs.n_genes_by_counts < 2500, :]
+    # adata = adata[adata.obs.pct_counts_mt < 5, :]
+    # sc.pp.normalize_total(adata, target_sum=1e4)
+    # sc.pp.log1p(adata)
+    # sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+    # adata.raw = adata
+    # adata = adata[:, adata.var.highly_variable]
+    # sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
+    # sc.pp.scale(adata, max_value=10)
+    # sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
+    # sc.tl.umap(adata)
+    # sc.pl.umap(adata, color=['batch', 'cluster'])
+    # sc.tl.leiden(adata)
+    # sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
+    # sc.pl.rank_genes_groups(adata, n_genes=25, sharey=False)
+    # sc.tl.rank_genes_groups(adata, 'leiden', method='wilcoxon')
