@@ -80,7 +80,7 @@ def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/CRC_dataset/pkl_f
     df.to_pickle(pkl_path, protocol=4)
     print(f"Saved to {pkl_path}")
 
-def get_marker_genes(df):
+def get_ranked_marker_genes(df):
     """
     perform filtering and leiden clustering of cell count data for a pd
 
@@ -94,7 +94,7 @@ def get_marker_genes(df):
     Returns
     -------
     anndata obj
-        with new cluster labels
+        with leiden cluster labels, and differential expression for different genes
 
     """
     counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
