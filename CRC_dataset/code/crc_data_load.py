@@ -98,6 +98,7 @@ def get_ranked_marker_genes(df, patient_name=None):
     -------
     anndata obj
         with leiden cluster labels, and differential expression for different genes
+        see rankings with `pd.DataFrame(adata.uns['rank_genes_groups']['names'])`
 
     """
     counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
@@ -139,6 +140,26 @@ def get_ranked_marker_genes(df, patient_name=None):
 
     return adata
 
+def get_pval_df(adata):
+    """
+    Gets df of ranked genes and pval for each group (ranked by "score")
+
+    Parameters
+    ----------
+    adata : anndata obj
+        post ranked marker gene analysis
+
+    Returns
+    -------
+    pandas df, double column format for each group
+
+    """
+    result = adata.uns['rank_genes_groups']
+    groups = result['names'].dtype.names
+    rtn = pd.DataFrame(
+        {group + '_' + key[:1]: result[key][group]
+         for group in groups for key in ['names', 'pvals']})
+    return rtn
 
 if __name__ == "__main__":
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
@@ -162,6 +183,14 @@ if __name__ == "__main__":
                       "TS-136T"]
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
     og_data = all_data[og_pat_inds]
+
+    patient_clusters = []
+    for name, df in og_data.groupby('PATIENT'):
+        patient_clusters.append(get_ranked_marker_genes(df))
+    gene_rank_pds = []
+    for i in range(len(patient_clusters)):
+        gene_rank_pds.append(get_pval_df(patient_clusters[i]))
+
 
     # counts = og_data.drop(['PATIENT','CLUSTER'], axis=1)
     # pats = np.array(og_data['PATIENT'])
