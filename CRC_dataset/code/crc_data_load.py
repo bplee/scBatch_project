@@ -112,7 +112,8 @@ def get_ranked_marker_genes(df, patient_name=None):
     sc.pp.filter_cells(adata, min_genes=200)
     sc.pp.filter_genes(adata, min_cells=3)
     adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
-    sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
+    adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
+    sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
     adata = adata[adata.obs.n_genes_by_counts < 2500, :]
     adata = adata[adata.obs.pct_counts_mt < 5, :]
     sc.pp.normalize_total(adata, target_sum=1e4)
@@ -122,22 +123,24 @@ def get_ranked_marker_genes(df, patient_name=None):
     adata = adata[:, adata.var.highly_variable]
     sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
 
+    # UMAP stuff
+    sc.pp.scale(adata, max_value=10)
+    sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
+    sc.tl.umap(adata)
+
+    # leiden clustering
+    sc.tl.leiden(adata)
+
     if patient_name is not None:
-        # UMAP stuff
-        sc.pp.scale(adata, max_value=10)
-        sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
-        sc.tl.umap(adata)
-
-        # leiden clustering
-        sc.tl.leiden(adata)
-
         # saving figure
         save_name = f"_{patient_name}_filtered_leiden.png"
         sc.pl.umap(adata, color=['batch', 'cluster', 'leiden'], save=save_name)
 
-        # Rank genes
-        sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
-        # sc.pl.rank_genes_groups(adata, n_genes=25, sharey=False)
+    # Rank genes
+    sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
+    if patient_name is not None:
+        rank_gene_save_name = f"_pat_{patient_name}.png"
+        sc.pl.rank_genes_groups(adata, save_name=rank_gene_save_name)
 
     return adata
 
