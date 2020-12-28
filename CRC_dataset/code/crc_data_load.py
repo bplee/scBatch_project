@@ -122,21 +122,22 @@ def get_ranked_marker_genes(df, patient_name=None):
     adata = adata[:, adata.var.highly_variable]
     sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
 
-    # UMAP stuff
-    sc.pp.scale(adata, max_value=10)
-    sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
-    sc.tl.umap(adata)
+    if patient_name is not None:
+        # UMAP stuff
+        sc.pp.scale(adata, max_value=10)
+        sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
+        sc.tl.umap(adata)
 
-    # leiden clustering
-    sc.tl.leiden(adata)
+        # leiden clustering
+        sc.tl.leiden(adata)
 
-    # saving figure
-    save_name = f"_{patient_name}_filtered_leiden.png"
-    sc.pl.umap(adata, color=['batch', 'cluster', 'leiden'], save=save_name)
+        # saving figure
+        save_name = f"_{patient_name}_filtered_leiden.png"
+        sc.pl.umap(adata, color=['batch', 'cluster', 'leiden'], save=save_name)
 
-    # Rank genes
-    sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
-    # sc.pl.rank_genes_groups(adata, n_genes=25, sharey=False)
+        # Rank genes
+        sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
+        # sc.pl.rank_genes_groups(adata, n_genes=25, sharey=False)
 
     return adata
 
