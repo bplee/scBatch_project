@@ -114,12 +114,16 @@ def get_ranked_marker_genes(df, patient_name=None):
     adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
     adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
     sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
+    print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
+    print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
     adata = adata[adata.obs.n_genes_by_counts < 2500, :]
     adata = adata[adata.obs.pct_counts_mt < 5, :]
     sc.pp.normalize_total(adata, target_sum=1e4)
     sc.pp.log1p(adata)
     sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
     adata.raw = adata
+    print(f" Number of highly variable MT genes: {sum(adata.var.highly_variable * adata.var.mt)}")
+    print(f" Number of highly variable ribo genes: {sum(adata.var.highly_variable * adata.var.ribo)}")
     adata = adata[:, adata.var.highly_variable]
     sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
 
