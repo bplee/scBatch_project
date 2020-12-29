@@ -199,6 +199,13 @@ if __name__ == "__main__":
     for i in range(len(patient_clusters)):
         gene_rank_pds.append(get_pval_df(patient_clusters[i]))
 
+    gene_markers_path = "/data/leslie/bplee/scBatch/CRC_dataset/metadata/immune_markers.xlsx"
+
+    # here columns are the different cell types and rows are diff genes
+    # no correspondence between genes in the same row
+    first_markers = pd.read_excel(gene_markers_path, sheet_name=0)
+    second_markers = pd.read_excel(gene_markers_path, sheet_name=1)
+    
 
     # counts = og_data.drop(['PATIENT','CLUSTER'], axis=1)
     # pats = np.array(og_data['PATIENT'])
