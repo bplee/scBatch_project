@@ -189,7 +189,7 @@ def assess_marker_genes(df, markers, n_genes=30):
 
     genes_by_groups = df.iloc[:n_genes, range(0, len(df.columns), 2)]
     # genes_by_groups.iloc[:30, range(0, len(a.columns), 2)].apply(lambda x: sum(markers.T_cell.isin(x)), axis=0)
-    return genes_by_groups.apply(lambda y: first_markers.apply(lambda x: sum(x.isin(y[:20])), axis=0), axis=0)
+    return genes_by_groups.apply(lambda y: markers.apply(lambda x: sum(x.isin(y[:20])), axis=0), axis=0)
 
 if __name__ == "__main__":
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
@@ -217,6 +217,13 @@ if __name__ == "__main__":
     test = get_ranked_marker_genes(ex_pat)
     a = get_pval_df(test)
 
+    gene_markers_path = "/data/leslie/bplee/scBatch/CRC_dataset/metadata/immune_markers.xlsx"
+
+    # here columns are the different cell types and rows are diff genes
+    # no correspondence between genes in the same row
+    first_markers = pd.read_excel(gene_markers_path, sheet_name=0)
+    second_markers = pd.read_excel(gene_markers_path, sheet_name=1)
+
     patient_clusters = []
     for name, df in og_data.groupby('PATIENT'):
         patient_clusters.append(get_ranked_marker_genes(df))
@@ -224,12 +231,7 @@ if __name__ == "__main__":
     for i in range(len(patient_clusters)):
         gene_rank_pds.append(get_pval_df(patient_clusters[i]))
 
-    gene_markers_path = "/data/leslie/bplee/scBatch/CRC_dataset/metadata/immune_markers.xlsx"
 
-    # here columns are the different cell types and rows are diff genes
-    # no correspondence between genes in the same row
-    first_markers = pd.read_excel(gene_markers_path, sheet_name=0)
-    second_markers = pd.read_excel(gene_markers_path, sheet_name=1)
 
     # for col in first_markers.columns:
     #     print(col)
