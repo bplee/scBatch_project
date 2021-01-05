@@ -189,7 +189,7 @@ def assess_marker_genes(df, markers, n_genes=30):
 
     genes_by_groups = df.iloc[:n_genes, range(0, len(df.columns), 2)]
     # genes_by_groups.iloc[:30, range(0, len(a.columns), 2)].apply(lambda x: sum(markers.T_cell.isin(x)), axis=0)
-    return genes_by_groups.apply(lambda y: markers.apply(lambda x: sum(x.isin(y[:20])), axis=0), axis=0)
+    return genes_by_groups.apply(lambda y: markers.apply(lambda x: sum(x.isin(y[:n_genes])), axis=0), axis=0)
 
 if __name__ == "__main__":
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
