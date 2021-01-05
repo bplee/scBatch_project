@@ -169,6 +169,28 @@ def get_pval_df(adata):
          for group in groups for key in ['names', 'pvals']})
     return rtn
 
+def assess_marker_genes(df, markers, n_genes=30):
+    """
+
+    Parameters
+    ----------
+    df : pandas df
+        of gene names and pvals (return of the `get_pval_df` function)
+    markers : pandas df
+        of gene markers to search for, where each column is a different cell type
+    n_genes : int
+        (default is 30) number of top scoring genes to search through for markers
+
+    Returns
+    -------
+    pandas df [|groups| x |cell types|]
+
+    """
+
+    genes_by_groups = df.iloc[:n_genes, range(0, len(a.columns), 2)]
+    # genes_by_groups.iloc[:30, range(0, len(a.columns), 2)].apply(lambda x: sum(markers.T_cell.isin(x)), axis=0)
+    return genes_by_groups.apply(lambda y: first_markers.apply(lambda x: sum(x.isin(y[:20])), axis=0), axis=0)
+
 if __name__ == "__main__":
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     # all_data = concat_data()
@@ -191,6 +213,9 @@ if __name__ == "__main__":
                       "TS-136T"]
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
     og_data = all_data[og_pat_inds]
+    ex_pat = og_data[og_data.PATIENT == 'TS-108T']
+    test = get_ranked_marker_genes(ex_pat)
+    a = get_pval_df(test)
 
     patient_clusters = []
     for name, df in og_data.groupby('PATIENT'):
@@ -205,33 +230,8 @@ if __name__ == "__main__":
     # no correspondence between genes in the same row
     first_markers = pd.read_excel(gene_markers_path, sheet_name=0)
     second_markers = pd.read_excel(gene_markers_path, sheet_name=1)
-    
 
-    # counts = og_data.drop(['PATIENT','CLUSTER'], axis=1)
-    # pats = np.array(og_data['PATIENT'])
-    # clust = np.array(og_data['CLUSTER']).astype(str)
-    # adata = anndata.AnnData(counts)
-    # adata.obs['batch'] = pats
-    # adata.obs['cluster'] = clust
-    # adata.obs_names_make_unique()
-    # # sc.pl.highest_expr_genes(adata, n_top=20, )
-    # sc.pp.filter_cells(adata, min_genes=200)
-    # sc.pp.filter_genes(adata, min_cells=3)
-    # adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
-    # sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
-    # adata = adata[adata.obs.n_genes_by_counts < 2500, :]
-    # adata = adata[adata.obs.pct_counts_mt < 5, :]
-    # sc.pp.normalize_total(adata, target_sum=1e4)
-    # sc.pp.log1p(adata)
-    # sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
-    # adata.raw = adata
-    # adata = adata[:, adata.var.highly_variable]
-    # sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
-    # sc.pp.scale(adata, max_value=10)
-    # sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
-    # sc.tl.umap(adata)
-    # sc.pl.umap(adata, color=['batch', 'cluster'])
-    # sc.tl.leiden(adata)
-    # sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
-    # sc.pl.rank_genes_groups(adata, n_genes=25, sharey=False)
-    # sc.tl.rank_genes_groups(adata, 'leiden', method='wilcoxon')
+    # for col in first_markers.columns:
+    #     print(col)
+    #     for i in range(13):
+    #         print(sum(first_markers[col].isin(a[str(i) + '_n'][:30])))
