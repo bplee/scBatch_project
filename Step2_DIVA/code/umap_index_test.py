@@ -64,8 +64,8 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
 
-        train_only_pats = patients[labels_d]
-        train_only_cell_types = cell_types[labels_y]
+        train_only_labels_d = labels_d
+        train_only_labels_y = labels_y
 
         ## Test
 
@@ -100,8 +100,8 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
 
-        test_only_pats = patients[labels_d]
-        test_only_cell_types = cell_types[labels_y]
+        test_only_labels_d = labels_d
+        test_only_labels_y = labels_y
 
         ## Train + Test
 
@@ -155,8 +155,8 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
 
-        train_test_pats = patients[labels_d]
-        train_test_cell_types = cell_types[labels_y]
+        train_test_labels_d = labels_d
+        train_test_labels_y = labels_y
 
 
 if __name__ == "__main__":
