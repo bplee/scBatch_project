@@ -97,8 +97,8 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True, 
     adata = anndata.AnnData(gene_dataset.X)
     adata.obs['cell_type'] = np.array(cell_labels)
     adata.obs['batch'] = np.array(patient_labels)
-    adata.obs['annotation'] = np.array(cell_labels)
-    adata.obs['annotation'][patient_indices == test_patient] = 'Unlabeled'
+    adata.obs['annotations'] = np.array(cell_labels)
+    adata.obs['annotations'][patient_indices == test_patient] = 'Unlabeled'
 
     if train_patient is not None:
         keep_inds_bool = np.logical_or(patient_indices == train_patient, patient_indices == test_patient)
