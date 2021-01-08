@@ -23,141 +23,6 @@ from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 from Step0_Data.code.starter import get_valid_diva_models
 
-def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_patient, cell_types, patients):
-    model.eval()
-    """
-    get the latent factors and plot the UMAP plots
-    produces 18 plots/testpatient: [zy, zd, zx] x [patient label, cell type label] x [train, test, train+test]
-    """
-    actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
-
-    with torch.no_grad():
-        # Train
-        patients_train = np.delete(patients, test_patient)
-        i = 0
-        for (xs, ys, ds) in train_loader:
-            i = i + 1
-            # To device
-            xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
-
-            # use classification function to compute all predictions for each batch
-            zy_loc, zy_scale = model.qzy(xs)
-            zd_loc, zd_scale = model.qzd(xs)
-            zx_loc, zx_scale = model.qzx(xs)
-            zy_.append(np.array(zy_loc.cpu()))
-            zd_.append(np.array(zd_loc.cpu()))
-            zx_.append(np.array(zx_loc.cpu()))
-            actuals_d.append(np.argmax(ds,axis=1))
-            actuals_y.append(np.argmax(ys,axis=1))
-            if i == 50:
-               break
-
-        zy = zy_[0]
-        zd = zd_[0]
-        zx = zx_[0]
-        labels_y = actuals_y[0]
-        labels_d = actuals_d[0]
-        for i in range(1,50):
-            zy = np.vstack((zy, zy_[i]))
-            zd = np.vstack((zd, zd_[i]))
-            zx = np.vstack((zx, zx_[i]))
-            labels_y = np.hstack((labels_y, actuals_y[i]))
-            labels_d = np.hstack((labels_d, actuals_d[i]))
-
-        train_only_labels_d = labels_d
-        train_only_labels_y = labels_y
-
-        ## Test
-
-        actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
-        i = 0
-        for (xs, ys, ds) in test_loader:
-            i = i + 1
-            # To device
-            xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
-
-            # use classification function to compute all predictions for each batch
-            zy_loc, zy_scale = model.qzy(xs)
-            zd_loc, zd_scale = model.qzd(xs)
-            zx_loc, zx_scale = model.qzx(xs)
-            zy_.append(np.array(zy_loc.cpu()))
-            zd_.append(np.array(zd_loc.cpu()))
-            zx_.append(np.array(zx_loc.cpu()))
-            actuals_d.append(np.argmax(ds, axis=1))
-            actuals_y.append(np.argmax(ys, axis=1))
-            if i == 50:
-                break
-
-        zy = zy_[0]
-        zd = zd_[0]
-        zx = zx_[0]
-        labels_y = actuals_y[0]
-        labels_d = actuals_d[0]
-        for i in range(1, 50):
-            zy = np.vstack((zy, zy_[i]))
-            zd = np.vstack((zd, zd_[i]))
-            zx = np.vstack((zx, zx_[i]))
-            labels_y = np.hstack((labels_y, actuals_y[i]))
-            labels_d = np.hstack((labels_d, actuals_d[i]))
-
-        test_only_labels_d = labels_d
-        test_only_labels_y = labels_y
-
-        ## Train + Test
-
-        patients = np.append(patients_train, patients[test_patient])
-        actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
-        i = 0
-        for (xs, ys, ds) in train_loader:
-            i = i + 1
-            # To device
-            xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
-
-            # use classification function to compute all predictions for each batch
-            zy_loc, zy_scale = model.qzy(xs)
-            zd_loc, zd_scale = model.qzd(xs)
-            zx_loc, zx_scale = model.qzx(xs)
-            zy_.append(np.array(zy_loc.cpu()))
-            zd_.append(np.array(zd_loc.cpu()))
-            zx_.append(np.array(zx_loc.cpu()))
-            actuals_d.append(np.argmax(ds, axis=1))
-            actuals_y.append(np.argmax(ys, axis=1))
-            if i == 50:
-                break
-
-        i = 0
-        for (xs, ys, ds) in test_loader:
-            i = i + 1
-            # To device
-            xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
-
-            # use classification function to compute all predictions for each batch
-            zy_loc, zy_scale = model.qzy(xs)
-            zd_loc, zd_scale = model.qzd(xs)
-            zx_loc, zx_scale = model.qzx(xs)
-            zy_.append(np.array(zy_loc.cpu()))
-            zd_.append(np.array(zd_loc.cpu()))
-            zx_.append(np.array(zx_loc.cpu()))
-            actuals_d.append(np.argmax(ds, axis=1))
-            actuals_y.append(np.argmax(ys, axis=1))
-            if i == 10:
-                break
-
-        zy = zy_[0]
-        zd = zd_[0]
-        zx = zx_[0]
-        labels_y = actuals_y[0]
-        labels_d = actuals_d[0]
-        for i in range(1, 50 + 10):
-            zy = np.vstack((zy, zy_[i]))
-            zd = np.vstack((zd, zd_[i]))
-            zx = np.vstack((zx, zx_[i]))
-            labels_y = np.hstack((labels_y, actuals_y[i]))
-            labels_d = np.hstack((labels_d, actuals_d[i]))
-
-        train_test_labels_d = labels_d
-        train_test_labels_y = labels_y
-
 
 if __name__ == "__main__":
     # this file is meant to be able to grab all valid models in a dir and run it on all of them
@@ -216,7 +81,7 @@ if __name__ == "__main__":
     test_patient = args.test_patient
     train_patient = args.train_patient
 
-    actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
+    pred_d_, pred_y_, actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], [], [], []
 
     with torch.no_grad():
         # Train
@@ -227,6 +92,10 @@ if __name__ == "__main__":
             # To device
             xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
 
+            pred_d, pred_y = model.classifier(xs)
+            pred_d_.append(pred_d)
+            pred_y_.append(pred_y)
+
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
             zd_loc, zd_scale = model.qzd(xs)
@@ -244,25 +113,36 @@ if __name__ == "__main__":
         zx = zx_[0]
         labels_y = actuals_y[0]
         labels_d = actuals_d[0]
+        predictions_y = pred_y_[0]
+        predictions_d = pred_d_[0]
         for i in range(1, 50):
             zy = np.vstack((zy, zy_[i]))
             zd = np.vstack((zd, zd_[i]))
             zx = np.vstack((zx, zx_[i]))
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
+            predictions_y = np.vstack((predictions_y, pred_y_[i]))
+            predictions_d = np.vstack((predictions_d, pred_d_[i]))
 
         train_only_labels_d = labels_d
         train_only_labels_y = labels_y
 
+        train_only_preds_d = predictions_d
+        train_only_preds_y = predictions_y
+
         ## Test
 
-        actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
+        pred_d_, pred_y_, actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], [], [], []
         i = 0
         for (xs, ys, ds) in test_loader:
             i = i + 1
             # To device
             xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
 
+            pred_d, pred_y = model.classifier(xs)
+            pred_d_.append(pred_d)
+            pred_y_.append(pred_y)
+
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
             zd_loc, zd_scale = model.qzd(xs)
@@ -280,26 +160,36 @@ if __name__ == "__main__":
         zx = zx_[0]
         labels_y = actuals_y[0]
         labels_d = actuals_d[0]
+        predictions_y = pred_y_[0]
+        predictions_d = pred_d_[0]
         for i in range(1, 50):
             zy = np.vstack((zy, zy_[i]))
             zd = np.vstack((zd, zd_[i]))
             zx = np.vstack((zx, zx_[i]))
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
-
+            predictions_y = np.vstack((predictions_y, pred_y_[i]))
+            predictions_d = np.vstack((predictions_d, pred_d_[i]))
         test_only_labels_d = labels_d
         test_only_labels_y = labels_y
+
+        test_only_preds_d = predictions_d
+        test_only_preds_y = predictions_y
 
         ## Train + Test
 
         patients = np.append(patients_train, patients[test_patient])
-        actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
+        pred_d_, pred_y_, actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], [], [], []
         i = 0
         for (xs, ys, ds) in train_loader:
             i = i + 1
             # To device
             xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
 
+            pred_d, pred_y = model.classifier(xs)
+            pred_d_.append(pred_d)
+            pred_y_.append(pred_y)
+
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
             zd_loc, zd_scale = model.qzd(xs)
@@ -317,6 +207,10 @@ if __name__ == "__main__":
             i = i + 1
             # To device
             xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
+
+            pred_d, pred_y = model.classifier(xs)
+            pred_d_.append(pred_d)
+            pred_y_.append(pred_y)
 
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
@@ -335,12 +229,19 @@ if __name__ == "__main__":
         zx = zx_[0]
         labels_y = actuals_y[0]
         labels_d = actuals_d[0]
+        predictions_y = pred_y_[0]
+        predictions_d = pred_d_[0]
         for i in range(1, 50 + 10):
             zy = np.vstack((zy, zy_[i]))
             zd = np.vstack((zd, zd_[i]))
             zx = np.vstack((zx, zx_[i]))
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
+            predictions_y = np.vstack((predictions_y, pred_y_[i]))
+            predictions_d = np.vstack((predictions_d, pred_d_[i]))
 
         train_test_labels_d = labels_d
         train_test_labels_y = labels_y
+
+        train_test_preds_d = predictions_d
+        train_test_preds_y = predictions_y
