@@ -141,7 +141,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
         ## Train + Test
 
-        patients = np.append(patients_train, patients[test_patient])
+        # patients = np.append(patients_train, patients[test_patient])
         actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
         i = 0
         for (xs, ys, ds) in train_loader:
