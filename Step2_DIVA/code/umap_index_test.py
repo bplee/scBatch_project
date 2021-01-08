@@ -209,8 +209,8 @@ if __name__ == "__main__":
             xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
 
             pred_d, pred_y = model.classifier(xs)
-            pred_d_.append(pred_d)
-            pred_y_.append(pred_y)
+            pred_d_.append(pred_d.cpu())
+            pred_y_.append(pred_y.cpu())
 
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
