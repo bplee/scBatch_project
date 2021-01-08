@@ -36,7 +36,7 @@ def unwrap_list(lst):
     except:
         return lst
 
-def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True):
+def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True, shuffle=False):
     """
 
     Parameters
@@ -94,43 +94,64 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True):
                                     remap_attributes=False)
     gene_dataset.subsample_genes(x_dim)
 
-    # selecting all of the indices that mark our testing patient
-    test_patient_inds = unwrap_list(gene_dataset.batch_indices == [test_patient])
-    # using inds to select data for our patient
-    test_patient_data = gene_dataset.X[test_patient_inds]
+    adata = anndata.AnnData(gene_dataset.X)
+    adata.obs['cell_type'] = np.array(cell_labels)
+    adata.obs['batch'] = np.array(patient_labels)
+    adata.obs['annotation'] = np.array(cell_labels)
+    adata.obs['annotation'][patient_indices == test_patient] = 'Unlabeled'
 
-    # if there was no training patient
-    if train_patient is None:
-        # training set will be all other patients
-        train_patient_inds = ~test_patient_inds
-        train_patient_data = gene_dataset.X[train_patient_inds]
-    else:
-        # selecting all of the indices that mark our training patient
-        train_patient_inds = unwrap_list(gene_dataset.batch_indices == [train_patient])
-        # using inds to select data for our patient
-        train_patient_data = gene_dataset.X[train_patient_inds]
+    if train_patient is not None:
+        keep_inds_bool = np.logical_or(patient_indices == train_patient, patient_indices == test_patient)
+        keep_inds = np.arange(len(keep_inds_bool))[keep_inds_bool]
+        adata = adata[keep_inds, :]
 
-    # making the data obj for our training and test patient
-    train_adata = anndata.AnnData(np.array(train_patient_data))
-    # train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
-    test_adata = anndata.AnnData(np.array(test_patient_data))
 
-    # setting gold labels: (using names and not indices)
-    cell_labels = cell_type_names[unwrap_list(gene_dataset.labels)]
+    ## OLD WAY
+    # # selecting all of the indices that mark our testing patient
+    # test_patient_inds = unwrap_list(gene_dataset.batch_indices == [test_patient])
+    # # using inds to select data for our patient
+    # test_patient_data = gene_dataset.X[test_patient_inds]
+    #
+    # # if there was no training patient
+    # if train_patient is None:
+    #     # training set will be all other patients
+    #     train_patient_inds = ~test_patient_inds
+    #     train_patient_data = gene_dataset.X[train_patient_inds]
+    # else:
+    #     # selecting all of the indices that mark our training patient
+    #     train_patient_inds = unwrap_list(gene_dataset.batch_indices == [train_patient])
+    #     # using inds to select data for our patient
+    #     train_patient_data = gene_dataset.X[train_patient_inds]
+    #
+    # # making the data obj for our training and test patient
+    # train_adata = anndata.AnnData(np.array(train_patient_data))
+    # # train_adata = anndata.AnnData(np.array(train.train_data.reshape(train_cell_num, X_DIM)))
+    # test_adata = anndata.AnnData(np.array(test_patient_data))
+    #
+    # # setting gold labels: (using names and not indices)
+    # cell_labels = cell_type_names[unwrap_list(gene_dataset.labels)]
+    #
+    # train_adata.obs['cell_type'] = np.array(cell_labels[train_patient_inds])  # there are cell types for multiple patients so we index for the one we care about
+    # test_adata.obs['cell_type'] = np.array(cell_labels[test_patient_inds])
+    #
+    # # setting the semi_supervised labels:
+    # train_adata.obs['annotations'] = np.array(cell_labels[train_patient_inds])
+    # test_adata.obs['annotations'] = 'Unlabeled'
+    #
+    # # concatenating data
+    # adata = train_adata.concatenate(test_adata)
+    # if train_patient == None:
+    #     adata.obs['batch'] = np.array(data_obj.data.patient)
+    #     print(f"Setting batch indices for all patient training")
 
-    train_adata.obs['cell_type'] = np.array(cell_labels[train_patient_inds])  # there are cell types for multiple patients so we index for the one we care about
-    test_adata.obs['cell_type'] = np.array(cell_labels[test_patient_inds])
-
-    # setting the semi_supervised labels:
-    train_adata.obs['annotations'] = np.array(cell_labels[train_patient_inds])
-    test_adata.obs['annotations'] = 'Unlabeled'
-
-    # concatenating data
-    adata = train_adata.concatenate(test_adata)
-    if train_patient == None:
-        adata.obs['batch'] = np.array(data_obj.data.patient)
-        print(f"Setting batch indices for all patient training")
-
+    # shuffle data:
+    if shuffle == True:
+        inds = np.arange(len(adata))
+        np.random.shuffle(inds)
+        adata.obs.batch = np.array(adata.obs.batch[inds])
+        adata.obs.annotations = np.array(adata.obs.annotations[inds])
+        adata.obs.cell_type = np.array(adata.obs.cell_type[inds])
+        adata.X = np.array(adata.X[inds])
 
     print("Returning adata and RccDatasetSemi loader obj")
     print(f"Test Patient: {test_patient}")
