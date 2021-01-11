@@ -100,7 +100,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, log_norm=True, 
     adata.obs['annotations'] = np.array(cell_labels)
     adata.obs['annotations'][patient_indices == test_patient] = 'Unlabeled'
     adata.obs['dist'] = 'train'
-    adata.obs['train'][patient_indices == test_patient] = 'test'
+    adata.obs['dist'][patient_indices == test_patient] = 'test'
 
     if train_patient is not None:
         keep_inds_bool = np.logical_or(patient_indices == train_patient, patient_indices == test_patient)
