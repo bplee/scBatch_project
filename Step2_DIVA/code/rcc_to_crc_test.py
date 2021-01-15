@@ -47,7 +47,7 @@ class DIVALoader(data_utils.Dataset):
         patients = adata.obs.batch
         raw_counts = adata.X
         print('Re-writing labels and patients as indices')
-        labels, self.cell_type_names = pd.factorize(cell_types)
+        labels, cell_type_names = pd.factorize(cell_types)
         batch_indices, patient_names = pd.factorize(patients)
 
         test_pat_int = np.where(patient_names == test_pat)
