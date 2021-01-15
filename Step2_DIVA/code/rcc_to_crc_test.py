@@ -43,12 +43,15 @@ class DIVALoader(data_utils.Dataset):
         training and testing data loaders for DIVA
         """
         print(adata)
-        cell_types = adata.obs.cell_types
+        cell_types = adata.obs.cell_type
         patients = adata.obs.batch
-        raw_counts = cell_types.X
+        raw_counts = adata.X
         print('Re-writing labels and patients as indices')
         labels, self.cell_type_names = pd.factorize(cell_types)
         batch_indices, patient_names = pd.factorize(patients)
+
+        test_pat_int = np.where(patient_names == test_pat)
+
         gene_names = adata.var  # np array
         print('Importing gene expression ds')
         gene_dataset = GeneExpressionDataset()
@@ -65,8 +68,8 @@ class DIVALoader(data_utils.Dataset):
 
         print('Making tensor batches')
 
-        idx_batch_train = ~(gene_dataset.batch_indices == test_pat).ravel()
-        idx_batch_test = (gene_dataset.batch_indices == test_pat).ravel()
+        idx_batch_train = ~(gene_dataset.batch_indices == test_pat_int).ravel()
+        idx_batch_test = (gene_dataset.batch_indices == test_pat_int).ravel()
 
         batch_train = gene_dataset.batch_indices[idx_batch_train].ravel()
         batch_test = gene_dataset.batch_indices[idx_batch_test].ravel()
@@ -108,6 +111,7 @@ class DIVALoader(data_utils.Dataset):
         labels_test = labels_test[inds]
         batch_test = batch_test[inds]
 
+        n_labels = len(labels)
         # Convert to onehot
         y = torch.eye(n_labels)
         labels_train = y[labels_train]
