@@ -169,6 +169,7 @@ if __name__ == "__main__":
     # getting one test patien
     crc_test_pat = "TS-101T"
     crc_data = crc_all_data[crc_all_data['PATIENT'] == crc_test_pat]
+    del crc_all_data
     crc_cluster = crc_data.CLUSTER
     crc_patient = crc_data.PATIENT
     crc_raw_counts = crc_data.drop(["CLUSTER", "PATIENT"], axis=1)
@@ -223,6 +224,7 @@ if __name__ == "__main__":
     crc_raw_counts = crc_raw_counts[genes_in_both]
     crc_adata = anndata.AnnData(np.log(crc_raw_counts + 1))
     crc_adata.obs['annotations'] = 'Unlabeled'
+    del crc_raw_counts
 
     rcc_symbol_genes = rcc_symbol_genes[genes_in_both]
     # there are 2 cols for "BAZ2B" and "CYB561D2"
@@ -242,8 +244,14 @@ if __name__ == "__main__":
     rcc_adata = anndata.AnnData(np.log(rcc_symbol_genes+1))
     rcc_adata.obs['cell_type'] = rcc_cell_type
     rcc_adata.obs['annotations'] = rcc_cell_type
+    del rcc_raw_counts
+    del rcc_symbol_genes
 
     adata = rcc_adata.concatenate(crc_adata)
     adata.obs['batch'] = np.array(pd.concat([rcc_patient, crc_patient]))
+
+    del rcc_adata
+    del crc_adata
+
 
     obj = DIVALoader(adata, crc_test_pat)
