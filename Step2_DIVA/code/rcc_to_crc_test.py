@@ -21,12 +21,19 @@ class DIVALoader(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, adata, test_pat, x_dim=784):
+    def __init__(self, adata, test_pat, x_dim=784, train=True, dry_copy=False):
         self.test_patient = test_pat
         self.x_dim = x_dim
-        train_loader_data, test_loader_data = self.get_diva_train_test_loaders(adata, test_pat, x_dim)
-        self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = train_loader_data
-        self.test_data, self.test_labels, self.test_domain, self.cell_types, self.patients = test_loader_data
+        self.train = train
+        if dry_copy == False:
+            train_loader_data, test_loader_data = self.get_diva_train_test_loaders(adata, test_pat, x_dim)
+            self.train_data, self.train_labels, self.train_domain, self.cell_types, self.patients = train_loader_data
+            self.test_data, self.test_labels, self.test_domain, self.cell_types, self.patients = test_loader_data
+        else:
+            self.train_data, self.train_labels, self.train_domain = None, None, None
+            self.test_data, self.test_labels, self.test_domain = None, None, None
+            self.cell_types = None
+            self.patients = None
 
     def get_diva_train_test_loaders(self, adata, test_pat, x_dim):
         """
@@ -129,8 +136,7 @@ class DIVALoader(data_utils.Dataset):
         print(f" batch_train.shape: {batch_train.shape}")
         train_loader = [data_train.unsqueeze(1), labels_train, batch_train, cell_type_names, patient_names]
         print("Summary: Test Data Loader")
-        print(f" test patient: {patient_names[test_pat]} (#{test_pat})")
-        print(f" train patient: {test_pat}")
+        print(f" test patient: {patient_names[test_pat_int]} (#{test_pat_int})")
         print(f" data_test.shape: {data_test.shape}")
         print(f" labels_test.shape: {labels_test.shape}")
         print(f" batch_test.shape: {batch_test.shape}")
