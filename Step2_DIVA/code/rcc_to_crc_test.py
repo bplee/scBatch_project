@@ -118,7 +118,8 @@ class DIVALoader(data_utils.Dataset):
         labels_test = y[labels_test]
 
         # Convert to onehot
-        d = torch.eye(6)
+        n_pats = len(patient_names)
+        d = torch.eye(n_pats)
         batch_train = d[batch_train]
         batch_test = d[batch_test]
 
@@ -252,6 +253,5 @@ if __name__ == "__main__":
 
     del rcc_adata
     del crc_adata
-
 
     obj = DIVALoader(adata, crc_test_pat)
