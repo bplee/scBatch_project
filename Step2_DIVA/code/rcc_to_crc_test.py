@@ -42,7 +42,7 @@ class DIVALoader(data_utils.Dataset):
         -------
         training and testing data loaders for DIVA
         """
-
+        print(adata)
         cell_types = adata.obs.cell_types
         patients = adata.obs.batch
         raw_counts = cell_types.X
@@ -242,4 +242,4 @@ if __name__ == "__main__":
     adata = rcc_adata.concatenate(crc_adata)
     adata.obs['batch'] = np.array(pd.concat([rcc_patient, crc_patient]))
 
-    DIVALoader(adata, crc_test_pat)
+    obj = DIVALoader(adata, crc_test_pat)
