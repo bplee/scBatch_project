@@ -169,8 +169,41 @@ def get_pval_df(adata):
          for group in groups for key in ['names', 'pvals']})
     return rtn
 
+def plot_gene_marker_umaps(adata, gene_markers, cell_type, save_name):
+    """
+    Plots umap of data colored by the gene markers for a specified cell type
+
+    Needs to be run on the output of `get_ranked_marker_genes`
+
+    Parameters
+    ----------
+    adata : anndata.AnnData obj
+        contains AnnData.obsm["X_umap"] and list of gene names
+    gene_markers : pandas df
+        dataframe where cols are cell types; each is a list of genes for the cell type
+
+    cell_type : str
+        cell type, should be a column in gene_markers
+    save_name
+
+    Returns
+    -------
+    None
+        saves umap figs
+
+    """
+    marker_gene_names = gene_markers[cell_type].dropna()
+    n_gene_markers = len(marker_gene_names)
+    markers_in_dataset = marker_gene_names.isin(adata.var.index)
+    if sum(markers_in_dataset) < n_gene_markers:
+        print(f"The following genes makers for {cell_type} do not exist in the dataset:")
+        print(marker_gene_names[~markers_in_dataset])
+    umap_colorings = np.array(marker_gene_names[markers_in_dataset])
+    sc.pl.umap(adata, color=umap_colorings, save=save_name)
+
 def assess_marker_genes(df, markers, n_genes=30):
     """
+    gets number of marker genes for each cell type (col) in markers that belong to each clusters DEGs
 
     Parameters
     ----------
@@ -190,6 +223,25 @@ def assess_marker_genes(df, markers, n_genes=30):
     genes_by_groups = df.iloc[:n_genes, range(0, len(df.columns), 2)]
     # genes_by_groups.iloc[:30, range(0, len(a.columns), 2)].apply(lambda x: sum(markers.T_cell.isin(x)), axis=0)
     return genes_by_groups.apply(lambda y: markers.apply(lambda x: sum(x.isin(y[:n_genes])), axis=0), axis=0)
+
+# def get_vianne_subset(df):
+#     """
+#     Returns a df of counts for ony the genes listed in viannes file
+#
+#     Parameters
+#     ----------
+#     df : pandas df
+#         dataframe where column values are gene names that we can subset
+#
+#     Returns
+#     -------
+#     subset of the pandas df that was inputted, where you only select specified genes
+#
+#     """
+#     vianne_genes_file_path = '/data/leslie/bplee/scBatch/CRC_dataset/metadata/vianne_gene_subset.txt'
+#
+#     vianne_genes = pd.read_csv(vianne_genes_file_path).to_numpy().T[0]
+#     df.columns
 
 if __name__ == "__main__":
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
@@ -213,9 +265,11 @@ if __name__ == "__main__":
                       "TS-136T"]
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
     og_data = all_data[og_pat_inds]
+
+    # small test data:
     ex_pat = og_data[og_data.PATIENT == 'TS-108T']
-    test = get_ranked_marker_genes(ex_pat)
-    a = get_pval_df(test)
+    # test = get_ranked_marker_genes(ex_pat)
+    # a = get_pval_df(test)
 
     gene_markers_path = "/data/leslie/bplee/scBatch/CRC_dataset/metadata/immune_markers.xlsx"
 
@@ -224,12 +278,56 @@ if __name__ == "__main__":
     first_markers = pd.read_excel(gene_markers_path, sheet_name=0)
     second_markers = pd.read_excel(gene_markers_path, sheet_name=1)
 
+    # # specific example for vianne,
+    # vianne = pd.read_csv("../metadata/vianne_gene_subset.txt", header=None)
+    # vianne = vianne.to_numpy().T[0]
+    # vianne = np.delete(vianne, np.isin(vianne, ['KLRA1', 'CD103', 'CPA1', 'LY6G', 'IL12'])) # missing these cell types
+    #
+    # df = ex_pat
+    #
+    # counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
+    # pats = np.array(df['PATIENT'])
+    # clust = np.array(df['CLUSTER']).astype(str)
+    # adata = anndata.AnnData(counts)
+    # adata.obs['batch'] = pats
+    # adata.obs['cluster'] = clust
+    # adata.obs_names_make_unique()
+    # # sc.pl.highest_expr_genes(adata, n_top=20, )
+    # sc.pp.filter_cells(adata, min_genes=200)
+    # sc.pp.filter_genes(adata, min_cells=3)
+    # adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
+    # adata.var['ribo'] = adata.var_names.str.startswith(
+    #     ("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
+    # sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
+    # print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
+    # print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
+    # adata = adata[adata.obs.n_genes_by_counts < 2500, :]
+    # adata = adata[adata.obs.pct_counts_mt < 5, :]
+    # mini = adata[:, vianne]
+    # mini.var_names_make_unique()
+    # mini.var_names_make_unique()
+    # sc.pp.normalize_total(mini, target_sum=1e4)
+    # sc.pp.neighbors(mini, n_neighbors=10)
+    # sc.tl.umap(mini)
+    # label_colors_for_plotting = list(vianne)
+    # label_colors_for_plotting.append('total_counts')
+    # sc.pl.umap(mini, color=np.array(label_colors_for_plotting), save="_vianne_genes_and_counts.png")
+
+
     patient_clusters = []
     for name, df in og_data.groupby('PATIENT'):
+        # getting the ranked marker genes for each patient
         patient_clusters.append(get_ranked_marker_genes(df))
+
     gene_rank_pds = []
     for i in range(len(patient_clusters)):
+        # getting readable tables of top scoring genes and pvals for each group
         gene_rank_pds.append(get_pval_df(patient_clusters[i]))
+
+    n_genes = 30
+    markers_found = []
+    for i, df in enumerate(gene_rank_pds):
+        markers_found.append(assess_marker_genes(df, first_markers, n_genes=n_genes))
 
 
 
