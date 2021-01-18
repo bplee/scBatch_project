@@ -199,6 +199,7 @@ def plot_gene_marker_umaps(adata, gene_markers, cell_type, save_name):
         print(f"The following genes makers for {cell_type} do not exist in the dataset:")
         print(marker_gene_names[~markers_in_dataset])
     umap_colorings = np.array(marker_gene_names[markers_in_dataset])
+    umap_colorings = np.append(umap_colorings, "leiden")
     sc.pl.umap(adata, color=umap_colorings, save=save_name)
 
 def assess_marker_genes(df, markers, n_genes=30):
