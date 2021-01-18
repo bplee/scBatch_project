@@ -82,7 +82,18 @@ def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/CRC_dataset/pkl_f
 
 def get_ranked_marker_genes(df, patient_name=None):
     """
-    perform filtering and leiden clustering of cell count data for a pd
+    performs:
+        - cell filtering
+        - qc for mt and ribo genes
+        - normalization
+        - log transform
+        - selecting for highly variable genes
+        - regressing out mt stuff (?)
+        - removal of mt and ribo genes
+
+        - umap
+        - leiden clustering
+        - rank DEG analysis between leiden clusters
 
     expects data without batch effects
 
@@ -126,6 +137,11 @@ def get_ranked_marker_genes(df, patient_name=None):
     print(f" Number of highly variable ribo genes: {sum(adata.var.highly_variable * adata.var.ribo)}")
     adata = adata[:, adata.var.highly_variable]
     sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
+
+    # removing mitochondrial and ribosomal genes:
+    print(f" Removing ribo and mitochondrial genes")
+    keep_genes = ~adata.var.mt & ~adata.var.ribo
+    adata = adata[:, keep_genes]
 
     # UMAP stuff
     sc.pp.scale(adata, max_value=10)
