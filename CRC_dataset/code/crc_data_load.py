@@ -330,33 +330,33 @@ if __name__ == "__main__":
     #
     # df = ex_pat
     #
-counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
-pats = np.array(df['PATIENT'])
-clust = np.array(df['CLUSTER']).astype(str)
-adata = anndata.AnnData(counts)
-adata.obs['batch'] = pats
-adata.obs['cluster'] = clust
-adata.obs_names_make_unique()
-# sc.pl.highest_expr_genes(adata, n_top=20, )
-sc.pp.filter_cells(adata, min_genes=200)
-sc.pp.filter_genes(adata, min_cells=3)
-adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
-adata.var['ribo'] = adata.var_names.str.startswith(
-    ("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
-sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
-print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
-print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
-adata = adata[adata.obs.n_genes_by_counts < 2500, :]
-adata = adata[adata.obs.pct_counts_mt < 5, :]
-mini = adata[:, vianne]
-mini.var_names_make_unique()
-mini.var_names_make_unique()
-sc.pp.normalize_total(mini, target_sum=1e4)
-sc.pp.neighbors(mini, n_neighbors=10)
-sc.tl.umap(mini)
-label_colors_for_plotting = list(vianne)
-label_colors_for_plotting.append('total_counts')
-sc.pl.umap(mini, color=np.array(label_colors_for_plotting), save="_vianne_genes_and_counts.png")
+    # counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
+    # pats = np.array(df['PATIENT'])
+    # clust = np.array(df['CLUSTER']).astype(str)
+    # adata = anndata.AnnData(counts)
+    # adata.obs['batch'] = pats
+    # adata.obs['cluster'] = clust
+    # adata.obs_names_make_unique()
+    # # sc.pl.highest_expr_genes(adata, n_top=20, )
+    # sc.pp.filter_cells(adata, min_genes=200)
+    # sc.pp.filter_genes(adata, min_cells=3)
+    # adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
+    # adata.var['ribo'] = adata.var_names.str.startswith(
+    #     ("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
+    # sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
+    # print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
+    # print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
+    # adata = adata[adata.obs.n_genes_by_counts < 2500, :]
+    # adata = adata[adata.obs.pct_counts_mt < 5, :]
+    # mini = adata[:, vianne]
+    # mini.var_names_make_unique()
+    # mini.var_names_make_unique()
+    # sc.pp.normalize_total(mini, target_sum=1e4)
+    # sc.pp.neighbors(mini, n_neighbors=10)
+    # sc.tl.umap(mini)
+    # label_colors_for_plotting = list(vianne)
+    # label_colors_for_plotting.append('total_counts')
+    # sc.pl.umap(mini, color=np.array(label_colors_for_plotting), save="_vianne_genes_and_counts.png")
 
 
     patient_clusters = []
