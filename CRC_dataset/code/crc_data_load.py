@@ -84,16 +84,25 @@ def get_ranked_marker_genes(df, patient_name=None):
     """
     performs:
         - cell filtering
-        - qc for mt and ribo genes
+        - gene filtering
+        - removing cells with MT gene count% > 20%
+        - saving an adata.raw
+        - removing MT and ribo genes
         - normalization
         - log transform
-        - selecting for highly variable genes
-        - regressing out mt stuff (?)
-        - removal of mt and ribo genes
 
         - umap
         - leiden clustering
         - rank DEG analysis between leiden clusters
+
+        - selecting for highly variable genes PULLS CLUSTERS APART
+
+        - TODO:
+            - GENES THAT ARE BROADLY EXPRESSED GET TOSSED OUT
+            - LOOK AT MEAN RAW COUNT ACROSS ALL GENES, CUT TAILS
+            - DISTRIBUTION OF LIBRARY SIZE AND CUT OFF
+            - PLOT LIBRARY CELLS
+
 
     expects data without batch effects
 
@@ -119,33 +128,46 @@ def get_ranked_marker_genes(df, patient_name=None):
     adata.obs['batch'] = pats
     adata.obs['cluster'] = clust
     adata.obs_names_make_unique()
-    # sc.pl.highest_expr_genes(adata, n_top=20, )
+
+    # removing sparse genes and cells
     sc.pp.filter_cells(adata, min_genes=200)
     sc.pp.filter_genes(adata, min_cells=3)
+
+    # identifying mt and ribo genes
     adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
     adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
-    sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
     print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
     print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
-    adata = adata[adata.obs.n_genes_by_counts < 2500, :]
-    adata = adata[adata.obs.pct_counts_mt < 5, :]
-    sc.pp.normalize_total(adata, target_sum=1e4)
-    sc.pp.log1p(adata)
-    sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+
+    # calculating pct_count_mt/ribo etc.
+    sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
+
+    # removing all cells with mt% > 20%
+    print(f" Number of cells with MT%>20: {sum(adata.obs.pct_counts_mt>20)} ")
+    adata = adata[adata.obs.pct_counts_mt<20, :]
+
+    # saving a raw, not sure if its needed anymore, can be access by adata.raw.to_adata()
     adata.raw = adata
-    print(f" Number of highly variable MT genes: {sum(adata.var.highly_variable * adata.var.mt)}")
-    print(f" Number of highly variable ribo genes: {sum(adata.var.highly_variable * adata.var.ribo)}")
-    adata = adata[:, adata.var.highly_variable]
-    sc.pp.regress_out(adata, ['total_counts', 'pct_counts_mt'])
 
     # removing mitochondrial and ribosomal genes:
     print(f" Removing ribo and mitochondrial genes")
     keep_genes = ~adata.var.mt & ~adata.var.ribo
     adata = adata[:, keep_genes]
 
+    # adata = adata[adata.obs.n_genes_by_counts < 2500, :]
+    # adata = adata[adata.obs.pct_counts_mt < 5, :]
+
+    sc.pp.normalize_total(adata, target_sum=1e4)
+    sc.pp.log1p(adata)
+
+    # sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+    # print(f" Number of highly variable MT genes: {sum(adata.var.highly_variable * adata.var.mt)}")
+    # print(f" Number of highly variable ribo genes: {sum(adata.var.highly_variable * adata.var.ribo)}")
+    # adata = adata[:, adata.var.highly_variable]
+
     # UMAP stuff
     sc.pp.scale(adata, max_value=10)
-    sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
+    sc.pp.neighbors(adata, n_neighbors=20, n_pcs=40)
     sc.tl.umap(adata)
 
     # leiden clustering
@@ -264,22 +286,28 @@ if __name__ == "__main__":
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     # all_data = concat_data()
     all_data = pd.read_pickle(pkl_path)
+    # patient_subset = ["TS-101T",
+    #                   "TS-104T",
+    #                   "TS-105T",
+    #                   "TS-106T",
+    #                   "TS-108T",
+    #                   "TS-109T",
+    #                   "TS-117T",
+    #                   "TS-122T",
+    #                   "TS-123T",
+    #                   "TS-124T",
+    #                   "TS-125T",
+    #                   "TS-127T",
+    #                   "TS-128T",
+    #                   "TS-129T",
+    #                   "TS-131T",
+    #                   "TS-136T"]
     patient_subset = ["TS-101T",
                       "TS-104T",
-                      "TS-105T",
+                      # "TS-105T",
                       "TS-106T",
                       "TS-108T",
-                      "TS-109T",
-                      "TS-117T",
-                      "TS-122T",
-                      "TS-123T",
-                      "TS-124T",
-                      "TS-125T",
-                      "TS-127T",
-                      "TS-128T",
-                      "TS-129T",
-                      "TS-131T",
-                      "TS-136T"]
+                      "TS-109T"]
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
     og_data = all_data[og_pat_inds]
 
@@ -302,33 +330,33 @@ if __name__ == "__main__":
     #
     # df = ex_pat
     #
-    # counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
-    # pats = np.array(df['PATIENT'])
-    # clust = np.array(df['CLUSTER']).astype(str)
-    # adata = anndata.AnnData(counts)
-    # adata.obs['batch'] = pats
-    # adata.obs['cluster'] = clust
-    # adata.obs_names_make_unique()
-    # # sc.pl.highest_expr_genes(adata, n_top=20, )
-    # sc.pp.filter_cells(adata, min_genes=200)
-    # sc.pp.filter_genes(adata, min_cells=3)
-    # adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
-    # adata.var['ribo'] = adata.var_names.str.startswith(
-    #     ("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
-    # sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
-    # print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
-    # print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
-    # adata = adata[adata.obs.n_genes_by_counts < 2500, :]
-    # adata = adata[adata.obs.pct_counts_mt < 5, :]
-    # mini = adata[:, vianne]
-    # mini.var_names_make_unique()
-    # mini.var_names_make_unique()
-    # sc.pp.normalize_total(mini, target_sum=1e4)
-    # sc.pp.neighbors(mini, n_neighbors=10)
-    # sc.tl.umap(mini)
-    # label_colors_for_plotting = list(vianne)
-    # label_colors_for_plotting.append('total_counts')
-    # sc.pl.umap(mini, color=np.array(label_colors_for_plotting), save="_vianne_genes_and_counts.png")
+counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
+pats = np.array(df['PATIENT'])
+clust = np.array(df['CLUSTER']).astype(str)
+adata = anndata.AnnData(counts)
+adata.obs['batch'] = pats
+adata.obs['cluster'] = clust
+adata.obs_names_make_unique()
+# sc.pl.highest_expr_genes(adata, n_top=20, )
+sc.pp.filter_cells(adata, min_genes=200)
+sc.pp.filter_genes(adata, min_cells=3)
+adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
+adata.var['ribo'] = adata.var_names.str.startswith(
+    ("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
+sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
+print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
+print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
+adata = adata[adata.obs.n_genes_by_counts < 2500, :]
+adata = adata[adata.obs.pct_counts_mt < 5, :]
+mini = adata[:, vianne]
+mini.var_names_make_unique()
+mini.var_names_make_unique()
+sc.pp.normalize_total(mini, target_sum=1e4)
+sc.pp.neighbors(mini, n_neighbors=10)
+sc.tl.umap(mini)
+label_colors_for_plotting = list(vianne)
+label_colors_for_plotting.append('total_counts')
+sc.pl.umap(mini, color=np.array(label_colors_for_plotting), save="_vianne_genes_and_counts.png")
 
 
     patient_clusters = []
