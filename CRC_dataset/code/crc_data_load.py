@@ -304,10 +304,10 @@ if __name__ == "__main__":
     #                   "TS-136T"]
     patient_subset = ["TS-101T",
                       "TS-104T",
-                      # "TS-105T",
                       "TS-106T",
                       "TS-108T",
-                      "TS-109T"]
+                      "TS-109T",
+                      "TS-125T"]
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
     og_data = all_data[og_pat_inds]
 
@@ -374,6 +374,7 @@ if __name__ == "__main__":
     for i, df in enumerate(gene_rank_pds):
         markers_found.append(assess_marker_genes(df, first_markers, n_genes=n_genes))
 
+    batch_corr = pd.read_csv("210121_batch_corrected_data.csv", index_col=0).T
 
 
     # for col in first_markers.columns:
