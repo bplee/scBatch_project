@@ -179,6 +179,27 @@ def clean_data_qc(df):
 
     return adata
 
+
+def save_adata_to_csv(adata):
+    df = pd.DataFrame(adata.X)
+    df.columns = adata.var.index
+    df.index = adata.obs.index
+    df.to_csv("210125_cleaned_counts.csv")
+    adata.obs.to_csv("210125_obs_batch_data.csv")
+
+
+def load_csv_R_data(csv_file_path, og_adata):
+    df = pd.read_csv(csv_file_path, index_col=0)
+    df = df.T
+    # df cell umi's have an 'X' appended to the front of each one
+    stripped = [umi[1:] for umi in df.index]
+    df.index = stripped
+    adata = anndata.AnnData(df)
+    adata.var = og_adata.var
+    adata.obs = og_adata.obs
+    return adata
+
+
 def get_ranked_marker_genes(adata, patient_name=None):
     """
     Runs the leiden clustering
@@ -194,7 +215,7 @@ def get_ranked_marker_genes(adata, patient_name=None):
     """
 
     # UMAP stuff
-    sc.pp.scale(adata, max_value=10)
+    # sc.pp.scale(adata, max_value=10)
     sc.pp.neighbors(adata, n_neighbors=20, n_pcs=40)
     sc.tl.umap(adata)
 
