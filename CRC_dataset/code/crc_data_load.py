@@ -80,7 +80,7 @@ def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/CRC_dataset/pkl_f
     df.to_pickle(pkl_path, protocol=4)
     print(f"Saved to {pkl_path}")
 
-def get_ranked_marker_genes(df, patient_name=None):
+def clean_data_qc(df):
     """
     performs:
         - cell filtering
@@ -129,10 +129,6 @@ def get_ranked_marker_genes(df, patient_name=None):
     adata.obs['cluster'] = clust
     adata.obs_names_make_unique()
 
-    # removing sparse genes and cells
-    sc.pp.filter_cells(adata, min_genes=200)
-    sc.pp.filter_genes(adata, min_cells=3)
-
     # identifying mt and ribo genes
     adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
     adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
@@ -154,16 +150,48 @@ def get_ranked_marker_genes(df, patient_name=None):
     keep_genes = ~adata.var.mt & ~adata.var.ribo
     adata = adata[:, keep_genes]
 
+    # removing sparse genes and cells
+    sc.pp.filter_cells(adata, min_genes=200)
+    sc.pp.filter_genes(adata, min_cells=3)
+
     # adata = adata[adata.obs.n_genes_by_counts < 2500, :]
     # adata = adata[adata.obs.pct_counts_mt < 5, :]
 
-    sc.pp.normalize_total(adata, target_sum=1e4)
-    sc.pp.log1p(adata)
+    # sc.pp.normalize_total(adata, target_sum=1e4)
+    # sc.pp.log1p(adata)
+
+
+    # performing library size cutoff
+    libsizes = adata.X.sum(axis=1)
+    log_libsizes = np.log(adata.X.sum(axis=1))
+    libsizes = pd.DataFrame({'libsizes' :libsizes, 'log_libsizes': log_libsizes})
+    max_cutoff = libsizes.quantile(.95)[0]
+
+    adata = adata[libsizes.libsizes<max_cutoff,:]
+
+    # size_factors = libsizes/np.mean(libsizes)
+
 
     # sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
     # print(f" Number of highly variable MT genes: {sum(adata.var.highly_variable * adata.var.mt)}")
     # print(f" Number of highly variable ribo genes: {sum(adata.var.highly_variable * adata.var.ribo)}")
     # adata = adata[:, adata.var.highly_variable]
+
+    return adata
+
+def get_ranked_marker_genes(adata, patient_name=None):
+    """
+    Runs the leiden clustering
+
+    Parameters
+    ----------
+    adata
+    patient_name
+
+    Returns
+    -------
+
+    """
 
     # UMAP stuff
     sc.pp.scale(adata, max_value=10)
@@ -311,6 +339,8 @@ if __name__ == "__main__":
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
     og_data = all_data[og_pat_inds]
 
+    adata = clean_data_qc(og_data)
+
     # small test data:
     ex_pat = og_data[og_data.PATIENT == 'TS-108T']
     # test = get_ranked_marker_genes(ex_pat)
@@ -359,22 +389,41 @@ if __name__ == "__main__":
     # sc.pl.umap(mini, color=np.array(label_colors_for_plotting), save="_vianne_genes_and_counts.png")
 
 
-    patient_clusters = []
-    for name, df in og_data.groupby('PATIENT'):
-        # getting the ranked marker genes for each patient
-        patient_clusters.append(get_ranked_marker_genes(df))
+    # patient_clusters = []
+    # for name, df in og_data.groupby('PATIENT'):
+    #     # getting the ranked marker genes for each patient
+    #     patient_clusters.append(get_ranked_marker_genes(df))
+    #
+    # gene_rank_pds = []
+    # for i in range(len(patient_clusters)):
+    #     # getting readable tables of top scoring genes and pvals for each group
+    #     gene_rank_pds.append(get_pval_df(patient_clusters[i]))
+    #
+    # n_genes = 30
+    # markers_found = []
+    # for i, df in enumerate(gene_rank_pds):
+    #     markers_found.append(assess_marker_genes(df, first_markers, n_genes=n_genes))
 
-    gene_rank_pds = []
-    for i in range(len(patient_clusters)):
-        # getting readable tables of top scoring genes and pvals for each group
-        gene_rank_pds.append(get_pval_df(patient_clusters[i]))
-
-    n_genes = 30
-    markers_found = []
-    for i, df in enumerate(gene_rank_pds):
-        markers_found.append(assess_marker_genes(df, first_markers, n_genes=n_genes))
-
-    batch_corr = pd.read_csv("210121_batch_corrected_data.csv", index_col=0).T
+    # batch_corr = pd.read_csv("210121_batch_corrected_data.csv", index_col=0).T
+    #
+    # og_umi_mapping = {og_data.PATIENT.index.values[i]: og_data.PATIENT.values[i] for i in range(len(og_data.PATIENT))}
+    #
+    # batch_corrected_patients = []
+    # for i, umi in enumerate(umis):
+    #     try:
+    #         batch_corrected_patients.append(og_umi_mapping[umi])
+    #     except:
+    #         try:
+    #             batch_corrected_patients.append(og_umi_mapping[umi - .1])
+    #         except:
+    #             batch_corrected_patients.append("Unknown")
+    #
+    # adata = anndata.AnnData(batch_corr)
+    # adata.obs["batch"] = batch_corrected_patients
+    # sc.pp.neighbors(adata, n_neigbors=20)
+    # sc.tl.umap(adata)
+    # sc.tl.leiden(adata)
+    # sc.pl.umap(adata, color=["batch", "leiden"], save="_batch_corrected_umap.png")
 
 
     # for col in first_markers.columns:
