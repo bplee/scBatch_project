@@ -165,9 +165,12 @@ def clean_data_qc(df):
     libsizes = adata.X.sum(axis=1)
     log_libsizes = np.log(adata.X.sum(axis=1))
     libsizes = pd.DataFrame({'libsizes' :libsizes, 'log_libsizes': log_libsizes})
-    max_cutoff = libsizes.quantile(.95)[0]
+    max_cutoff = libsizes.quantile(.975)[0]
+    min_cutoff = libsizes.quantile(.025)[0]
 
-    adata = adata[libsizes.libsizes<max_cutoff,:]
+    keep_cells = (libsizes.libsizes > min_cutoff) & (libsizes.libsizes < max_cutoff)
+
+    adata = adata[keep_cells,:]
 
     # size_factors = libsizes/np.mean(libsizes)
 
@@ -195,8 +198,9 @@ def load_csv_R_data(csv_file_path, og_adata):
     stripped = [umi[1:] for umi in df.index]
     df.index = stripped
     adata = anndata.AnnData(df)
-    adata.var = og_adata.var
-    adata.obs = og_adata.obs
+    # adata.var = og_adata.var
+    adata.obs['cluster'] = og_adata.obs.cluster.copy()
+    adata.obs['batch'] = og_adata.obs.batch.copy()
     return adata
 
 
