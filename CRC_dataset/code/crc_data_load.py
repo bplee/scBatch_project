@@ -183,12 +183,12 @@ def clean_data_qc(df):
     return adata
 
 
-def save_adata_to_csv(adata):
+def save_adata_to_csv(adata, date):
     df = pd.DataFrame(adata.X)
     df.columns = adata.var.index
     df.index = adata.obs.index
-    df.to_csv("210125_cleaned_counts.csv")
-    adata.obs.to_csv("210125_obs_batch_data.csv")
+    df.to_csv(f"{date}_cleaned_counts.csv")
+    adata.obs.to_csv(f"{date}_obs_batch_data.csv")
 
 
 def load_csv_R_data(csv_file_path, og_adata):
