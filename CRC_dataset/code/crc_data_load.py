@@ -143,8 +143,6 @@ def clean_data_qc(df):
     print(f" Number of cells with MT%>20: {sum(adata.obs.pct_counts_mt>20)} ")
     adata = adata[adata.obs.pct_counts_mt<20, :]
 
-    # saving a raw, not sure if its needed anymore, can be access by adata.raw.to_adata()
-    adata.raw = adata
 
     # removing mitochondrial and ribosomal genes:
     print(f" Removing ribo and mitochondrial genes")
@@ -172,6 +170,9 @@ def clean_data_qc(df):
     keep_cells = (libsizes.libsizes > min_cutoff) & (libsizes.libsizes < max_cutoff)
 
     adata = adata[keep_cells,:]
+
+    # saving a raw, not sure if its needed anymore, can be access by adata.raw.to_adata()
+    # adata.raw = adata
 
     # size_factors = libsizes/np.mean(libsizes)
 
@@ -212,6 +213,7 @@ def transfer_leiden_get_ranked_degs(adata, mnn_adata):
     sc.tl.leiden(mnn_adata)
 
     # transferring leiden cluster to adata
+    adata.obsm['X_umap'] = mnn_adata.obsm['X_umap']
     adata.obs['leiden'] = mnn_adata.obs.leiden.copy()
     # not adding the params in adata.uns['leiden']
 
@@ -237,7 +239,7 @@ def get_pval_df(adata):
     groups = result['names'].dtype.names
     rtn = pd.DataFrame(
         {group + '_' + key[:1]: result[key][group]
-         for group in groups for key in ['names', 'pvals', 'LFC']})
+         for group in groups for key in ['names', 'pvals', 'logfoldchanges']})
     return rtn
 
 
@@ -328,8 +330,7 @@ def assess_marker_genes(df, markers, n_genes=30):
     pandas df [|groups| x |cell types|]
 
     """
-
-    genes_by_groups = df.iloc[:n_genes, range(0, len(df.columns), 2)]
+    genes_by_groups = df.iloc[:n_genes, range(0, len(df.columns), 3)]
     # genes_by_groups.iloc[:30, range(0, len(a.columns), 2)].apply(lambda x: sum(markers.T_cell.isin(x)), axis=0)
     return genes_by_groups.apply(lambda y: markers.apply(lambda x: sum(x.isin(y[:n_genes])), axis=0), axis=0)
 
