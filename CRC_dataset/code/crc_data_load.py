@@ -88,6 +88,7 @@ def clean_data_qc(df):
         - removing cells with MT gene count% > 20%
         - saving an adata.raw
         - removing MT and ribo genes
+    none of the following:
         - normalization
         - log transform
 
@@ -191,7 +192,7 @@ def save_adata_to_csv(adata, date):
     adata.obs.to_csv(f"{date}_obs_batch_data.csv")
 
 
-def load_csv_R_data(csv_file_path, og_adata):
+def load_batch_corr_data(csv_file_path, og_adata):
     df = pd.read_csv(csv_file_path, index_col=0)
     df = df.T
     # df cell umi's have an 'X' appended to the front of each one
@@ -202,6 +203,42 @@ def load_csv_R_data(csv_file_path, og_adata):
     adata.obs['cluster'] = og_adata.obs.cluster.copy()
     adata.obs['batch'] = og_adata.obs.batch.copy()
     return adata
+
+def transfer_leiden_get_ranked_degs(adata, mnn_adata):
+
+    # running umap for leiden on batch corr data:
+    sc.pp.neighbors(mnn_adata, n_neighbors=20, n_pcs=40)
+    sc.tl.umap(mnn_adata)
+    sc.tl.leiden(mnn_adata)
+
+    # transferring leiden cluster to adata
+    adata.obs['leiden'] = mnn_adata.obs.leiden.copy()
+    # not adding the params in adata.uns['leiden']
+
+    # now run the deg rank genes on adata:
+    sc.tl.rank_genes_groups(adata, 'leiden', method='t-test', use_raw=False)
+
+
+def get_pval_df(adata):
+    """
+    Gets df of ranked genes and pval for each group (ranked by "score")
+
+    Parameters
+    ----------
+    adata : anndata obj
+        post ranked marker gene analysis
+
+    Returns
+    -------
+    pandas df, double column format for each group
+
+    """
+    result = adata.uns['rank_genes_groups']
+    groups = result['names'].dtype.names
+    rtn = pd.DataFrame(
+        {group + '_' + key[:1]: result[key][group]
+         for group in groups for key in ['names', 'pvals', 'LFC']})
+    return rtn
 
 
 def get_ranked_marker_genes(adata, patient_name=None):
@@ -239,26 +276,6 @@ def get_ranked_marker_genes(adata, patient_name=None):
 
     return adata
 
-def get_pval_df(adata):
-    """
-    Gets df of ranked genes and pval for each group (ranked by "score")
-
-    Parameters
-    ----------
-    adata : anndata obj
-        post ranked marker gene analysis
-
-    Returns
-    -------
-    pandas df, double column format for each group
-
-    """
-    result = adata.uns['rank_genes_groups']
-    groups = result['names'].dtype.names
-    rtn = pd.DataFrame(
-        {group + '_' + key[:1]: result[key][group]
-         for group in groups for key in ['names', 'pvals']})
-    return rtn
 
 def plot_gene_marker_umaps(adata, gene_markers, cell_type, save_name):
     """
