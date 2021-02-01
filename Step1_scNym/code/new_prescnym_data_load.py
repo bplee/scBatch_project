@@ -75,6 +75,8 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, shuffle=False):
     # cell_type_names = np.unique(data_obj.data.cell_type)
     gene_names = raw_counts.columns
 
+    raw_counts = np.array(raw_counts)
+
     # getting categorical indices for patients and cell_types
     patient_indices, patient_names = pd.factorize(data_obj.data.patient)
     cell_type_indices, cell_type_names = pd.factorize(data_obj.data.cell_type)
