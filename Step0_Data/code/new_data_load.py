@@ -29,10 +29,11 @@ class NewRccDatasetSemi(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, test_patient, x_dim, train=True, train_patient=None, starspace=False, scanvi=False, convolutions=True):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None, ssl=True, starspace=False, scanvi=False, convolutions=True):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
+        self.ssl = ssl
         self.init_time = time.time()
         self.train_patient = train_patient
         self.starspace = starspace
@@ -126,44 +127,76 @@ class NewRccDatasetSemi(data_utils.Dataset):
             n_each_cell_type[i] = np.sum(labels == i)
 
         print('Importing gene expression ds')
-
         gene_dataset = GeneExpressionDataset()
-        gene_dataset.populate_from_data(
-            X=np.array(raw_counts),
-            batch_indices=batch_indices,
-            labels=labels,
-            gene_names=gene_names,
-            cell_types=cell_types,
-            remap_attributes=False
-        )
+
+        # this is SSL
+        if self.ssl:
+            print("Selecting genes from train+test set")
+            # then we get to see the testing set and subset for highly variable genes here
+            gene_dataset.populate_from_data(
+                X=np.array(raw_counts),
+                batch_indices=batch_indices,
+                labels=labels,
+                gene_names=gene_names,
+                cell_types=cell_types,
+                remap_attributes=False
+            )
+            gene_dataset.subsample_genes(self.x_dim)
+            print('Making tensor batches')
+
+            if self.scanvi == True:
+                # returning data before any subselecting for patients
+                print("Returning GeneExpressionDataset obj for scANVI")
+                return gene_dataset, batch_indices, cell_type_names, patient_names
+
+            if self.train_patient is None:
+                idx_batch_train = ~(gene_dataset.batch_indices == self.test_patient).ravel()
+            else:
+                idx_batch_train = (gene_dataset.batch_indices == self.train_patient).ravel()
+            idx_batch_test = (gene_dataset.batch_indices == self.test_patient).ravel()
+
+            batch_train = gene_dataset.batch_indices[idx_batch_train].ravel()
+            batch_test = gene_dataset.batch_indices[idx_batch_test].ravel()
+
+            labels_train = gene_dataset.labels[idx_batch_train].ravel()
+            labels_test = gene_dataset.labels[idx_batch_test].ravel()
+
+            data_train = gene_dataset.X[idx_batch_train]
+            data_test = gene_dataset.X[idx_batch_test]
+        else:
+            # we its supervised (not ssl) then we dont see test set, do highly varibale gene selection on training set
+            # then we just take the same indices from the test set
+            test_inds = batch_indices.ravel() == self.test_patient
+            test_counts = raw_counts.iloc[test_inds,:]
+            if self.train_patient is None:
+                train_inds = ~test_inds
+            else:
+                train_inds = batch_indices.ravel() == self.train_patient
+            train_counts = raw_counts.iloc[train_inds,:]
+            gene_dataset.populate_from_data(
+                X=np.array(train_counts),
+                batch_indices=batch_indices[train_inds],
+                labels=labels[train_inds],
+                gene_names=gene_names,
+                cell_types=cell_types,
+                remap_attributes=False)
+            gene_dataset.subsample_genes(self.x_dim)
+
+            gene_subset = gene_dataset.gene_names
+
+            data_train = gene_dataset.X
+            data_test = np.array(test_counts[gene_subset])
+            labels_train = gene_dataset.labels.ravel()
+            labels_test = labels[test_inds].ravel()
+            batch_train = gene_dataset.batch_indices.ravel()
+            batch_test = batch_indices[test_inds].ravel()
+
         del raw_counts
         del data_obj
-        gene_dataset.subsample_genes(self.x_dim)
+        # gene_dataset.subsample_genes(self.x_dim)
         #gene_dataset.filter_cells_by_count()
 
         self.gene_names = gene_dataset.gene_names
-
-        if self.scanvi == True:
-            # returning data before any subselecting for patients
-            print("Returning GeneExpressionDataset obj for scANVI")
-            return gene_dataset, batch_indices, cell_type_names, patient_names
-
-        print('Making tensor batches')
-
-        if self.train_patient is None:
-            idx_batch_train = ~(gene_dataset.batch_indices == self.test_patient).ravel()
-        else:
-            idx_batch_train = (gene_dataset.batch_indices == self.train_patient).ravel()
-        idx_batch_test = (gene_dataset.batch_indices == self.test_patient).ravel()
-
-        batch_train = gene_dataset.batch_indices[idx_batch_train].ravel()
-        batch_test = gene_dataset.batch_indices[idx_batch_test].ravel()
-
-        labels_train = gene_dataset.labels[idx_batch_train].ravel()
-        labels_test = gene_dataset.labels[idx_batch_test].ravel()
-
-        data_train = gene_dataset.X[idx_batch_train]
-        data_test = gene_dataset.X[idx_batch_test]
 
         data_train = np.log(data_train + 1)
         data_test = np.log(data_test + 1)
