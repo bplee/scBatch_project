@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pandas as pd
+import numpy as np
 
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
@@ -13,9 +14,9 @@ if WORKING_DIR not in sys.path:
 
 from Step0_Data.code,pkl_load_data import PdRccAllData
 
-class Network(nn.module):
+class Network(nn.Module):
     def __init__(self, n_genes, n_classes):
-        super(Net, self).__init__()
+        # super(Net, self).__init__()
         self.fc1 = nn.Linear(n_genes, n_classes)
     def forward(self, x):
         h = self.fc1(x)
@@ -28,6 +29,7 @@ if __name__ == "__main__":
     data_obj = PdRccAllData()  # default args for this function will give me what I want
     raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
     patients = data_obj.data.patient
+    dim_out = len(np.unique(patients))
     y_onehot = np.eye(dim_out)[pd.factorize(patients)]
     cell_types = data_obj.data.cell_type
 
