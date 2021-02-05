@@ -35,7 +35,6 @@ if __name__ == "__main__":
     y = torch.tensor(np.eye(27)[torch.tensor(data_obj.train_labels.astype(int))])
     test_labels = torch.tensor(np.eye(27)[torch.tensor(data_obj.test_labels.astype(int)])
     
-
     test_pat = 0
 
     dim_in = x.shape[1]
