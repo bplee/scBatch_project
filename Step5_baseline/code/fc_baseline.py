@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pandas as pd
-
+import numpy as np
+import sys
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 # adding the project dir to the path to import relevant modules below
@@ -11,33 +12,38 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 
-from Step0_Data.code,pkl_load_data import PdRccAllData
+from Step0_Data.code.pkl_load_data import PdRccAllData
+from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
-class Network(nn.module):
+class Network(nn.Module):
     def __init__(self, n_genes, n_classes):
-        super(Net, self).__init__()
+        # super(Net, self).__init__()
         self.fc1 = nn.Linear(n_genes, n_classes)
     def forward(self, x):
         h = self.fc1(x)
-        return F.log_softmax(a, dim=1)
+        return F.log_softmax(h, dim=1)
 
 
 
 
 if __name__ == "__main__":
-    data_obj = PdRccAllData()  # default args for this function will give me what I want
-    raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
-    patients = data_obj.data.patient
-    y_onehot = np.eye(dim_out)[pd.factorize(patients)]
-    cell_types = data_obj.data.cell_type
+    test_pat=5
+    data_obj = RccDatasetSemi(test_pat, 784. starspace=True)
+
+    test_set = torch.tensor(data_obj.test_data)
+    x = torch.tensor(data_obj.train_data)
+    y = torch.tensor(np.eye(27)[torch.tensor(data_obj.train_labels.astype(int))])
+    test_labels = torch.tensor(np.eye(27)[torch.tensor(data_obj.test_labels.astype(int)])
+    
 
     test_pat = 0
 
-    dim_in = raw_counts.shape[0]
-    dim_out = len(np.unique(cell_types))
+    dim_in = x.shape[1]
+    dim_out = y.shape[1]
 
     # creating model
-    model = Network(dim_in, dim_out)
+    #model = Network(dim_in, dim_out)
+    model = nn.Linear(dim_in, dim_out)
 
 
     # training
