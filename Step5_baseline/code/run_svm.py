@@ -12,7 +12,8 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 
-from Step0_Data.code,pkl_load_data import PdRccAllData
+from Step0_Data.code.pkl_load_data import PdRccAllData
+from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
 
 if __name__ == "__main__":
