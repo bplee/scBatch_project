@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 import anndata
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 # adding the project dir to the path to import relevant modules below
@@ -133,8 +135,8 @@ def clean_data_qc(df):
     # identifying mt and ribo genes
     adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
     adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
-    print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
-    print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
+    print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[1]}")
+    print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[1]}")
 
     # calculating pct_count_mt/ribo etc.
     sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
@@ -194,6 +196,18 @@ def save_adata_to_csv(adata, date):
 
 
 def load_batch_corr_data(csv_file_path, og_adata):
+    """
+    Makes a new adata with the batch corrected data but with the original cell and gene annotations
+
+    Parameters
+    ----------
+    csv_file_path
+    og_adata
+
+    Returns
+    -------
+
+    """
     df = pd.read_csv(csv_file_path, index_col=0)
     df = df.T
     # df cell umi's have an 'X' appended to the front of each one
@@ -206,6 +220,20 @@ def load_batch_corr_data(csv_file_path, og_adata):
     return adata
 
 def transfer_leiden_get_ranked_degs(adata, mnn_adata):
+    """
+    Performs leiden clustering on mnn adata obj (second arg)
+    and gives the umap and clusters to the original adata object. Then uses the leiden
+    clusters to do a DEG analysis of the original adata data.
+
+    Parameters
+    ----------
+    adata
+    mnn_adata
+
+    Returns
+    -------
+
+    """
 
     # running umap for leiden on batch corr data:
     sc.pp.neighbors(mnn_adata, n_neighbors=20, n_pcs=40)
@@ -309,7 +337,7 @@ def plot_gene_marker_umaps(adata, gene_markers, cell_type, save_name):
         print(f"The following genes makers for {cell_type} do not exist in the dataset:")
         print(marker_gene_names[~markers_in_dataset])
     umap_colorings = np.array(marker_gene_names[markers_in_dataset])
-    umap_colorings = np.append(umap_colorings, "leiden")
+    umap_colorings = np.append(umap_colorings, ["leiden", "total_counts"])
     sc.pl.umap(adata, color=umap_colorings, save=save_name)
 
 def assess_marker_genes(df, markers, n_genes=30):
@@ -396,80 +424,40 @@ if __name__ == "__main__":
     first_markers = pd.read_excel(gene_markers_path, sheet_name=0)
     second_markers = pd.read_excel(gene_markers_path, sheet_name=1)
 
-    # # specific example for vianne,
-    # vianne = pd.read_csv("../metadata/vianne_gene_subset.txt", header=None)
-    # vianne = vianne.to_numpy().T[0]
-    # vianne = np.delete(vianne, np.isin(vianne, ['KLRA1', 'CD103', 'CPA1', 'LY6G', 'IL12'])) # missing these cell types
-    #
-    # df = ex_pat
-    #
-    # counts = df.drop(['PATIENT', 'CLUSTER'], axis=1)
-    # pats = np.array(df['PATIENT'])
-    # clust = np.array(df['CLUSTER']).astype(str)
-    # adata = anndata.AnnData(counts)
-    # adata.obs['batch'] = pats
-    # adata.obs['cluster'] = clust
-    # adata.obs_names_make_unique()
-    # # sc.pl.highest_expr_genes(adata, n_top=20, )
-    # sc.pp.filter_cells(adata, min_genes=200)
-    # sc.pp.filter_genes(adata, min_cells=3)
-    # adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
-    # adata.var['ribo'] = adata.var_names.str.startswith(
-    #     ("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
-    # sc.pp.calculate_qc_metrics(adata, qc_vars=['mt', 'ribo'], percent_top=None, log1p=False, inplace=True)
-    # print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[0]}")
-    # print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[0]}")
-    # adata = adata[adata.obs.n_genes_by_counts < 2500, :]
-    # adata = adata[adata.obs.pct_counts_mt < 5, :]
-    # mini = adata[:, vianne]
-    # mini.var_names_make_unique()
-    # mini.var_names_make_unique()
-    # sc.pp.normalize_total(mini, target_sum=1e4)
-    # sc.pp.neighbors(mini, n_neighbors=10)
-    # sc.tl.umap(mini)
-    # label_colors_for_plotting = list(vianne)
-    # label_colors_for_plotting.append('total_counts')
-    # sc.pl.umap(mini, color=np.array(label_colors_for_plotting), save="_vianne_genes_and_counts.png")
+    sc.pp.normalize_total(adata, 1e4)
+    sc.pp.log1p(adata)
+    np.random.seed(0)
+    sc.pp.neighbors(adata, n_neighbors=20, n_pcs=40, random_state=None)
+    sc.tl.umap(adata, random_state=None)
+    # sc.pl.umap(adata, color=['batch','total_counts'], save='_210208_uncorrected_set_seed_0.png')
+    test = load_batch_corr_data("210126_mnn_data.csv", adata)
+    sc.pp.neighbors(test, n_neighbors=20, n_pcs=40, random_state=None)
+    sc.tl.umap(test, random_state=None)
+    sc.tl.louvain(test)
+    # sc.pl.umap(test, color=['batch', 'louvain'], save="_210208_batch_corr_louvain_set_seed_0.png")
 
-
-    # patient_clusters = []
-    # for name, df in og_data.groupby('PATIENT'):
-    #     # getting the ranked marker genes for each patient
-    #     patient_clusters.append(get_ranked_marker_genes(df))
+    # sc.tl.rank_genes_groups(adata, "louvain", method='wilcoxon', n_genes=16983, use_raw=False, rankby_abs=True)
     #
-    # gene_rank_pds = []
-    # for i in range(len(patient_clusters)):
-    #     # getting readable tables of top scoring genes and pvals for each group
-    #     gene_rank_pds.append(get_pval_df(patient_clusters[i]))
+    # transfer_leiden_get_ranked_degs(adata, test)
     #
-    # n_genes = 30
-    # markers_found = []
-    # for i, df in enumerate(gene_rank_pds):
-    #     markers_found.append(assess_marker_genes(df, first_markers, n_genes=n_genes))
-
-    # batch_corr = pd.read_csv("210121_batch_corrected_data.csv", index_col=0).T
+    # a = get_pval_df(adata)
+    # top15 = a.iloc[:15, np.arange(0, len(a.columns), 3)]
+    # top_15_lst = np.array(top15).T.reshape(-1)
+    # t_15 = []
+    # for gene in top_15_lst:
+    #     gene_log_fold_changes_across_groups = []
+    #     for g_col in top15.columns:
+    #         # g_col = f"{i}_n"
+    #         l_col = g_col[:-1] + "l"
+    #         gene_log_fold_changes_across_groups.append(float(pvals[l_col][pvals[g_col] == gene]))
+    #     t_15.append(gene_log_fold_changes_across_groups)
+    # t_15 = np.array(t_15)
+    # df = pd.DataFrame(t_15, index=top_15_lst, columns=top15.columns)
     #
-    # og_umi_mapping = {og_data.PATIENT.index.values[i]: og_data.PATIENT.values[i] for i in range(len(og_data.PATIENT))}
-    #
-    # batch_corrected_patients = []
-    # for i, umi in enumerate(umis):
-    #     try:
-    #         batch_corrected_patients.append(og_umi_mapping[umi])
-    #     except:
-    #         try:
-    #             batch_corrected_patients.append(og_umi_mapping[umi - .1])
-    #         except:
-    #             batch_corrected_patients.append("Unknown")
-    #
-    # adata = anndata.AnnData(batch_corr)
-    # adata.obs["batch"] = batch_corrected_patients
-    # sc.pp.neighbors(adata, n_neigbors=20)
-    # sc.tl.umap(adata)
-    # sc.tl.leiden(adata)
-    # sc.pl.umap(adata, color=["batch", "leiden"], save="_batch_corrected_umap.png")
-
-
-    # for col in first_markers.columns:
-    #     print(col)
-    #     for i in range(13):
-    #         print(sum(first_markers[col].isin(a[str(i) + '_n'][:30])))
+    # plt.figure(figsize=(20,20))
+    # ax = sns.heatmap(df, cmap="vlag", center=0, linewidth=.5)
+    # plt.savefig("DEG_analysis/210209_up+down_reg_DEGs_all_louvain_clusters.png")
+    # plt.clf()
+    # plt.figure(figsize=(20, 20))
+    # ax = sns.heatmap(df.iloc[:15*5, :5], cmap="vlag", center=0, linewidth=.5)
+    # plt.savefig("DEG_analysis/210208_up+down_reg_DEGs_major_aggregated_clusters.png")
