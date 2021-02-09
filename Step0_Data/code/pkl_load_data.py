@@ -25,6 +25,7 @@ class PdRccAllData:
         self.pkl_path = pkl_path
         self.take_cell_label_intersection = take_cell_label_intersection
         self.labels_to_remove = labels_to_remove
+        self.gene_symbol = True # option to make the gene names gene symbols instead of ensembl ids
 
         self.init_time = time.time()
         self.data = self._load_data()
@@ -72,6 +73,11 @@ class PdRccAllData:
             return self._create_pkl(self.pkl_path)
         else:
             rtn = pd.read_pickle(self.pkl_path)
+            if self.gene_symbol == True:
+                conversion_table = pd.read_csv("/data/leslie/bplee/scBatch/Step0_Data/code/feature_conversion/ccRCC_ensembl_to_gene_symbol_conversion.csv", index_col=0)
+                new_cols = np.array(conversion_table.gene_symbol)
+                new_cols = np.append(new_cols, ["cell_type", "patient"])
+                rtn.columns = new_cols
             return rtn
 
     @staticmethod
