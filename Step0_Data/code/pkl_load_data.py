@@ -78,6 +78,7 @@ class PdRccAllData:
                 new_cols = np.array(conversion_table.gene_symbol)
                 new_cols = np.append(new_cols, ["cell_type", "patient"])
                 rtn.columns = new_cols
+                rtn = rtn.iloc[:, ~rtn.columns.duplicated()]
             return rtn
 
     @staticmethod
