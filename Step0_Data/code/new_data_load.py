@@ -29,7 +29,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, test_patient, x_dim, train=True, train_patient=None, ssl=True, starspace=False, scanvi=False, convolutions=True):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None, ssl=True, starspace=False, scanvi=False, convolutions=True, libsize_norm=False):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
@@ -41,6 +41,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         self.scanvi = scanvi
         self.batch_indices = None # used for scANVI
         self.convolutions = convolutions
+        self.libsize_norm = libsize_norm
 
         if self.scanvi:
             self.GeneExpressionDataset, self.batch_indices, self.cell_types, self.patients = self._get_data()
@@ -198,12 +199,20 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         self.gene_names = gene_dataset.gene_names
 
-        data_train = np.log(data_train + 1)
-        data_test = np.log(data_test + 1)
+        if self.libsize_norm:
+            data_train = data_train/data_train.sum(axis=1)*1e5
+            data_test = data_test/data_test.sum(axis=1)*1e5
 
-        # what is the point of this line?
-        data_train = data_train / np.max(data_train)
-        data_test = data_test / np.max(data_test)
+            data_train = np.log(data_train + 1)
+            data_test = np.log(data_test + 1)
+        else:
+            # usual diva stuff
+            data_train = np.log(data_train + 1)
+            data_test = np.log(data_test + 1)
+
+            # what is the point of this line?
+            data_train = data_train / np.max(data_train)
+            data_test = data_test / np.max(data_test)
 
         n_train = len(labels_train)
         n_test = len(labels_test)
