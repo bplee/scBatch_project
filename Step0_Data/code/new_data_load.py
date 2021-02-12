@@ -200,8 +200,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
         self.gene_names = gene_dataset.gene_names
 
         if self.libsize_norm:
-            data_train = data_train/data_train.sum(axis=1)*1e5
-            data_test = data_test/data_test.sum(axis=1)*1e5
+            data_train = data_train/data_train.sum(axis=1).reshape(-1, 1)*1e5
+            data_test = data_test/data_test.sum(axis=1).reshape(-1,1)*1e5
 
             data_train = np.log(data_train + 1)
             data_test = np.log(data_test + 1)
