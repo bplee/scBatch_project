@@ -26,7 +26,7 @@ from DIVA.dataset.rcc_loader import RccDataset
 #from ForBrennan.DIVA.dataset.rcc_loader_semi_sup import NewRccDatasetSemi as RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
-def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_types, num_labels, model_name):
+def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_types, num_labels, model_name, device):
     # model.eval()
     """
     compute the accuracy over the supervised training set or the testing set
