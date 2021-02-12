@@ -88,6 +88,8 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
         # plt.savefig('./figs_diva/fig_diva_cm_semi_sup_heldout_pat_'+str(test_patient)+'.pdf')
         plt.savefig(save_name)
 
+        print(f"weighted: {accuracy_y_weighted}\nunweighted:{accuracy_y}")
+
         return accuracy_y, accuracy_y_weighted
 
 
