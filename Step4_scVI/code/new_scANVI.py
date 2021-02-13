@@ -103,8 +103,8 @@ if __name__ == "__main__":
 
     sc.pp.neighbors(umap_adata, n_neighbors=30)
     sc.tl.umap(umap_adata)
-    save_name_batch = f"_scANVI_new_embedding_by_batches_test_pat_{test_patient}.png"
-    save_name_label = f"_scANVI_new_embedding_by_label_test_pat_{test_patient}.png"
-    sc.pl.umap(umap_adata, color='batch', size=10, alpha=.5, save=save_name_batch)
-    sc.pl.umap(umap_adata, color='cell_type', size=10, alpha=.5, save=save_name_label)
+    save_name = f"_scANVI_new_embedding_batches_labels_test_pat_{test_patient}.png"
+    # save_name_label = f"_scANVI_new_embedding_by_label_test_pat_{test_patient}.png"
+    sc.pl.umap(umap_adata, color=['batch', 'cell_type'], size=10, alpha=.5, save=save_name)
+    # sc.pl.umap(umap_adata, color='cell_type', size=10, alpha=.5, save=save_name_label)
 
