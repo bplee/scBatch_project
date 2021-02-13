@@ -236,18 +236,12 @@ if __name__ == "__main__":
         print("successfully turned int labels into strings")
     except:
         print("couldnt change the labels, sorry bro, trying to turn them into ints tho")
-        try:
-            umap_adata.obs['batch'] = np.array(batches_starspace, dtype=np.int32)
-            umap_adata.obs['cell_type'] = np.array(labels_starspace, dtype=np.int32)
-        except:
-            print("couldnt change them into ints even, big sorry bro")
 
     sc.pp.neighbors(umap_adata, n_neighbors=30)
     sc.tl.umap(umap_adata)
-    save_name_batch = f"_starspace_embedding_by_batches_test_pat_{args_starspace.test_patient}.png"
-    save_name_label = f"_starspace_embedding_by_label_test_pat_{args_starspace.test_patient}.png"
-    sc.pl.umap(umap_adata, color='batch', size=10, alpha=.5, save=save_name_batch)
-    sc.pl.umap(umap_adata, color='cell_type', size=10, alpha=.5, save=save_name_label)
+    save_name = f"_starspace_embedding_batches_cell_types_test_pat_{args_starspace.test_patient}.png"
+    sc.pl.umap(umap_adata, color=['batch', 'cell_type'], size=7, alpha=.3, save=save_name)
+    # sc.pl.umap(umap_adata, color='cell_type', size=7, alpha=.3, save=save_name_label)
 
     # UMAP plot
     # ensure_dir('umap_figs')
