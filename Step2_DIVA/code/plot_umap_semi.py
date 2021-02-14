@@ -85,7 +85,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             #     save_name = f"_diva_new_semi_sup_train_{name[i]}_by_batches_heldout_pat_{test_patient}_train_pat_{train_patient}.png"
             # else:
             #     save_name = f"_diva_new_semi_sup_train_{name[i]}_by_batches_heldout_pat_{test_patient}_train_pat_ALL.png"
-            save_name = f"_{model_name}_{name[i]}.png"
+            save_name = f"_{model_name}_train_set_{name[i]}.png"
 
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
@@ -142,7 +142,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             _.obs['cell_type'] = cell_types[labels_y]
             # save_name_pat = '_diva_new_semi_sup_train_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
             # save_name_cell_type = '_diva_new_semi_sup_train_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
-            save_name = f"_{model_name}_{name[i]}.png"
+            save_name = f"_{model_name}_test_set_{name[i]}.png"
 
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
@@ -217,7 +217,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             _.obs['cell_type'] = cell_types[labels_y]
             # save_name_pat = '_diva_new_semi_sup_train_' + name[i] + '_by_batches_heldout_pat_' + str(test_patient) + '.png'
             # save_name_cell_type = '_diva_new_semi_sup_train_' + name[i] + '_by_label_heldout_pat_' + str(test_patient) + '.png'
-            save_name = f"_{model_name}_{name[i]}.png"
+            save_name = f"_{model_name}_train+test_set_{name[i]}.png"
 
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
@@ -243,6 +243,8 @@ if __name__ == "__main__":
 
         model = torch.load(model_name + '.model')
         args = torch.load(model_name + '.config')
+        if args.zx_dim != 0:
+            empty_zx = True
         print(model_name)
         print(args)
 
@@ -275,4 +277,4 @@ if __name__ == "__main__":
         torch.backends.cudnn.benchmark = False
         np.random.seed(args.seed)
 
-        plot_umap(train_loader, test_loader, model, args.batch_size, args.test_patient, args.train_patient, cell_types, patients)
+        plot_umap(train_loader, test_loader, model, args.batch_size, args.test_patient, args.train_patient, cell_types, patients, model_name, empty_zx=empty_zx)
