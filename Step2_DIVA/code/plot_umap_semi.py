@@ -23,7 +23,7 @@ from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 from Step0_Data.code.starter import get_valid_diva_models
 
-def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_patient, cell_types, patients, model_name, empty_zy=False):
+def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_patient, cell_types, patients, model_name, empty_zx=False):
     model.eval()
     """
     get the latent factors and plot the UMAP plots
@@ -43,7 +43,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
             zd_loc, zd_scale = model.qzd(xs)
-            if not empty_zy:
+            if not empty_zx:
                 zx_loc, zx_scale = model.qzx(xs)
                 zx_.append(np.array(zx_loc.cpu()))
             zy_.append(np.array(zy_loc.cpu()))
@@ -55,19 +55,19 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
         zy = zy_[0]
         zd = zd_[0]
-        if not empty_zy:
+        if not empty_zx:
             zx = zx_[0]
         labels_y = actuals_y[0]
         labels_d = actuals_d[0]
         for i in range(1,50):
             zy = np.vstack((zy, zy_[i]))
             zd = np.vstack((zd, zd_[i]))
-            if not empty_zy:
+            if not empty_zx:
                 zx = np.vstack((zx, zx_[i]))
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
 
-        if not empty_zy:
+        if not empty_zx:
             zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
             adatas = [zy_adata, zd_adata, zx_adata]
         else:
@@ -105,7 +105,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
             zd_loc, zd_scale = model.qzd(xs)
-            if not empty_zy:
+            if not empty_zx:
                 zx_loc, zx_scale = model.qzx(xs)
                 zx_.append(np.array(zx_loc.cpu()))
             zy_.append(np.array(zy_loc.cpu()))
@@ -117,19 +117,19 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
         zy = zy_[0]
         zd = zd_[0]
-        if not empty_zy:
+        if not empty_zx:
             zx = zx_[0]
         labels_y = actuals_y[0]
         labels_d = actuals_d[0]
         for i in range(1, 50):
             zy = np.vstack((zy, zy_[i]))
             zd = np.vstack((zd, zd_[i]))
-            if not empty_zy:
+            if not empty_zx:
                 zx = np.vstack((zx, zx_[i]))
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
 
-        if not empty_zy:
+        if not empty_zx:
             zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
             adatas = [zy_adata, zd_adata, zx_adata]
         else:
@@ -161,7 +161,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
             zd_loc, zd_scale = model.qzd(xs)
-            if not empty_zy:
+            if not empty_zx:
                 zx_loc, zx_scale = model.qzx(xs)
                 zx_.append(np.array(zx_loc.cpu()))
             zy_.append(np.array(zy_loc.cpu()))
@@ -180,7 +180,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
             zd_loc, zd_scale = model.qzd(xs)
-            if not empty_zy:
+            if not empty_zx:
                 zx_loc, zx_scale = model.qzx(xs)
                 zx_.append(np.array(zx_loc.cpu()))
             zy_.append(np.array(zy_loc.cpu()))
@@ -192,19 +192,19 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
         zy = zy_[0]
         zd = zd_[0]
-        if not empty_zy:
+        if not empty_zx:
             zx = zx_[0]
         labels_y = actuals_y[0]
         labels_d = actuals_d[0]
         for i in range(1, 50 + 10):
             zy = np.vstack((zy, zy_[i]))
             zd = np.vstack((zd, zd_[i]))
-            if not empty_zy:
+            if not empty_zx:
                 zx = np.vstack((zx, zx_[i]))
             labels_y = np.hstack((labels_y, actuals_y[i]))
             labels_d = np.hstack((labels_d, actuals_d[i]))
 
-        if not empty_zy:
+        if not empty_zx:
             zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
             adatas = [zy_adata, zd_adata, zx_adata]
         else:
