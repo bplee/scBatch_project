@@ -123,7 +123,11 @@ class px(nn.Module):
         # self.de3[0].bias.data.zero_()
 
     def forward(self, zd, zx, zy):
-        zdzxzy = torch.cat((zd, zx, zy), dim=-1)
+        if zx is None:
+            # if no zx layer
+            zdzxzy = torch.cat((zd, zy), dim=-1)
+        else:
+            zdzxzy = torch.cat((zd, zx, zy), dim=-1)
         h = self.fc1(zdzxzy)
         h = self.fc2(h)
 #         h = h.view(-1, 64, 4, 4)
@@ -343,7 +347,7 @@ class DIVA(nn.Module):
 
             _, d_target = d.max(dim=1)
             CE_d = F.cross_entropy(d_hat, d_target, reduction='sum')
-            # using MSE here too
+            # not using MSE here since lables
             # CE_d = torch.norm(d_hat, d_target)
 
             num_labels = self.y_dim
@@ -391,6 +395,7 @@ class DIVA(nn.Module):
             x_recon, d_hat, y_hat, qzd, pzd, zd_q, qzx, pzx, zx_q, qzy, pzy, zy_q = self.forward(d, x, y)
 
             x_target = x
+            # mse of reconstructionx
             CE_x = torch.norm(x_recon - x_target)
 
             zd_p_minus_zd_q = torch.sum(pzd.log_prob(zd_q) - qzd.log_prob(zd_q))
