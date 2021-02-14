@@ -169,7 +169,7 @@ if __name__ == "__main__":
         torch.backends.cudnn.benchmark = False
         np.random.seed(args.seed)
 
-        test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types, args.y_dim, f)
+        test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, test_patient, cell_types, args.y_dim, f, device)
         test_accuracy_y_list.append(test_accuracy_y)
         test_accuracy_y_list_weighted.append(test_accuracy_y_weighted)
     print(f"Train patient {args.train_patient}")
