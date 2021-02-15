@@ -129,7 +129,7 @@ if __name__ == "__main__":
                         help='train domain')
 
     # Model
-    parser.add_argument('--d-dim', type=int, default=5,
+    parser.add_argument('--d-dim', type=int, default=6,
                         help='number of classes')
     parser.add_argument('--x-dim', type=int, default=784,
                         help='input size after flattening')
