@@ -125,6 +125,8 @@ if __name__ == "__main__":
     #                     help='domain used during testing')
     parser.add_argument('--test_patient', type=int, default=5,
                         help='test domain')
+    parser.add_argument('--train_patient', type=int, default=None,
+                        help='train domain')
 
     # Model
     parser.add_argument('--d-dim', type=int, default=5,
