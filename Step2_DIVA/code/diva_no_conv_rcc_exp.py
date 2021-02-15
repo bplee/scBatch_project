@@ -75,7 +75,8 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     for i in range(batches_per_epoch):
 
         # whether this batch is supervised or not
-        is_unsupervised = (i % (periodic_interval_batches + 1) == 0) and ctr_unsup < unsup_batches
+        # is_unsupervised = (i % (periodic_interval_batches + 1) == 0) and ctr_unsup < unsup_batches
+        is_unsupervised = (i % (periodic_interval_batches) == 0) and ctr_unsup < unsup_batches
 
         # extract the corresponding batch
         if is_unsupervised:
@@ -209,7 +210,7 @@ if __name__ == "__main__":
                         help='number of classes')
     parser.add_argument('--x-dim', type=int, default=784,
                         help='input size after flattening')
-    parser.add_argument('--y-dim', type=int, default=29, # was 16 for old data
+    parser.add_argument('--y-dim', type=int, default=26, # was 16 for old data
                         help='number of classes')
     parser.add_argument('--zd-dim', type=int, default=64,
                         help='size of latent space 1')
@@ -321,10 +322,10 @@ if __name__ == "__main__":
     print('\nStart training:', args)
     torch.save(args, model_name + '.config')
     for epoch in range(1, args.epochs + 1):
-        beta = min([args.max_beta, args.max_beta * (epoch * 1.) / args.warmup])
-        model.beta_d = beta
-        model.beta_y = beta
-        model.beta_x = beta
+        # beta = min([args.max_beta, args.max_beta * (epoch * 1.) / args.warmup])
+        # model.beta_d = beta
+        # model.beta_y = beta
+        # model.beta_x = beta
 
         # train
         if epoch > 100:
