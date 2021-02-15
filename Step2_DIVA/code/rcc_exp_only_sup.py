@@ -128,7 +128,7 @@ if __name__ == "__main__":
                         help='number of classes')
     parser.add_argument('--x-dim', type=int, default=784,
                         help='input size after flattening')
-    parser.add_argument('--y-dim', type=int, default=16,
+    parser.add_argument('--y-dim', type=int, default=26,
                         help='number of classes')
     parser.add_argument('--zd-dim', type=int, default=64,
                         help='size of latent space 1')
