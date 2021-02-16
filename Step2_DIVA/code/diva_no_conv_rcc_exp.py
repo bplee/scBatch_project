@@ -323,10 +323,10 @@ if __name__ == "__main__":
     print('\nStart training:', args)
     torch.save(args, model_name + '.config')
     for epoch in range(1, args.epochs + 1):
-        # beta = min([args.max_beta, args.max_beta * (epoch * 1.) / args.warmup])
-        # model.beta_d = beta
-        # model.beta_y = beta
-        # model.beta_x = beta
+        beta = min([args.max_beta, args.max_beta * (epoch * 1.) / args.warmup])
+        model.beta_d = beta
+        model.beta_y = beta
+        model.beta_x = beta
 
         # train
         if epoch > 100:
