@@ -1,5 +1,8 @@
 library(Seurat)
 library(magrittr)
+library(scran)
+library(scater)
+library(batchelor)
 
 
 ### APPLY FUNCTIONS ###

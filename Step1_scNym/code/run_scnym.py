@@ -11,7 +11,7 @@ import pandas as pd
 import scnym
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
-import seaborn as sn
+import seaborn as sns
 
 import urllib
 import json
@@ -129,6 +129,7 @@ def predict_from_scnym_model(adata, trained_model,
 def get_accuracies(adata, key_added="scNym", test_patient=None):
     """
     Used to get the accuracy and weighted accuracy of scnym predictions
+    If test_patient arg is submitted, makes a cm matrix in `cm_figs/` dir
 
     Parameters
     ----------
@@ -170,8 +171,7 @@ def get_accuracies(adata, key_added="scNym", test_patient=None):
         print("Making confusion matrix")
         cm_norm_df = pd.DataFrame(cm_norm, index=cell_types, columns=cell_types)
         plt.figure(figsize=(20, 20))
-        ax = sn.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
-                        linewidths=.5, annot=True, fmt='4.2f', square=True)
+        ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1, linewidths=.5, annot=True, fmt='4.2f', square=True)
         plt.savefig('cm_figs/fig_scnym_cm_test_pat_' + str(test_patient) + '.png')
 
     return accuracy, weighted_accuracy
@@ -207,10 +207,8 @@ def plot_scnym_umap(adata, test_pat, train_pat=None, use_rep='X_scnym'):
         train_pat = "ALL"
     sc.pp.neighbors(adata, use_rep=use_rep, n_neighbors=30)
     sc.tl.umap(adata, min_dist=.3)
-    save_name_batch = f"_scnym_train_domain_{test_pat}_test_domain_{train_pat}_by_batches.png"
-    save_name_cell_type = f"_scnym_train_domain_{test_pat}_test_domain_{train_pat}_by_labels.png"
-    sc.pl.umap(adata, color='batch', size=5, alpha=.2, save=save_name_batch)
-    sc.pl.umap(adata, color='cell_type', size=5, alpha=.2, save=save_name_cell_type)
+    save_name = f"_scnym_train_domain_{test_pat}_test_domain_{train_pat}_batches+celltype.png"
+    sc.pl.umap(adata, color=['batch', 'cell_type'], size=5, alpha=.2, save=save_name)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='scANVI')
@@ -237,3 +235,13 @@ if __name__ == "__main__":
     accur, weighted_accur = get_accuracies(adata)
     print(f"Accuracy: {accur}\nWeigted Accuracy: {weighted_accur}")
     plot_scnym_umap(adata, test_pat)
+
+    # accurs, weighted_accurs = [],[]
+    # for test_pat in range(6):
+    #     model_name = f"210202_multi_domain_test_pat_{test_pat}"
+    #     adata, obj = get_Rcc_adata(test_pat, x_dim=784)
+    #     predict_from_scnym_model(adata, model_name)
+    #     out = get_accuracies(adata, test_patient=test_pat)
+    #     accurs.append(out[0])
+    #     weighted_accurs.append(out[1])
+    # print(accurs, weighted_accurs)

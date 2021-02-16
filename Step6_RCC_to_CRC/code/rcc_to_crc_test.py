@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
     crc_genes = set(crc_adata.var.index.values)
 
-    # crc_patient = crc_adata.obs.batch
+    crc_patient = crc_adata.obs.batch
 
     # this needs to get the annotaions from diva
     # preparing UMAP for new pat:

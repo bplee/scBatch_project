@@ -5,7 +5,7 @@ from inspect import getsource
 
 # diva specific commands
 
-def get_valid_diva_models(dir="./"):
+def get_valid_diva_models(folder="./"):
     """
     Collects the names of DIVA models in `dir`
     These are NOT filepaths or file names.
@@ -22,7 +22,7 @@ def get_valid_diva_models(dir="./"):
         for which there exist "<name>.model" and "<name>.config" within `dir`
 
     """
-    files = os.listdir(dir)
+    files = os.listdir(folder)
     model_file_exts = set(("model", "config"))
     name_exts = [f.split(".") for f in files if f.split(".")[-1] in model_file_exts]
     model_names = []
@@ -55,5 +55,5 @@ def ensure_dir(filepath):
 
     """
     if not os.path.exists(filepath):
-        print('Directory {out_dir} does not exist. Creating directory in {main_dir}.')
+        print(f'Directory {filepath} does not exist. Creating directory in {os.getcwd()}.')
         os.makedirs(filepath)

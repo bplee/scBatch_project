@@ -7,6 +7,8 @@ import scanpy as sc
 import anndata
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scvi.dataset import GeneExpressionDataset
+
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 # adding the project dir to the path to import relevant modules below
@@ -337,7 +339,7 @@ def plot_gene_marker_umaps(adata, gene_markers, cell_type, save_name):
         print(f"The following genes makers for {cell_type} do not exist in the dataset:")
         print(marker_gene_names[~markers_in_dataset])
     umap_colorings = np.array(marker_gene_names[markers_in_dataset])
-    umap_colorings = np.append(umap_colorings, ["leiden", "total_counts"])
+    umap_colorings = np.append(umap_colorings, ["louvain", "total_counts"])
     sc.pl.umap(adata, color=umap_colorings, save=save_name)
 
 def assess_marker_genes(df, markers, n_genes=30):
@@ -380,6 +382,12 @@ def assess_marker_genes(df, markers, n_genes=30):
 #
 #     vianne_genes = pd.read_csv(vianne_genes_file_path).to_numpy().T[0]
 #     df.columns
+
+def load_louvain(path="/data/leslie/bplee/scBatch/CRC_dataset/code/DEG_analysis/210208_adata_obs_clusters.pkl"):
+    return pd.read_pickle(path)
+
+def load_umap(path="/data/leslie/bplee/scBatch/CRC_dataset/code/DEG_analysis/210210_patient_umap.pkl"):
+    return pd.read_pickle(path)
 
 if __name__ == "__main__":
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
@@ -424,24 +432,38 @@ if __name__ == "__main__":
     first_markers = pd.read_excel(gene_markers_path, sheet_name=0)
     second_markers = pd.read_excel(gene_markers_path, sheet_name=1)
 
+    print("normalizing and log transforming `adata`")
     sc.pp.normalize_total(adata, 1e4)
     sc.pp.log1p(adata)
+    print('setting the seed and running neighbors and umap on original data')
     np.random.seed(0)
     sc.pp.neighbors(adata, n_neighbors=20, n_pcs=40, random_state=None)
     sc.tl.umap(adata, random_state=None)
     # sc.pl.umap(adata, color=['batch','total_counts'], save='_210208_uncorrected_set_seed_0.png')
+    sc.pl.umap(adata, color=['batch','total_counts'], save='_delete_this.png')
+
+    print('loading batch corrected data and running neighbors, umap, and louvain, clustering')
     test = load_batch_corr_data("210126_mnn_data.csv", adata)
     sc.pp.neighbors(test, n_neighbors=20, n_pcs=40, random_state=None)
     sc.tl.umap(test, random_state=None)
     sc.tl.louvain(test)
     # sc.pl.umap(test, color=['batch', 'louvain'], save="_210208_batch_corr_louvain_set_seed_0.png")
+    sc.pl.umap(test, color=['batch', 'louvain'], save="_delete_this_0.png")
+    print('loaded log normalized original data in: `adata`\nloaded batch corrected data in `test`')
+
+    a = load_louvain()
+    adata.obs['louvain'] = np.array(a.louvain)
+    adata.obsm['X_umap'] = test.obsm['X_umap'].copy()
+
+    # sc.pl.umap(adata, color=["CD3D", "TPSAB1", "PTPRC", "louvain"], save="_210210_specific_genes.png")
+
 
     # sc.tl.rank_genes_groups(adata, "louvain", method='wilcoxon', n_genes=16983, use_raw=False, rankby_abs=True)
     #
-    # transfer_leiden_get_ranked_degs(adata, test)
+    # # transfer_leiden_get_ranked_degs(adata, test)
     #
-    # a = get_pval_df(adata)
-    # top15 = a.iloc[:15, np.arange(0, len(a.columns), 3)]
+    # pvals = get_pval_df(adata)
+    # top15 = a.iloc[:15, np.arange(0, len(pvals.columns), 3)]
     # top_15_lst = np.array(top15).T.reshape(-1)
     # t_15 = []
     # for gene in top_15_lst:
@@ -454,10 +476,14 @@ if __name__ == "__main__":
     # t_15 = np.array(t_15)
     # df = pd.DataFrame(t_15, index=top_15_lst, columns=top15.columns)
     #
-    # plt.figure(figsize=(20,20))
+    # plt.figure(figsize=(40,40))
     # ax = sns.heatmap(df, cmap="vlag", center=0, linewidth=.5)
     # plt.savefig("DEG_analysis/210209_up+down_reg_DEGs_all_louvain_clusters.png")
     # plt.clf()
-    # plt.figure(figsize=(20, 20))
-    # ax = sns.heatmap(df.iloc[:15*5, :5], cmap="vlag", center=0, linewidth=.5)
-    # plt.savefig("DEG_analysis/210208_up+down_reg_DEGs_major_aggregated_clusters.png")
+    # # plt.figure(figsize=(20, 20))
+    # # ax = sns.heatmap(df.iloc[:15*5, :5], cmap="vlag", center=0, linewidth=.5)
+    # # plt.savefig("DEG_analysis/210208_up+down_reg_DEGs_major_aggregated_clusters.png")
+    #
+    # for cell_type in first_markers.columns:
+    #     name = f"_210210_batch_corr_{cell_type}.png"
+    #     plot_gene_marker_umaps(adata, first_markers, cell_type, name)

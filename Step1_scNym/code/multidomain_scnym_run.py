@@ -8,7 +8,7 @@ from run_scnym import *
 from scnym.api import scnym_api
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='scANVI')
+    parser = argparse.ArgumentParser(description='scNym')
     parser.add_argument('--test_patient', type=int, default=5,
                         help='test domain')
     parser.add_argument('--train_patient', type=int, default=None,
