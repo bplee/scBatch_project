@@ -201,7 +201,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         if self.libsize_norm:
             data_train = data_train/data_train.sum(axis=1).reshape(-1, 1)*1e5
-            data_test = data_test/data_test.sum(axis=1).reshape(-1,1)*1e5
+            data_test = data_test/data_test.sum(axis=1).reshape(-1, 1)*1e5
 
             data_train = np.log(data_train + 1)
             data_test = np.log(data_test + 1)
@@ -290,7 +290,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
             else:
                 print("Summary: Test Data Loader")
                 print(f" test patient: {patient_names[self.test_patient]} (#{self.test_patient})")
-                print(f" train patient: {self.test_patient}")
+                print(f" train patient: {self.train_patient}")
                 print(f" data_test.shape: {data_test.shape}")
                 print(f" labels_test.shape: {labels_test.shape}")
                 print(f" batch_test.shape: {batch_test.shape}")

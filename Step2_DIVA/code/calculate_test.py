@@ -175,3 +175,147 @@ if __name__ == "__main__":
     print(f"Train patient {args.train_patient}")
     print(f"Accuracies: {test_accuracy_y_list}")
     print(f"Weighted Accuracies: {test_accuracy_y_list_weighted}")
+
+
+# added code for dumb beta grid search
+# from calculate_test import *
+# bds = ["10.0"]
+# bys = ["10.0"]
+#
+# strs = ["0.1", "0.5", "1.0", "2.0", "5.0", "10.0"]
+#
+# all_weighted, all_unweighted = [], []
+# for i, bd in enumerate(bds):
+#     by_weighted, by_unweighted = [], []
+#     for j, by in enumerate(bys):
+#         if bd == 1 and by == 1:
+#             continue
+#         else:
+#             weighted, unweighted = [], []
+#             for test_pat in range(6):
+#                 model_name = f"rcc_no_conv_test_domain_{test_pat}_Bd_{bds[i]}_By_{bys[j]}_semi_sup_seed_0"
+#                 model = torch.load(model_name + ".model")
+#                 args = torch.load(model_name + ".config")
+#                 print(model_name)
+#                 print(args)
+#                 # catching any cases where --conv wasnt an arg and setting it to be true
+#                 try:
+#                     conv = args.conv
+#                 except:
+#                     conv = True
+#                 args.cuda = not args.no_cuda and torch.cuda.is_available()
+#                 device = torch.device("cuda" if args.cuda else "cpu")
+#                 kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
+#                 my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient,
+#                                             train=False, convolutions=args.conv)
+#                 test_loader_sup = data_utils.DataLoader(
+#                     my_dataset,
+#                     batch_size=args.batch_size,
+#                     shuffle=True)
+#                 cell_types, _ = my_dataset.cell_types_batches()
+#                 torch.manual_seed(args.seed)
+#                 torch.backends.cudnn.benchmark = False
+#                 np.random.seed(args.seed)
+#                 test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier,
+#                                                                          args.batch_size, args.test_patient,
+#                                                                          cell_types,
+#                                                                          args.y_dim, model_name, device)
+#                 unweighted.append(test_accuracy_y)
+#                 weighted.append(test_accuracy_y_weighted)
+#             print(f"Beta_d: {bd}, Beta_y: {by}\n Weighted Accur: {weighted}\n Unweighted Accur: {unweighted}")
+#             by_weighted.append(weighted)
+#             by_unweighted.append(unweighted)
+#     all_weighted.append(by_weighted)
+#     all_unweighted.append(by_unweighted)
+#
+#
+# # added code for alpha grid search
+# from calculate_test import *
+# ads = ["15000.0"]
+# ays = ["8000.0", "15000.0"]
+#
+# strs = ["1000.0", "2000.0", "4200.0", "8000.0", "15000.0"]
+#
+# all_weighted, all_unweighted = [], []
+# for i, ad in enumerate(ads):
+#     ay_weighted, ay_unweighted = [], []
+#     for j, ay in enumerate(ays):
+#         weighted, unweighted = [], []
+#         for test_pat in range(6):
+#             model_name = f"rcc_no_conv_test_domain_{test_pat}_ad_{ads[i]}_ay_{ays[j]}_semi_sup_seed_0"
+#             model = torch.load(model_name + ".model")
+#             args = torch.load(model_name + ".config")
+#             print(model_name)
+#             print(args)
+#             # catching any cases where --conv wasnt an arg and setting it to be true
+#             try:
+#                 conv = args.conv
+#             except:
+#                 conv = True
+#             args.cuda = not args.no_cuda and torch.cuda.is_available()
+#             device = torch.device("cuda" if args.cuda else "cpu")
+#             kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
+#             my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient,
+#                                         train=False, convolutions=args.conv)
+#             test_loader_sup = data_utils.DataLoader(
+#                 my_dataset,
+#                 batch_size=args.batch_size,
+#                 shuffle=True)
+#             cell_types, _ = my_dataset.cell_types_batches()
+#             torch.manual_seed(args.seed)
+#             torch.backends.cudnn.benchmark = False
+#             np.random.seed(args.seed)
+#             test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier,
+#                                                                      args.batch_size, args.test_patient,
+#                                                                      cell_types,
+#                                                                      args.y_dim, model_name, device)
+#             unweighted.append(test_accuracy_y)
+#             weighted.append(test_accuracy_y_weighted)
+#         print("_________________________________________________")
+#         print(f"alpha_d: {ad}, alpha_y: {ay}\n Weighted Accur: {weighted}\n Unweighted Accur: {unweighted}")
+#         print("_________________________________________________")
+#         w_str = [str(i) for i in weighted]
+#         unw_str = [str(i) for i in unweighted]
+#         with open("alpha_grid_search_weighted.csv", "a") as text_file:
+#             text_file.write(f"{ad}, {ay}, {','.join(w_str)}\n")
+#         with open("alpha_grid_search_unweighted.csv", "a") as text_file:
+#             text_file.write(f"{ad}, {ay}, {','.join(unw_str)}\n")
+#         ay_weighted.append(weighted)
+#         ay_unweighted.append(unweighted)
+#     all_weighted.append(ay_weighted)
+#     all_unweighted.append(ay_unweighted)
+#
+#
+# # this is code for supervised diva
+# weighted, unweighted = [], []
+# for test_pat in range(6):
+#     model_name = f"rcc_no_conv_test_domain_{test_pat}_sup_seed_0"
+#     model = torch.load(model_name + ".model")
+#     args = torch.load(model_name + ".config")
+#     print(model_name)
+#     print(args)
+#     # catching any cases where --conv wasnt an arg and setting it to be true
+#     try:
+#         conv = args.conv
+#     except:
+#         conv = True
+#     args.cuda = not args.no_cuda and torch.cuda.is_available()
+#     device = torch.device("cuda" if args.cuda else "cpu")
+#     kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
+#     my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient,
+#                                 train=False, convolutions=args.conv)
+#     test_loader_sup = data_utils.DataLoader(
+#         my_dataset,
+#         batch_size=args.batch_size,
+#         shuffle=True)
+#     cell_types, _ = my_dataset.cell_types_batches()
+#     torch.manual_seed(args.seed)
+#     torch.backends.cudnn.benchmark = False
+#     np.random.seed(args.seed)
+#     test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier,
+#                                                              args.batch_size, args.test_patient,
+#                                                              cell_types,
+#                                                              args.y_dim, model_name, device)
+#     unweighted.append(test_accuracy_y)
+#     weighted.append(test_accuracy_y_weighted)
+# print(f"SUPERVISED\nWeighted Accur: {weighted}\n Unweighted Accur: {unweighted}")
