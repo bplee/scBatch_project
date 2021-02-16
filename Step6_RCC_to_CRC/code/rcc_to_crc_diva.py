@@ -204,7 +204,7 @@ if __name__ == "__main__":
     # dont have an arg for getting rid of certian types
 
     # Model
-    parser.add_argument('--d-dim', type=int, default=6,
+    parser.add_argument('--d-dim', type=int, default=12,
                         help='number of classes')
     parser.add_argument('--x-dim', type=int, default=784,
                         help='input size after flattening')
@@ -303,7 +303,7 @@ if __name__ == "__main__":
 
     crc_genes = set(crc_adata.var.index.values)
 
-    # crc_patient = crc_adata.obs.batch
+    crc_patient = crc_adata.obs.batch
 
 
     # this needs to get the annotaions from diva
@@ -362,8 +362,8 @@ if __name__ == "__main__":
     train_loader, test_loader = get_diva_loaders(adata)
     ######################################################################
 
-    data_loaders['sup'] = train_loader
-    data_loaders['unsup'] = train_loader
+    data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
+    data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
 
     # how often would a supervised batch be encountered during inference
     sup_batches = len(data_loaders["sup"])
