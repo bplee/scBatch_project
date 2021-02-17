@@ -23,7 +23,7 @@ from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 from Step0_Data.code.starter import get_valid_diva_models
 
-def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_patient, cell_types, patients, model_name, empty_zx=False):
+def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_patient, cell_types, patients, model_name, device, empty_zx=False):
     model.eval()
     """
     get the latent factors and plot the UMAP plots
@@ -33,7 +33,7 @@ def plot_umap(train_loader, test_loader, model, batch_size, test_patient, train_
 
     with torch.no_grad():
         # Train
-        patients_train = np.delete(patients, test_patient)
+        # patients_train = np.delete(patients, test_patient)
         i = 0
         for (xs, ys, ds) in train_loader:
             i = i + 1
