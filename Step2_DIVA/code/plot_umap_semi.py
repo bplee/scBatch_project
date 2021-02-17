@@ -244,10 +244,10 @@ if __name__ == "__main__":
         model = torch.load(model_name + '.model')
         args = torch.load(model_name + '.config')
         if args.zx_dim != 0:
-            empty_zx = True
+            empty_zx = False
             print(f"Empty_zx: {empty_zx}")
         else:
-            empty_zx = False
+            empty_zx = True
         print(model_name)
         print(args)
 
