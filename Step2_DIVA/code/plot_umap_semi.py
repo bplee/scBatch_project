@@ -280,4 +280,4 @@ if __name__ == "__main__":
         torch.backends.cudnn.benchmark = False
         np.random.seed(args.seed)
 
-        plot_umap(train_loader, test_loader, model, args.batch_size, args.test_patient, args.train_patient, cell_types, patients, model_name, empty_zx=empty_zx)
+        plot_umap(train_loader, test_loader, model, args.batch_size, args.test_patient, args.train_patient, cell_types, patients, model_name, device, empty_zx=empty_zx)
