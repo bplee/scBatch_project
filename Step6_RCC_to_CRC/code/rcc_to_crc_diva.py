@@ -478,3 +478,5 @@ if __name__ == "__main__":
             accurate_preds_d += (v.item() == 6)
     # calculate the accuracy between 0 and 1
     accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
+    print(f"d accuracy:{accuracy_d}")
+    pd.DataFrame(np.array(predictions_y)).to_csv("210218_preds.csv")
