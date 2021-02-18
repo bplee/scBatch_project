@@ -418,8 +418,7 @@ if __name__ == "__main__":
         str_print += ", class y loss {}".format(avg_epoch_class_y_loss)
 
         # str_print = str(epoch)
-        sup_accuracy_d, sup_accuracy_y, sup_accuracy_y_weighted = get_accuracy(data_loaders["sup"], model,
-                                                                    args.batch_size, device)
+        sup_accuracy_d, sup_accuracy_y, sup_accuracy_y_weighted = get_accuracy(data_loaders["sup"], model, device)
         str_print += " sup accuracy d {}".format(sup_accuracy_d)
         str_print += ", y {}".format(sup_accuracy_y)
         str_print += ", y_weighted {}".format(sup_accuracy_y_weighted)
@@ -457,7 +456,7 @@ if __name__ == "__main__":
 
     classifier_fn = model.classifier
 
-    print(get_accuracy(data_loaders['sup'], model, args.batch_size, device))
+    print(get_accuracy(data_loaders['sup'], model, device))
 
     predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
     with torch.no_grad():
