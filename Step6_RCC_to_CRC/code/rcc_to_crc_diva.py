@@ -116,36 +116,32 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     return epoch_losses_sup, epoch_losses_unsup, epoch_class_y_loss
 
 
-def get_accuracy(data_loader, classifier_fn, batch_size):
+def get_accuracy(data_loader, model, device):
     model.eval()
+    classifier_fn = model.classifier
     """
     compute the accuracy over the supervised training set or the testing set
     """
     predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
-
     with torch.no_grad():
         # use the right data loader
         for (xs, ys, ds) in data_loader:
             # To device
             xs, ys, ds = xs.to(device), ys.to(device), ds.to(device)
-
             # use classification function to compute all predictions for each batch
             pred_d, pred_y = classifier_fn(xs)
             predictions_d.append(pred_d)
             actuals_d.append(ds)
             predictions_y.append(pred_y)
             actuals_y.append(ys)
-
         # compute the number of accurate predictions
         accurate_preds_d = 0
         for pred, act in zip(predictions_d, actuals_d):
             for i in range(pred.size(0)):
                 v = torch.sum(pred[i] == act[i])
                 accurate_preds_d += (v.item() == 6)
-
         # calculate the accuracy between 0 and 1
         accuracy_d = (accurate_preds_d * 1.0) / len(data_loader.dataset)
-
         # compute the number of accurate predictions
         accurate_preds_y = 0
         labels_true = []
@@ -156,18 +152,14 @@ def get_accuracy(data_loader, classifier_fn, batch_size):
                 accurate_preds_y += (v.item() == 16)
                 labels_pred.append(torch.argmax(pred[i]))
                 labels_true.append(torch.argmax(act[i]))
-
         # calculate the accuracy between 0 and 1
         accuracy_y = (accurate_preds_y * 1.0) / len(data_loader.dataset)
-
         # true and predicted labels for calculating confusion matrix
         labels_pred = np.array(labels_pred).astype(int)
         labels_true = np.array(labels_true).astype(int)
-
         cm = confusion_matrix(labels_true, labels_pred)
         cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         accuracy_y_weighted = np.mean(np.diag(cm_norm))
-
         return accuracy_d, accuracy_y, accuracy_y_weighted
 
 
@@ -280,9 +272,6 @@ if __name__ == "__main__":
     # crc_all_data = pd.read_pickle(crc_pkl_path)
     #
     # # getting one test patien
-    # crc_test_pat = "TS-101T"
-    # crc_data = crc_all_data[crc_all_data['PATIENT'] == crc_test_pat]
-    # del crc_all_data
     # crc_cluster = crc_data.CLUSTER
     # crc_patient = crc_data.PATIENT
     # crc_raw_counts = crc_data.drop(["CLUSTER", "PATIENT"], axis=1)
@@ -429,8 +418,8 @@ if __name__ == "__main__":
         str_print += ", class y loss {}".format(avg_epoch_class_y_loss)
 
         # str_print = str(epoch)
-        sup_accuracy_d, sup_accuracy_y, sup_accuracy_y_weighted = get_accuracy(data_loaders["sup"], model.classifier,
-                                                                    args.batch_size)
+        sup_accuracy_d, sup_accuracy_y, sup_accuracy_y_weighted = get_accuracy(data_loaders["sup"], model,
+                                                                    args.batch_size, device)
         str_print += " sup accuracy d {}".format(sup_accuracy_d)
         str_print += ", y {}".format(sup_accuracy_y)
         str_print += ", y_weighted {}".format(sup_accuracy_y_weighted)
@@ -464,4 +453,28 @@ if __name__ == "__main__":
                 break
         print('time passed: {} mins'.format((time.time() - t0)/60))
 
+    print(f"Done training testing some predicions")
 
+    classifier_fn = model.classifier
+
+    print(get_accuracy(data_loaders['sup'], model, args.batch_size, device))
+
+    predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
+    with torch.no_grad():
+        # use the right data loader
+        for (xs, ys, ds) in data_loaders['unsup']:
+            # To device
+            xs, ys, ds = xs.to(device), ys.to(device), ds.to(device)
+            # use classification function to compute all predictions for each batch
+            pred_d, pred_y = classifier_fn(xs)
+            predictions_d.append(pred_d)
+            actuals_d.append(ds)
+            predictions_y.append(pred_y)
+            actuals_y.append(ys)
+    accurate_preds_d = 0
+    for pred, act in zip(predictions_d, actuals_d):
+        for i in range(pred.size(0)):
+            v = torch.sum(pred[i] == act[i])
+            accurate_preds_d += (v.item() == 6)
+    # calculate the accuracy between 0 and 1
+    accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
