@@ -49,6 +49,11 @@ def get_accuracy(data_loader, classifier_fn, batch_size):
     """
     compute the accuracy over the supervised training set or the testing set
     """
+
+    # getting num classes and labels:
+    n_labels = len(data_loader.dataset[0][1])
+    n_batches = len(data_loader.dataset[0][2])
+
     predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
 
     with torch.no_grad():
@@ -70,7 +75,7 @@ def get_accuracy(data_loader, classifier_fn, batch_size):
         for pred, act in zip(predictions_d, actuals_d):
             for i in range(pred.size(0)):
                 v = torch.sum(pred[i] == act[i])
-                accurate_preds_d += (v.item() == 5)
+                accurate_preds_d += (v.item() == n_batches)
 
         # calculate the accuracy between 0 and 1
         accuracy_d = (accurate_preds_d * 1.0) / len(data_loader.dataset)
@@ -82,7 +87,7 @@ def get_accuracy(data_loader, classifier_fn, batch_size):
         for pred, act in zip(predictions_y, actuals_y):
             for i in range(pred.size(0)):
                 v = torch.sum(pred[i] == act[i])
-                accurate_preds_y += (v.item() == 16)
+                accurate_preds_y += (v.item() == n_labels)
                 labels_pred.append(torch.argmax(pred[i]))
                 labels_true.append(torch.argmax(act[i]))
 
