@@ -117,25 +117,15 @@ class EmptyDIVALoader(data_utils.Dataset):
         return x, y, d
 
 
-if __name__ == "__main__":
+def load_rcc_to_crc_data_loaders():
+    """
+    Function made from scratch code, returns DIVA RCC training and CRC test loaders for SSL training as well as
+    crc adata so that we can plot predictions on the adata
+    Returns
+    -------
+    train loader, test loader, crc adata
 
-    # CRC DATA
-    # --------
-    # crc_dir = "/data/leslie/bplee/scBatch/CRC_dataset/code"
-    #
-    # # loading testing set crc data
-    # crc_pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
-    # crc_all_data = pd.read_pickle(crc_pkl_path)
-    #
-    # # getting one test patien
-    # crc_test_pat = "TS-101T"
-    # crc_data = crc_all_data[crc_all_data['PATIENT'] == crc_test_pat]
-    # del crc_all_data
-    # crc_cluster = crc_data.CLUSTER
-    # crc_patient = crc_data.PATIENT
-    # crc_raw_counts = crc_data.drop(["CLUSTER", "PATIENT"], axis=1)
-    #
-    # crc_gene_names = crc_raw_counts.columns.values
+    """
     pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     all_data = pd.read_pickle(pkl_path)
     patient_subset = ["TS-101T",
@@ -153,6 +143,9 @@ if __name__ == "__main__":
 
     crc_patient = crc_adata.obs.batch
 
+    crc_adata.obs['cell_types'] = np.array(load_louvain().cell_types)
+    crc_adata.obsm['X_umap'] = np.array(load_umap())
+
     # this needs to get the annotaions from diva
     # preparing UMAP for new pat:
     # crc_adata = anndata.AnnData(np.log(crc_raw_counts + 1))
@@ -161,7 +154,6 @@ if __name__ == "__main__":
     # sc.pp.neighbors(crc_adata, n_neighbors=10)
     # sc.tl.umap(crc_adata)
     # sc.pl.umap(crc_adata, color=[], save='markers')
-
 
     # RCC DATA
     # --------
@@ -207,6 +199,12 @@ if __name__ == "__main__":
     adata = adata[:, gene_ds.gene_names]
 
     train_loader, test_loader = get_diva_loaders(adata)
+
+    return train_loader, test_loader, crc_adata
+
+if __name__ == "__main__":
+
+    train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders()
 
     # svm code:
     # data = gene_ds.X
