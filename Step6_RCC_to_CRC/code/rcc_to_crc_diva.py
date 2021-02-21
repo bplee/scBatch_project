@@ -119,6 +119,8 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
 def get_accuracy(data_loader, model, device):
     model.eval()
     classifier_fn = model.classifier
+    n_labels = len(data_loader.dataset[0][1])
+    n_batches = len(data_loader.dataset[0][2])
     """
     compute the accuracy over the supervised training set or the testing set
     """
@@ -139,7 +141,7 @@ def get_accuracy(data_loader, model, device):
         for pred, act in zip(predictions_d, actuals_d):
             for i in range(pred.size(0)):
                 v = torch.sum(pred[i] == act[i])
-                accurate_preds_d += (v.item() == 6)
+                accurate_preds_d += (v.item() == n_batches)
         # calculate the accuracy between 0 and 1
         accuracy_d = (accurate_preds_d * 1.0) / len(data_loader.dataset)
         # compute the number of accurate predictions
@@ -149,7 +151,7 @@ def get_accuracy(data_loader, model, device):
         for pred, act in zip(predictions_y, actuals_y):
             for i in range(pred.size(0)):
                 v = torch.sum(pred[i] == act[i])
-                accurate_preds_y += (v.item() == 16)
+                accurate_preds_y += (v.item() == n_labels)
                 labels_pred.append(torch.argmax(pred[i]))
                 labels_true.append(torch.argmax(act[i]))
         # calculate the accuracy between 0 and 1
@@ -262,94 +264,7 @@ if __name__ == "__main__":
     data_loaders = {}
 
     # loading CRC RCC merged data from rcc_to_crc_test.py
-    ###########################################################
-    # CRC DATA
-    # --------
-    # crc_dir = "/data/leslie/bplee/scBatch/CRC_dataset/code"
-    #
-    # # loading testing set crc data
-    # crc_pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
-    # crc_all_data = pd.read_pickle(crc_pkl_path)
-    #
-    # # getting one test patien
-    # crc_cluster = crc_data.CLUSTER
-    # crc_patient = crc_data.PATIENT
-    # crc_raw_counts = crc_data.drop(["CLUSTER", "PATIENT"], axis=1)
-    #
-    # crc_gene_names = crc_raw_counts.columns.values
-    pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
-    all_data = pd.read_pickle(pkl_path)
-    patient_subset = ["TS-101T",
-                      "TS-104T",
-                      "TS-106T",
-                      "TS-108T",
-                      "TS-109T",
-                      "TS-125T"]
-    og_pat_inds = all_data['PATIENT'].isin(patient_subset)
-    og_data = all_data[og_pat_inds]
-
-    crc_adata = clean_data_qc(og_data)
-
-    crc_genes = set(crc_adata.var.index.values)
-
-    crc_patient = crc_adata.obs.batch
-
-
-    # this needs to get the annotaions from diva
-    # preparing UMAP for new pat:
-    # crc_adata = anndata.AnnData(np.log(crc_raw_counts + 1))
-    # crc_adata.obs['batch'] = np.array(crc_data_patient)
-    # crc_adata.obs['annotations'] = 'Unlabeled'
-    # sc.pp.neighbors(crc_adata, n_neighbors=10)
-    # sc.tl.umap(crc_adata)
-    # sc.pl.umap(crc_adata, color=[], save='markers')
-
-
-    # RCC DATA
-    # --------
-    # loading training set RCC, removing ccRCC cells
-    rcc_obj = PdRccAllData(labels_to_remove=["Ambiguous", "Megakaryocyte", "TAM/TCR (Ambiguos)", "CD45- ccRCC CA9+"])
-    rcc_patient = rcc_obj.data.patient
-    rcc_cell_type = rcc_obj.data.cell_type
-    rcc_raw_counts = rcc_obj.data.drop(["cell_type", "patient"], axis=1)
-
-    # these are the ensembl.gene names
-    rcc_genes = set(rcc_raw_counts.columns.values)
-
-    # comparing set of gene names:
-    print(f" Unique CRC gene names: {len(crc_genes)}\n Unique RCC gene names: {len(rcc_genes)}")
-
-    universe = crc_genes.intersection(rcc_genes)
-    print(f" Genes in both datasets: {len(universe)}")
-
-    crc_adata = crc_adata[:, np.array(list(universe))]
-
-    # getting rid of non shared genes and making adata's
-    crc_adata.obs['annotations'] = 'Unlabeled'
-
-    rcc_raw_counts = rcc_raw_counts[universe]
-
-    rcc_adata = anndata.AnnData(rcc_raw_counts)
-    rcc_adata.obs['cell_type'] = rcc_cell_type
-    rcc_adata.obs['annotations'] = rcc_cell_type
-    del rcc_raw_counts
-
-    adata = rcc_adata.concatenate(crc_adata)
-    # adata.obs['batch'] = np.array(pd.concat([rcc_patient, crc_patient]))
-
-    pats = np.append(np.array(rcc_patient), np.array(crc_patient))
-    adata.obs['patient'] = pats
-    gene_ds = GeneExpressionDataset()
-    gene_ds.populate_from_data(X=adata.X,
-                               gene_names=np.array(adata.var.index),
-                               batch_indices=pd.factorize(pats)[0],
-                               remap_attributes=False)
-    gene_ds.subsample_genes(784)
-
-    adata = adata[:, gene_ds.gene_names]
-
-    train_loader, test_loader = get_diva_loaders(adata)
-    ######################################################################
+    train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders()
 
     data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
     data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
@@ -365,6 +280,7 @@ if __name__ == "__main__":
 
     # setup the VAE
     l = len(train_loader[0][1])
+    args.d_dim = len(train_loader[0][2])
     print(f"Setting y_dim DIVA arg to: {l}")
     args.y_dim = l
     model = DIVA(args).to(device)
