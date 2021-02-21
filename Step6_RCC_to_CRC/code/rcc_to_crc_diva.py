@@ -374,8 +374,10 @@ if __name__ == "__main__":
 
     classifier_fn = model.classifier
 
+    print(f"accuracy for training set:")
     print(get_accuracy(data_loaders['sup'], model, device))
 
+    print("accuracy for test set:")
     predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
     with torch.no_grad():
         # use the right data loader
@@ -397,7 +399,7 @@ if __name__ == "__main__":
     # calculate the accuracy between 0 and 1
     accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
     print(f"d accuracy:{accuracy_d}")
-    a = pd.DataFrame(predictions_y.cpu().numpy())
+    a = pd.DataFrame(torch.cat(predictions_y).cpu().numpy())
     a.to_csv("210221_test_label_preds.csv")
-    b = pd.DataFrame(predictions_d.cpu().numpy())
+    b = pd.DataFrame(torch.cat(predictions_d).cpu().numpy())
     b.to_csv("210221_test_batch_preds.csv")
