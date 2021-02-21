@@ -22,7 +22,7 @@ print("\tWorking dir appended to Sys path.")
 from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 from Step0_Data.code.starter import get_valid_diva_models
-from Step6_RCC_to_CRC.rcc_to_crc_test import *
+from Step6_RCC_to_CRC.code.rcc_to_crc_test import *
 
 def plot_umap(train_loader, test_loader, model, cell_types, patients, model_name, device, empty_zx=False):
     model.eval()
