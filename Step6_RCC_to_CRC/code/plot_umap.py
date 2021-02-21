@@ -208,7 +208,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if args.cuda else "cpu")
     kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
 
-    train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders(shuffle=False)
+    train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders(shuffle=True)
 
     cell_types = test_loader.cell_types
     patients = test_loader.patients
