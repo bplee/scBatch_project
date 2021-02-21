@@ -81,6 +81,9 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, shuffle=False):
     patient_indices, patient_names = pd.factorize(data_obj.data.patient)
     cell_type_indices, cell_type_names = pd.factorize(data_obj.data.cell_type)
 
+    # normalizing the total here
+    raw_counts = raw_counts/raw_counts.sum(axis=1).reshape(-1,1)*1e5
+
     # subsampling genes before selecting patient indices
     gene_dataset = GeneExpressionDataset()
     gene_dataset.populate_from_data(X=raw_counts,
@@ -98,7 +101,7 @@ def get_Rcc_adata(test_patient, train_patient=None, x_dim=16323, shuffle=False):
     adata.obs['dist'] = 'train'
     adata.obs['dist'][patient_indices == test_patient] = 'test'
 
-    sc.pp.normalize_total(adata, 1e4)
+    # sc.pp.normalize_total(adata, 1e4)
     sc.pp.log1p(adata)
 
     if train_patient is not None:
