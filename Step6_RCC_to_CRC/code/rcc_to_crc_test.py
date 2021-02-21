@@ -18,7 +18,7 @@ from CRC_dataset.code.crc_data_load import *
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
 
-def get_diva_loaders(adata):
+def get_diva_loaders(adata, shuffle=False):
     """
 
     Parameters
@@ -48,17 +48,18 @@ def get_diva_loaders(adata):
     batch_train = patients[train_inds]
     batch_test = patients[test_inds]
 
-    # Shuffle everything one more time
-    inds = np.arange(n_train)
-    np.random.shuffle(inds)
-    data_train = data_train[inds]
-    labels_train = labels_train[inds]
-    batch_train = batch_train[inds]
-    inds = np.arange(n_test)
-    np.random.shuffle(inds)
-    data_test = data_test[inds]
-    labels_test = labels_test[inds]
-    batch_test = batch_test[inds]
+    if shuffle:
+        # Shuffle everything one more time
+        inds = np.arange(n_train)
+        np.random.shuffle(inds)
+        data_train = data_train[inds]
+        labels_train = labels_train[inds]
+        batch_train = batch_train[inds]
+        inds = np.arange(n_test)
+        np.random.shuffle(inds)
+        data_test = data_test[inds]
+        labels_test = labels_test[inds]
+        batch_test = batch_test[inds]
 
     # converting to tensors
     data_train = torch.as_tensor(data_train)
@@ -117,7 +118,7 @@ class EmptyDIVALoader(data_utils.Dataset):
         return x, y, d
 
 
-def load_rcc_to_crc_data_loaders():
+def load_rcc_to_crc_data_loaders(shuffle=False):
     """
     Function made from scratch code, returns DIVA RCC training and CRC test loaders for SSL training as well as
     crc adata so that we can plot predictions on the adata
@@ -198,7 +199,7 @@ def load_rcc_to_crc_data_loaders():
 
     adata = adata[:, gene_ds.gene_names]
 
-    train_loader, test_loader = get_diva_loaders(adata)
+    train_loader, test_loader = get_diva_loaders(adata, shuffle=shuffle)
 
     return train_loader, test_loader, crc_adata
 

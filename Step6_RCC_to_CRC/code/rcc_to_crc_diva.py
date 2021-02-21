@@ -20,9 +20,7 @@ if WORKING_DIR not in sys.path:
     print("\tWorking dir appended to Sys path.")
 
 from ForBrennan.DIVA.model.model_diva_no_convolutions import DIVA
-#from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
-import numpy as np
 from Step0_Data.code.pkl_load_data import PdRccAllData
 import anndata
 import torch
@@ -264,10 +262,14 @@ if __name__ == "__main__":
     data_loaders = {}
 
     # loading CRC RCC merged data from rcc_to_crc_test.py
-    train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders()
+    train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders(shuffle=False)
 
-    data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
-    data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
+    # data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
+    # data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
+
+    # No shuffling here
+    data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=False)
+    data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=False)
 
     # how often would a supervised batch be encountered during inference
     sup_batches = len(data_loaders["sup"])
@@ -386,12 +388,16 @@ if __name__ == "__main__":
             actuals_d.append(ds)
             predictions_y.append(pred_y)
             actuals_y.append(ys)
+    num_batches = len(data_loaders['unsup'].dataset[0][2])
     accurate_preds_d = 0
     for pred, act in zip(predictions_d, actuals_d):
         for i in range(pred.size(0)):
             v = torch.sum(pred[i] == act[i])
-            accurate_preds_d += (v.item() == 6)
+            accurate_preds_d += (v.item() == num_batches)
     # calculate the accuracy between 0 and 1
     accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
     print(f"d accuracy:{accuracy_d}")
-    pd.DataFrame(np.array(predictions_y)).to_csv("210218_preds.csv")
+    a = pd.DataFrame(predictions_y.cpu().numpy())
+    a.to_csv("210221_test_label_preds.csv")
+    b = pd.DataFrame(predictions_d.cpu().numpy())
+    b.to_csv("210221_test_batch_preds.csv")
