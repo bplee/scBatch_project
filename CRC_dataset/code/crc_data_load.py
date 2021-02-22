@@ -151,7 +151,10 @@ def clean_data_qc(df):
 
     # removing mitochondrial and ribosomal genes:
     print(f" Removing ribo and mitochondrial genes")
-    keep_genes = ~adata.var.mt & ~adata.var.ribo
+    extra_removing = ["NEAT1", "MALAT1"]
+    print(f" Removing {extra_removing} from list")
+    extra_bools = adata.var_names.isin(extra_removing) # these are true for NEAT1 and MALAT1
+    keep_genes = ~adata.var.mt & ~adata.var.ribo & ~extra_bools
     adata = adata[:, keep_genes]
 
     # removing sparse genes and cells
