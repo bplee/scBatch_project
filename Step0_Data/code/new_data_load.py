@@ -122,6 +122,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         batch_indices = batch_indices.astype(int)
 
         gene_names = raw_counts.columns.values # np array
+        raw_counts = np.array(raw_counts)
 
         n_each_cell_type = np.zeros(len(cell_types)).astype(int)
         for i in range(len(cell_type_names)):
@@ -138,7 +139,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
             print("Selecting genes from train+test set")
             # then we get to see the testing set and subset for highly variable genes here
             gene_dataset.populate_from_data(
-                X=np.array(raw_counts),
+                X=raw_counts,
                 batch_indices=batch_indices,
                 labels=labels,
                 gene_names=gene_names,
