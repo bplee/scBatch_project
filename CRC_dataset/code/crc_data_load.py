@@ -136,7 +136,8 @@ def clean_data_qc(df):
 
     # identifying mt and ribo genes
     adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
-    adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
+    # adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
+    adata.var['ribo'] = adata.var_names.str.startswith(("RP"))  # annotate the group of ribosomal genes as 'ribo'
     print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[1]}")
     print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[1]}")
 
@@ -453,7 +454,7 @@ if __name__ == "__main__":
 
     a = load_louvain()
     adata.obs['louvain'] = np.array(a.louvain)
-    adata.obsm['X_umap'] = test.obsm['X_umap'].copy()
+    adata.obsm['X_umap'] = np.array(test.obsm['X_umap'])
 
     # sc.pl.umap(adata, color=["CD3D", "TPSAB1", "PTPRC", "louvain"], save="_210210_specific_genes.png")
 

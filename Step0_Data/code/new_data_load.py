@@ -130,6 +130,9 @@ class NewRccDatasetSemi(data_utils.Dataset):
         print('Importing gene expression ds')
         gene_dataset = GeneExpressionDataset()
 
+        if self.libsize_norm:
+            raw_counts = raw_counts/raw_counts.sum(axis=1).reshape(-1, 1)*1e5
+
         # this is SSL
         if self.ssl:
             print("Selecting genes from train+test set")
@@ -199,18 +202,12 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
         self.gene_names = gene_dataset.gene_names
 
-        if self.libsize_norm:
-            data_train = data_train/data_train.sum(axis=1).reshape(-1, 1)*1e5
-            data_test = data_test/data_test.sum(axis=1).reshape(-1, 1)*1e5
+        # usual diva stuff
+        data_train = np.log(data_train + 1)
+        data_test = np.log(data_test + 1)
 
-            data_train = np.log(data_train + 1)
-            data_test = np.log(data_test + 1)
-        else:
-            # usual diva stuff
-            data_train = np.log(data_train + 1)
-            data_test = np.log(data_test + 1)
-
-            # what is the point of this line?
+        if not self.libsize_norm:
+            # this is DIVA preprocessing we want to toggle if we arent trying to get the libsize norm data
             data_train = data_train / np.max(data_train)
             data_test = data_test / np.max(data_test)
 
