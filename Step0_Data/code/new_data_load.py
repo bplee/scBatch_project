@@ -122,7 +122,6 @@ class NewRccDatasetSemi(data_utils.Dataset):
         batch_indices = batch_indices.astype(int)
 
         gene_names = raw_counts.columns.values # np array
-        raw_counts = np.array(raw_counts)
 
         n_each_cell_type = np.zeros(len(cell_types)).astype(int)
         for i in range(len(cell_type_names)):
@@ -131,11 +130,12 @@ class NewRccDatasetSemi(data_utils.Dataset):
         print('Importing gene expression ds')
         gene_dataset = GeneExpressionDataset()
 
-        if self.libsize_norm:
-            raw_counts = raw_counts/raw_counts.sum(axis=1).reshape(-1, 1)*1e5
-
         # this is SSL
         if self.ssl:
+            raw_counts = np.array(raw_counts)
+            if self.libsize_norm:
+                raw_counts = raw_counts / raw_counts.sum(axis=1).reshape(-1, 1) * 1e5
+
             print("Selecting genes from train+test set")
             # then we get to see the testing set and subset for highly variable genes here
             gene_dataset.populate_from_data(
@@ -178,6 +178,9 @@ class NewRccDatasetSemi(data_utils.Dataset):
             else:
                 train_inds = batch_indices.ravel() == self.train_patient
             train_counts = raw_counts.iloc[train_inds,:]
+            if self.libsize_norm:
+                train_counts = np.array(train_counts)
+                train_counts = train_counts/train_counts.sum(axis=1).reshape(-1,1)*1e5
             gene_dataset.populate_from_data(
                 X=np.array(train_counts),
                 batch_indices=batch_indices[train_inds],
@@ -191,6 +194,8 @@ class NewRccDatasetSemi(data_utils.Dataset):
 
             data_train = gene_dataset.X
             data_test = np.array(test_counts[gene_subset])
+            if self.libsize_norm:
+                data_test = data_test/data_test.sum(axis=1).reshape(-1,1) * 1e5
             labels_train = gene_dataset.labels.ravel()
             labels_test = labels[test_inds].ravel()
             batch_train = gene_dataset.batch_indices.ravel()
