@@ -118,7 +118,7 @@ class EmptyDIVALoader(data_utils.Dataset):
         return x, y, d
 
 
-def load_rcc_to_crc_data_loaders(old_load=False, shuffle=False):
+def load_rcc_to_crc_data_loaders(cell_types_to_remove=["Plasma"],old_load=False, shuffle=False):
     """
     Function made from scratch code, returns DIVA RCC training and CRC test loaders for SSL training as well as
     crc adata so that we can plot predictions on the adata
@@ -146,6 +146,9 @@ def load_rcc_to_crc_data_loaders(old_load=False, shuffle=False):
 
     crc_adata.obs['cell_types'] = load_louvain().cell_types
     crc_adata.obs['chirag'] = load_louvain().chirag
+
+    cells_to_remove = crc_adata.obs['chirag'].isin(cell_types_to_remove)
+    crc_adata = crc_adata[~cell_types_to_remove,:]
     # crc_adata.obsm['X_umap'] = np.array(load_umap())
 
     # this needs to get the annotaions from diva
@@ -212,6 +215,12 @@ if __name__ == "__main__":
     # data = gene_ds.X
     # train_inds = adata.obs.batch=='0'
     # x = data[train_inds, :]
-    # y, map = pd.factorize(adata.obs.cell_type[train_inds])
+    # y, map = pd.factorize(adata.obs.cell_types[train_inds])
     #
     # test_x = data[~train_inds, :]
+
+    # svm = LinearSVC()
+    svm.fit(x, y)
+    preds = map[svm.predict(test_x)]
+
+
