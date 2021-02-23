@@ -84,7 +84,7 @@ def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/CRC_dataset/pkl_f
     df.to_pickle(pkl_path, protocol=4)
     print(f"Saved to {pkl_path}")
 
-def clean_data_qc(df):
+def clean_data_qc(df, old_load=False):
     """
     performs:
         - cell filtering
@@ -136,8 +136,10 @@ def clean_data_qc(df):
 
     # identifying mt and ribo genes
     adata.var['mt'] = adata.var_names.str.startswith('MT-')  # annotate the group of mitochondrial genes as 'mt'
-    # adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
-    adata.var['ribo'] = adata.var_names.str.startswith(("RP"))  # annotate the group of ribosomal genes as 'ribo'
+    if old_load:
+        adata.var['ribo'] = adata.var_names.str.startswith(("RPS", "RPL"))  # annotate the group of ribosomal genes as 'ribo'
+    else:
+        adata.var['ribo'] = adata.var_names.str.startswith(("RP"))  # annotate the group of ribosomal genes as 'ribo'
     print(f" Number of MT genes: {sum(adata.var['mt'])} / {adata.shape[1]}")
     print(f" Number of Ribo genes: {sum(adata.var['ribo'])} / {adata.shape[1]}")
 
@@ -150,11 +152,14 @@ def clean_data_qc(df):
 
 
     # removing mitochondrial and ribosomal genes:
-    print(f" Removing ribo and mitochondrial genes")
-    extra_removing = ["NEAT1", "MALAT1"]
-    print(f" Removing {extra_removing} from list")
-    extra_bools = adata.var_names.isin(extra_removing) # these are true for NEAT1 and MALAT1
-    keep_genes = ~adata.var.mt & ~adata.var.ribo & ~extra_bools
+    if not old_load:
+        print(f" Removing ribo and mitochondrial genes")
+        extra_removing = ["NEAT1", "MALAT1"]
+        print(f" Removing {extra_removing} from list")
+        extra_bools = adata.var_names.isin(extra_removing) # these are true for NEAT1 and MALAT1
+        keep_genes = ~adata.var.mt & ~adata.var.ribo & ~extra_bools
+    else:
+        keep_genes = ~adata.var.mt & ~adata.var.ribo
     adata = adata[:, keep_genes]
 
     # removing sparse genes and cells
