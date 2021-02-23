@@ -118,7 +118,7 @@ class EmptyDIVALoader(data_utils.Dataset):
         return x, y, d
 
 
-def load_rcc_to_crc_data_loaders(shuffle=False):
+def load_rcc_to_crc_data_loaders(old_load=False, shuffle=False):
     """
     Function made from scratch code, returns DIVA RCC training and CRC test loaders for SSL training as well as
     crc adata so that we can plot predictions on the adata
@@ -138,7 +138,7 @@ def load_rcc_to_crc_data_loaders(shuffle=False):
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
     og_data = all_data[og_pat_inds]
 
-    crc_adata = clean_data_qc(og_data)
+    crc_adata = clean_data_qc(og_data, old_load=old_load)
 
     crc_genes = set(crc_adata.var.index.values)
 
