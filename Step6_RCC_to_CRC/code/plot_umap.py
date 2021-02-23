@@ -31,7 +31,6 @@ def plot_umap(train_loader, test_loader, model, cell_types, patients, model_name
     produces 18 plots/testpatient: [zy, zd, zx] x [patient label, cell type label] x [train, test, train+test]
     """
     actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
-
     with torch.no_grad():
         # Train
         # patients_train = np.delete(patients, test_patient)
@@ -40,7 +39,6 @@ def plot_umap(train_loader, test_loader, model, cell_types, patients, model_name
             i = i + 1
             # To device
             xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
-
             # use classification function to compute all predictions for each batch
             zy_loc, zy_scale = model.qzy(xs)
             zd_loc, zd_scale = model.qzd(xs)
@@ -49,33 +47,28 @@ def plot_umap(train_loader, test_loader, model, cell_types, patients, model_name
                 zx_.append(np.array(zx_loc.cpu()))
             zy_.append(np.array(zy_loc.cpu()))
             zd_.append(np.array(zd_loc.cpu()))
+            # getting integer labels here
             actuals_d.append(np.argmax(ds,axis=1))
             actuals_y.append(np.argmax(ys,axis=1))
             if i == 50:
-               break
-
-        zy = torch.cat(zy_)
-        zd = torch.cat(zd_)
+                break
+        zy = np.vstack(zy_)
+        zd = np.vstack(zd_)
         if not empty_zx:
-            zx = torch.cat(zx_)
-        labels_y = torch.cat(actuals_y)
-        labels_d = torch.cat(actuals_d)
-
-
+            zx = np.vstack(zx_)
+        labels_y = np.hstack(actuals_y)
+        labels_d = np.hstack(actuals_d)
         if not empty_zx:
             zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
             adatas = [zy_adata, zd_adata, zx_adata]
         else:
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
-
         name = ['zy', 'zd', 'zx']
-
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
             save_name = f"_{model_name}_train_set_{name[i]}.png"
-
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color=['batch', 'cell_type'], size=15, alpha=.8, save=save_name)
@@ -104,13 +97,12 @@ def plot_umap(train_loader, test_loader, model, cell_types, patients, model_name
             if i == 50:
                 break
 
-        zy = torch.cat(zy_)
-        zd = torch.cat(zd_)
+        zy = np.vstack(zy_)
+        zd = np.vstack(zd_)
         if not empty_zx:
-            zx = torch.cat(zx_)
-        labels_y = torch.cat(actuals_y)
-        labels_d = torch.cat(actuals_d)
-
+            zx = np.vstack(zx_)
+        labels_y = np.hstack(actuals_y)
+        labels_d = np.hstack(actuals_d)
         if not empty_zx:
             zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
             adatas = [zy_adata, zd_adata, zx_adata]
@@ -172,12 +164,12 @@ def plot_umap(train_loader, test_loader, model, cell_types, patients, model_name
             if i == 10:
                 break
 
-        zy = torch.cat(zy_)
-        zd = torch.cat(zd_)
+        zy = np.vstack(zy_)
+        zd = np.vstack(zd_)
         if not empty_zx:
-            zx = torch.cat(zx_)
-        labels_y = torch.cat(actuals_y)
-        labels_d = torch.cat(actuals_d)
+            zx = np.vstack(zx_)
+        labels_y = np.hstack(actuals_y)
+        labels_d = np.hstack(actuals_d)
 
         if not empty_zx:
             zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
