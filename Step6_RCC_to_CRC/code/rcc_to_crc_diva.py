@@ -266,6 +266,9 @@ if __name__ == "__main__":
     # loading CRC RCC merged data from rcc_to_crc_test.py
     train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders(shuffle=False)
 
+    cell_types = test_loader.cell_types
+    patients = test_loader.patients
+
     # data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
     # data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
 
@@ -401,7 +404,59 @@ if __name__ == "__main__":
     # calculate the accuracy between 0 and 1
     accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
     print(f"d accuracy:{accuracy_d}")
-    a = pd.DataFrame(torch.cat(predictions_y).cpu().numpy())
+    labels_d = np.hstack(actuals_d)
+    labels_y = np.hstack(actuals_y)
+    a = torch.cat(predictions_y).cpu().numpy()
+    preds_y = [np.argmax(i) for i in a]
+    a = pd.DataFrame({"preds": preds_y, "actuals": labels_y})
     a.to_csv("210221_test_label_preds.csv")
-    b = pd.DataFrame(torch.cat(predictions_d).cpu().numpy())
+
+    b = torch.cat(predictions_d).cpu().numpy()
+    preds_d = [np.argmax(i) for i in b]
+    b = pd.DataFrame({"preds": preds_d, "actuals": labels_d})
     b.to_csv("210221_test_batch_preds.csv")
+
+    empty_zx = False
+    # trying to plot
+    actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
+    with torch.no_grad():
+        # Train
+        # patients_train = np.delete(patients, test_patient)
+        i = 0
+        for (xs, ys, ds) in train_loader:
+            i = i + 1
+            # To device
+            xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
+            # use classification function to compute all predictions for each batch
+            zy_loc, zy_scale = model.qzy(xs)
+            zd_loc, zd_scale = model.qzd(xs)
+            if not empty_zx:
+                zx_loc, zx_scale = model.qzx(xs)
+                zx_.append(np.array(zx_loc.cpu()))
+            zy_.append(np.array(zy_loc.cpu()))
+            zd_.append(np.array(zd_loc.cpu()))
+            # getting integer labels here
+            actuals_d.append(np.argmax(ds, axis=1))
+            actuals_y.append(np.argmax(ys, axis=1))
+            if i == 50:
+                break
+        zy = np.vstack(zy_)
+        zd = np.vstack(zd_)
+        if not empty_zx:
+            zx = np.vstack(zx_)
+        labels_y = np.hstack(actuals_y)
+        labels_d = np.hstack(actuals_d)
+        if not empty_zx:
+            zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
+            adatas = [zy_adata, zd_adata, zx_adata]
+        else:
+            zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
+            adatas = [zy_adata, zd_adata]
+        name = ['zy', 'zd', 'zx']
+        for i, _ in enumerate(adatas):
+            _.obs['batch'] = patients[labels_d]
+            _.obs['cell_type'] = cell_types[labels_y]
+            save_name = f"_{model_name}_train_set_{name[i]}.png"
+            sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
+            sc.tl.umap(_, min_dist=.3)
+            sc.pl.umap(_, color=['batch', 'cell_type'], size=15, alpha=.8, save=save_name)
