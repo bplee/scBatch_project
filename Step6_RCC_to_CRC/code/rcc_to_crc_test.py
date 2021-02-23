@@ -142,13 +142,15 @@ def load_rcc_to_crc_data_loaders(cell_types_to_remove=["Plasma"],old_load=False,
 
     crc_genes = set(crc_adata.var.index.values)
 
-    crc_patient = crc_adata.obs.batch
-
     crc_adata.obs['cell_types'] = load_louvain().cell_types
     crc_adata.obs['chirag'] = load_louvain().chirag
 
     cells_to_remove = crc_adata.obs['chirag'].isin(cell_types_to_remove)
-    crc_adata = crc_adata[~cells_to_remove,:]
+    if cell_types_to_remove is not None:
+        crc_adata = crc_adata[~cells_to_remove,:]
+    
+    crc_patient = crc_adata.obs.batch
+
     # crc_adata.obsm['X_umap'] = np.array(load_umap())
 
     # this needs to get the annotaions from diva
