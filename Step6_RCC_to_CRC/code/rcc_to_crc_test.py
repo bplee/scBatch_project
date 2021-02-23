@@ -144,8 +144,9 @@ def load_rcc_to_crc_data_loaders(shuffle=False):
 
     crc_patient = crc_adata.obs.batch
 
-    crc_adata.obs['cell_types'] = np.array(load_louvain().cell_types)
-    crc_adata.obsm['X_umap'] = np.array(load_umap())
+    crc_adata.obs['cell_types'] = load_louvain().cell_types
+    crc_adata.obs['chirag'] = load_louvain().chirag
+    # crc_adata.obsm['X_umap'] = np.array(load_umap())
 
     # this needs to get the annotaions from diva
     # preparing UMAP for new pat:

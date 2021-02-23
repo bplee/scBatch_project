@@ -12,6 +12,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data_utils
 
+from Step6_RCC_to_CRC.code.rcc_to_crc_test import load_rcc_to_crc_data_loaders
+
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:

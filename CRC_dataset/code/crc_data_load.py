@@ -387,10 +387,10 @@ def assess_marker_genes(df, markers, n_genes=30):
 #     vianne_genes = pd.read_csv(vianne_genes_file_path).to_numpy().T[0]
 #     df.columns
 
-def load_louvain(path="/data/leslie/bplee/scBatch/CRC_dataset/code/DEG_analysis/210208_adata_obs_clusters.pkl"):
+def load_louvain(path="/data/leslie/bplee/scBatch/CRC_dataset/code/DEG_analysis/210222_adata_obs_clusters.pkl"):
     return pd.read_pickle(path)
 
-def load_umap(path="/data/leslie/bplee/scBatch/CRC_dataset/code/DEG_analysis/210210_patient_umap.pkl"):
+def load_umap(path="/data/leslie/bplee/scBatch/CRC_dataset/code/DEG_analysis/210222_patient_umap.pkl"):
     return pd.read_pickle(path)
 
 if __name__ == "__main__":
@@ -421,23 +421,23 @@ if __name__ == "__main__":
                       "TS-125T"]
     og_pat_inds = all_data['PATIENT'].isin(patient_subset)
     og_data = all_data[og_pat_inds]
-
+    
     adata = clean_data_qc(og_data)
-
+    
     # small test data:
     ex_pat = og_data[og_data.PATIENT == 'TS-108T']
     # test = get_ranked_marker_genes(ex_pat)
     # a = get_pval_df(test)
-
+    
     gene_markers_path = "/data/leslie/bplee/scBatch/CRC_dataset/metadata/immune_markers.xlsx"
-
+    
     # here columns are the different cell types and rows are diff genes
     # no correspondence between genes in the same row
     first_markers = pd.read_excel(gene_markers_path, sheet_name=0)
     second_markers = pd.read_excel(gene_markers_path, sheet_name=1)
-
+    
     print("normalizing and log transforming `adata`")
-    sc.pp.normalize_total(adata, 1e4)
+    sc.pp.normalize_total(adata, 1e5)
     sc.pp.log1p(adata)
     print('setting the seed and running neighbors and umap on original data')
     np.random.seed(0)
@@ -455,9 +455,22 @@ if __name__ == "__main__":
     sc.pl.umap(test, color=['batch', 'louvain'], save="_delete_this_0.png")
     print('loaded log normalized original data in: `adata`\nloaded batch corrected data in `test`')
 
-    a = load_louvain()
-    adata.obs['louvain'] = np.array(a.louvain)
-    adata.obsm['X_umap'] = np.array(test.obsm['X_umap'])
+    l = load_louvain().louvain
+    adata.obs['old_louvain'] = l
+    test = load_batch_corr_data("210222_mnn_data.csv", adata)
+    np.random.seed(0)
+    sc.pp.neighbors(test, n_neighbors=20, n_pcs=40, random_state=None)
+    sc.tl.umap(test, random_state=None)
+    sc.tl.louvain(test)
+    sc.pl.umap(test, color=['batch', 'louvain'], save="_delete_this_0.png")
+    # old_louvain = l[l.index.isin(adata.obs_names)].louvain
+    # adata.obs['old_louvain'] = np.array(old_louvain)
+
+    # adata.obs['louvain'] = np.array(load_louvain().louvain)
+    # adata.obsm['X_umap'] = np.array(test.obsm['X_umap'])
+    # adata.obsm['X_umap'] = np.array(load_umap().)
+
+
 
     # sc.pl.umap(adata, color=["CD3D", "TPSAB1", "PTPRC", "louvain"], save="_210210_specific_genes.png")
 
