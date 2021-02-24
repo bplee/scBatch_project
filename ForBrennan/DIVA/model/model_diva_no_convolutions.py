@@ -8,7 +8,7 @@ import numpy as np
 
 # Encoders
 class qzd(nn.Module):
-    def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
+    def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim, encoding_dim=1024):
         super(qzd, self).__init__()
 
         # self.encoder = nn.Sequential(
@@ -16,11 +16,11 @@ class qzd(nn.Module):
         #     nn.Conv2d(32, 64, kernel_size=5, stride=1, bias=False), nn.BatchNorm2d(64), nn.ReLU(), nn.MaxPool2d(2, 2),
         # )
         self.encoder = nn.Sequential(
-            nn.Linear(x_dim, 1024), nn.ReLU()
+            nn.Linear(x_dim, encoding_dim), nn.ReLU()
         )
 
-        self.fc11 = nn.Sequential(nn.Linear(1024, zd_dim))
-        self.fc12 = nn.Sequential(nn.Linear(1024, zd_dim), nn.Softplus())
+        self.fc11 = nn.Sequential(nn.Linear(encoding_dim, zd_dim))
+        self.fc12 = nn.Sequential(nn.Linear(encoding_dim, zd_dim), nn.Softplus())
 
         # torch.nn.init.xavier_uniform_(self.encoder[0].weight)
         # torch.nn.init.xavier_uniform_(self.encoder[4].weight)
@@ -40,7 +40,7 @@ class qzd(nn.Module):
 
 
 class qzx(nn.Module):
-    def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
+    def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim, encoding_dim=1024):
         super(qzx, self).__init__()
 
         # self.encoder = nn.Sequential(
@@ -49,11 +49,11 @@ class qzx(nn.Module):
         # )
 
         self.encoder = nn.Sequential(
-            nn.Linear(x_dim, 1024), nn.ReLU()
+            nn.Linear(x_dim, encoding_dim), nn.ReLU()
         )
 
-        self.fc11 = nn.Sequential(nn.Linear(1024, zx_dim))
-        self.fc12 = nn.Sequential(nn.Linear(1024, zx_dim), nn.Softplus())
+        self.fc11 = nn.Sequential(nn.Linear(encoding_dim, zx_dim))
+        self.fc12 = nn.Sequential(nn.Linear(encoding_dim, zx_dim), nn.Softplus())
 
         torch.nn.init.xavier_uniform_(self.encoder[0].weight)
         # torch.nn.init.xavier_uniform_(self.encoder[4].weight)
@@ -72,7 +72,7 @@ class qzx(nn.Module):
 
 
 class qzy(nn.Module):
-    def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
+    def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim, encoding_dim=1024):
         super(qzy, self).__init__()
 
         # self.encoder = nn.Sequential(
@@ -81,11 +81,11 @@ class qzy(nn.Module):
         # )
 
         self.encoder = nn.Sequential(
-            nn.Linear(x_dim, 1024), nn.ReLU()
+            nn.Linear(x_dim, encoding_dim), nn.ReLU()
         )
 
-        self.fc11 = nn.Sequential(nn.Linear(1024, zy_dim))
-        self.fc12 = nn.Sequential(nn.Linear(1024, zy_dim), nn.Softplus())
+        self.fc11 = nn.Sequential(nn.Linear(encoding_dim, zy_dim))
+        self.fc12 = nn.Sequential(nn.Linear(encoding_dim, zy_dim), nn.Softplus())
 
         torch.nn.init.xavier_uniform_(self.encoder[0].weight)
         # torch.nn.init.xavier_uniform_(self.encoder[4].weight)
@@ -228,6 +228,7 @@ class DIVA(nn.Module):
         self.d_dim = args.d_dim
         self.x_dim = args.x_dim
         self.y_dim = args.y_dim
+        self.encoding_dim = args.encoding_dim
 
         self.start_zx = self.zd_dim
         self.start_zy = self.zd_dim + self.zx_dim
@@ -236,10 +237,10 @@ class DIVA(nn.Module):
         self.pzd = pzd(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim)
         self.pzy = pzy(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim)
 
-        self.qzd = qzd(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim)
+        self.qzd = qzd(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim, self.encoding_dim)
         if self.zx_dim != 0:
-            self.qzx = qzx(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim)
-        self.qzy = qzy(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim)
+            self.qzx = qzx(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim, self.encoding_dim)
+        self.qzy = qzy(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim, self.encoding_dim)
 
         self.qd = qd(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim)
         self.qy = qy(self.d_dim, self.x_dim, self.y_dim, self.zd_dim, self.zx_dim, self.zy_dim)
