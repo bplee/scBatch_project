@@ -247,7 +247,7 @@ if __name__ == "__main__":
 
     # Choose training domains
 
-    print('test domain: '+str(args.test_patient))
+    # print('test domain: '+str(args.test_patient))
 
     # Set seed
     torch.manual_seed(args.seed)
