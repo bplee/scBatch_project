@@ -143,12 +143,12 @@ def load_rcc_to_crc_data_loaders(cell_types_to_remove=["Plasma"],old_load=False,
     crc_genes = set(crc_adata.var.index.values)
 
     if old_load:
-        crc_adata.obs['cell_types'] = load_louvain().cell_types
+        crc_adata.obs['cell_type'] = load_louvain().cell_types
     else:
-        crc_adata.obs['cell_types'] = load_louvain().chirag
+        crc_adata.obs['cell_type'] = load_louvain().chirag
 
     if not old_load:
-        cells_to_remove = crc_adata.obs['cell_types'].isin(cell_types_to_remove)
+        cells_to_remove = crc_adata.obs['cell_type'].isin(cell_types_to_remove)
         if cell_types_to_remove is not None:
             crc_adata = crc_adata[~cells_to_remove,:]
 
