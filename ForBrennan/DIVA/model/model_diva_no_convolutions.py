@@ -10,6 +10,7 @@ import numpy as np
 class qzd(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim, encoding_dim=1024):
         super(qzd, self).__init__()
+        self.encoding_dim = encoding_dim
 
         # self.encoder = nn.Sequential(
         #     nn.Conv2d(1, 32, kernel_size=5, stride=1, bias=False), nn.BatchNorm2d(32), nn.ReLU(), nn.MaxPool2d(2, 2),
@@ -32,7 +33,7 @@ class qzd(nn.Module):
 
     def forward(self, x):
         h = self.encoder(x)
-        h = h.view(-1, 1024)
+        h = h.view(-1, self.encoding_dim)
         zd_loc = self.fc11(h)
         zd_scale = self.fc12(h) + 1e-7
 
@@ -42,6 +43,7 @@ class qzd(nn.Module):
 class qzx(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim, encoding_dim=1024):
         super(qzx, self).__init__()
+        self.encoding_dim = encoding_dim
 
         # self.encoder = nn.Sequential(
         #     nn.Conv2d(1, 32, kernel_size=5, stride=1, bias=False), nn.BatchNorm2d(32), nn.ReLU(), nn.MaxPool2d(2, 2),
@@ -64,7 +66,7 @@ class qzx(nn.Module):
 
     def forward(self, x):
         h = self.encoder(x)
-        h = h.view(-1, 1024)
+        h = h.view(-1, self.encoding_dim)
         zx_loc = self.fc11(h)
         zx_scale = self.fc12(h) + 1e-7
 
@@ -74,6 +76,7 @@ class qzx(nn.Module):
 class qzy(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim, encoding_dim=1024):
         super(qzy, self).__init__()
+        self.encoding_dim = encoding_dim
 
         # self.encoder = nn.Sequential(
         #     nn.Conv2d(1, 32, kernel_size=5, stride=1, bias=False), nn.BatchNorm2d(32), nn.ReLU(), nn.MaxPool2d(2, 2),
@@ -96,7 +99,7 @@ class qzy(nn.Module):
 
     def forward(self, x):
         h = self.encoder(x)
-        h = h.view(-1, 1024)
+        h = h.view(-1, self.encoding_dim)
         zy_loc = self.fc11(h)
         zy_scale = self.fc12(h) + 1e-7
 
