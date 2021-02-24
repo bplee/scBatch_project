@@ -218,6 +218,8 @@ if __name__ == "__main__":
                         help='size of latent space 2')
     parser.add_argument('--zy-dim', type=int, default=64,
                         help='size of latent space 3')
+    parser.add_argument('--encoding-dim', type=int, default=1024,
+                        help='dimension of first encoders for all three latent spaces')
 
     # Aux multipliers
     parser.add_argument('--aux_loss_multiplier_y', type=float, default=4200.,
@@ -253,9 +255,10 @@ if __name__ == "__main__":
     if args.train_patient is not None:
         model_name = f"{args.outpath}rcc_no_conv_test_domain_{args.test_patient}_train_domain_{args.train_patient}_semi_sup_seed_{args.seed}"
     else:
-        model_name = f"{args.outpath}rcc_no_conv_test_domain_{args.test_patient}_semi_sup_seed_{args.seed}"
+        # model_name = f"{args.outpath}rcc_no_conv_test_domain_{args.test_patient}_semi_sup_seed_{args.seed}"
         # model_name = f"{args.outpath}rcc_no_conv_test_domain_{args.test_patient}_Bd_{args.beta_d}_By_{args.beta_y}_semi_sup_seed_{args.seed}"
         # model_name = f"{args.outpath}rcc_no_conv_test_domain_{args.test_patient}_ad_{args.aux_loss_multiplier_d}_ay_{args.aux_loss_multiplier_y}_semi_sup_seed_{args.seed}"
+        model_name = f"{args.outpath}rcc_no_conv_test_domain_{args.test_patient}_encoding_dim_{args.encoding_dim}_semi_sup_seed_{args.seed}"
 
     print(model_name)
 
