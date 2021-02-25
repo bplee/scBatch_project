@@ -349,7 +349,7 @@ if __name__ == "__main__":
 
             best_y_acc = sup_accuracy_y
             best_loss = avg_epoch_class_y_loss
-
+            print(f"Saving Model, epoch: {epoch}")
             torch.save(model, model_name + '.model')
 
         elif sup_accuracy_y == best_y_acc:
@@ -363,11 +363,13 @@ if __name__ == "__main__":
             else:
                 early_stopping_counter += 1
                 if early_stopping_counter == max_early_stopping:
+                    print(f"Early Stopping reached max counter: {max_early_stopping}")
                     break
 
         else:
             early_stopping_counter += 1
             if early_stopping_counter == max_early_stopping:
+                print(f"Early Stopping reached max counter: {max_early_stopping}")
                 break
         print('time passed: {} mins'.format((time.time() - t0)/60))
     torch.save(model, model_name+'_backup.model')
@@ -405,12 +407,14 @@ if __name__ == "__main__":
     labels_y = torch.cat(actuals_y).cpu().numpy()
     a = torch.cat(predictions_y).cpu().numpy()
     preds_y = [np.argmax(i) for i in a]
-    a = pd.DataFrame({"preds": preds_y, "actuals": labels_y})
+    # a = pd.DataFrame({"preds": preds_y, "actuals": labels_y})
+    a = pd.DataFrame(preds_y)
     a.to_csv("210221_test_label_preds.csv")
 
     b = torch.cat(predictions_d).cpu().numpy()
     preds_d = [np.argmax(i) for i in b]
-    b = pd.DataFrame({"preds": preds_d, "actuals": labels_d})
+    # b = pd.DataFrame({"preds": preds_d, "actuals": labels_d})
+    b = pd.DataFrame(preds_d)
     b.to_csv("210221_test_batch_preds.csv")
 
     empty_zx = False
