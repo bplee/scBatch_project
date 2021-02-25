@@ -210,6 +210,8 @@ if __name__ == "__main__":
                         help='size of latent space 2')
     parser.add_argument('--zy-dim', type=int, default=64,
                         help='size of latent space 3')
+    parser.add_argument('--encoding-dim', type=int, default=1024,
+                        help='dimension encoding layers work down to')
 
     # Aux multipliers
     parser.add_argument('--aux_loss_multiplier_y', type=float, default=4200.,
