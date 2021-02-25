@@ -368,6 +368,7 @@ if __name__ == "__main__":
             if early_stopping_counter == max_early_stopping:
                 break
         print('time passed: {} mins'.format((time.time() - t0)/60))
+    torch.save(model, model_name+'_backup.model')
 
     print(f"Done training testing some predicions")
 
@@ -398,8 +399,8 @@ if __name__ == "__main__":
     # calculate the accuracy between 0 and 1
     accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
     print(f"d accuracy:{accuracy_d}")
-    labels_d = np.hstack(actuals_d)
-    labels_y = np.hstack(actuals_y)
+    labels_d = torch.cat(actuals_d).cpu().numpy()
+    labels_y = torch.cat(actuals_y).cpu().numpy()
     a = torch.cat(predictions_y).cpu().numpy()
     preds_y = [np.argmax(i) for i in a]
     a = pd.DataFrame({"preds": preds_y, "actuals": labels_y})
