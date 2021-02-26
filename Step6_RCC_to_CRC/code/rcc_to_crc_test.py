@@ -141,6 +141,7 @@ def load_rcc_to_crc_data_loaders(cell_types_to_remove=["Plasma"],old_load=False,
     crc_adata = clean_data_qc(og_data, old_load=old_load)
 
     crc_genes = set(crc_adata.var.index.values)
+    crc_adata.obsm["X_umap"] = np.array(load_umap())
 
     if old_load:
         crc_adata.obs['cell_type'] = load_louvain().cell_types
@@ -216,16 +217,88 @@ if __name__ == "__main__":
 
     train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders()
 
-    # svm code:
-    # data = gene_ds.X
-    # train_inds = adata.obs.batch=='0'
-    # x = data[train_inds, :]
-    # y, map = pd.factorize(adata.obs.cell_types[train_inds])
-    #
-    # test_x = data[~train_inds, :]
+    cell_types_to_remove = ["Plasma"]
+    old_load = False
+    shuffle = False
+    pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+    all_data = pd.read_pickle(pkl_path)
+    patient_subset = ["TS-101T",
+                      "TS-104T",
+                      "TS-106T",
+                      "TS-108T",
+                      "TS-109T",
+                      "TS-125T"]
+    og_pat_inds = all_data['PATIENT'].isin(patient_subset)
+    og_data = all_data[og_pat_inds]
 
-    # svm = LinearSVC()
-    # svm.fit(x, y)
-    # preds = map[svm.predict(test_x)]
+    crc_adata = clean_data_qc(og_data, old_load=old_load)
+
+    crc_genes = set(crc_adata.var.index.values)
+
+    if old_load:
+        crc_adata.obs['cell_type'] = load_louvain().cell_types
+    else:
+        crc_adata.obs['cell_type'] = load_louvain().chirag
+
+    if not old_load:
+        cells_to_remove = crc_adata.obs['cell_type'].isin(cell_types_to_remove)
+        if cell_types_to_remove is not None:
+            crc_adata = crc_adata[~cells_to_remove, :]
+
+    crc_patient = crc_adata.obs.batch
+
+    # RCC DATA
+    # --------
+    # loading training set RCC, removing ccRCC cells
+    rcc_obj = PdRccAllData(labels_to_remove=["Ambiguous", "Megakaryocyte", "TAM/TCR (Ambiguos)", "CD45- ccRCC CA9+"])
+    rcc_patient = rcc_obj.data.patient
+    rcc_cell_type = rcc_obj.data.cell_type
+    rcc_raw_counts = rcc_obj.data.drop(["cell_type", "patient"], axis=1)
+
+    # these are the ensembl.gene names
+    rcc_genes = set(rcc_raw_counts.columns.values)
+
+    # comparing set of gene names:
+    print(f" Unique CRC gene names: {len(crc_genes)}\n Unique RCC gene names: {len(rcc_genes)}")
+
+    universe = crc_genes.intersection(rcc_genes)
+    print(f" Genes in both datasets: {len(universe)}")
+
+    crc_adata = crc_adata[:, np.array(list(universe))]
+
+    # getting rid of non shared genes and making adata's
+    crc_adata.obs['annotations'] = 'Unlabeled'
+
+    rcc_raw_counts = rcc_raw_counts[universe]
+
+    rcc_adata = anndata.AnnData(rcc_raw_counts)
+    rcc_adata.obs['cell_type'] = rcc_cell_type
+    rcc_adata.obs['annotations'] = rcc_cell_type
+    del rcc_raw_counts
+
+    adata = rcc_adata.concatenate(crc_adata)
+    # adata.obs['batch'] = np.array(pd.concat([rcc_patient, crc_patient]))
+
+    pats = np.append(np.array(rcc_patient), np.array(crc_patient))
+    adata.obs['patient'] = pats
+    gene_ds = GeneExpressionDataset()
+    gene_ds.populate_from_data(X=adata.X,
+                               gene_names=np.array(adata.var.index),
+                               batch_indices=pd.factorize(pats)[0],
+                               remap_attributes=False)
+    gene_ds.subsample_genes(784)
+
+    adata = adata[:, gene_ds.gene_names]
+    # svm code:
+    data = gene_ds.X
+    train_inds = adata.obs.batch=='0'
+    x = data[train_inds, :]
+    y, map = pd.factorize(adata.obs.cell_type[train_inds])
+
+    test_x = data[~train_inds, :]
+
+    svm = LinearSVC()
+    svm.fit(x, y)
+    preds = map[svm.predict(test_x)]
 
 
