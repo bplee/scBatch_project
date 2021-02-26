@@ -424,7 +424,7 @@ if __name__ == "__main__":
         # Train
         # patients_train = np.delete(patients, test_patient)
         i = 0
-        for (xs, ys, ds) in train_loader:
+        for (xs, ys, ds) in data_loaders['sup']:
             i = i + 1
             # To device
             xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
@@ -468,7 +468,7 @@ if __name__ == "__main__":
         # test
         # patients_train = np.delete(patients, test_patient)
         i = 0
-        for (xs, ys, ds) in test_loader:
+        for (xs, ys, ds) in data_loaders['unsup']:
             i = i + 1
             # To device
             xs, ys, ds = xs.to(device), np.array(ys), np.array(ds)
