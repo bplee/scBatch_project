@@ -244,7 +244,7 @@ if __name__ == "__main__":
     # Model name
     print(args.outpath)
     model_name = f"{args.outpath}rcc_to_crc_no_conv_semi_sup_seed_{args.seed}"
-
+    fig_name = f"rcc_to_crc_no_conv_semi_sup_seed_{args.seed}"
     print(model_name)
 
     # Choose training domains
@@ -457,7 +457,7 @@ if __name__ == "__main__":
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
-            save_name = f"_{model_name}_train_set_{name[i]}.png"
+            save_name = f"_{fig_name}_train_set_{name[i]}.png"
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color=['batch', 'cell_type'], size=15, alpha=.8, save=save_name)
@@ -501,7 +501,7 @@ if __name__ == "__main__":
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
-            save_name = f"_{model_name}_train_set_{name[i]}.png"
+            save_name = f"_{fig_name}_test_set_{name[i]}.png"
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color=['batch', 'cell_type'], size=15, alpha=.8, save=save_name)
