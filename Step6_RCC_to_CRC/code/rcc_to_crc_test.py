@@ -47,6 +47,10 @@ def get_diva_loaders(adata, shuffle=False):
     labels_test = labels[test_inds]
     batch_train = patients[train_inds]
     batch_test = patients[test_inds]
+    
+    # doing the normalization thing
+    data_train = data_train/np.max(data_train)
+    data_test = data_test/np.max(data_test)
 
     if shuffle:
         # Shuffle everything one more time
