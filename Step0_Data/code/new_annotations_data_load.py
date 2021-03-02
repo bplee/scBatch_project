@@ -140,6 +140,9 @@ class PdRccAllData:
 if __name__ == "__main__":
 
     data_obj = PdRccAllData()
+
+    test_patient = 5
+
     raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
     patients = data_obj.data.patient
     cell_types = data_obj.data.cell_type
