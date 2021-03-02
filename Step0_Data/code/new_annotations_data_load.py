@@ -177,12 +177,12 @@ if __name__ == "__main__":
     # Shuffle everything one more time
     inds = np.arange(n_train)
     np.random.shuffle(inds)
-    data_train = data_train[inds]
-    labels_train = labels_train[inds]
+    data_train = data_train.iloc[inds]
+    labels_train = labels_train.iloc[inds]
     batch_train = batch_train[inds]
 
     inds = np.arange(n_test)
     np.random.shuffle(inds)
-    data_test = data_test[inds]
-    labels_test = labels_test[inds]
+    data_test = data_test.iloc[inds]
+    labels_test = labels_test.iloc[inds]
     batch_test = batch_test[inds]
