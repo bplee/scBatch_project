@@ -47,8 +47,9 @@ def get_diva_loaders(adata, shuffle=False):
     labels_test = labels[test_inds]
     batch_train = patients[train_inds]
     batch_test = patients[test_inds]
-    
+
     # doing the normalization thing
+    print("normalizing all values between 0 and 1")
     data_train = data_train/np.max(data_train)
     data_test = data_test/np.max(data_test)
 
@@ -187,7 +188,10 @@ def load_rcc_to_crc_data_loaders(cell_types_to_remove=["Plasma"],old_load=False,
     universe = crc_genes.intersection(rcc_genes)
     print(f" Genes in both datasets: {len(universe)}")
 
-    crc_adata = crc_adata[:, np.array(list(universe))]
+    universe = list(universe)
+    universe.sort()
+
+    crc_adata = crc_adata[:, np.array(universe)]
 
     # getting rid of non shared genes and making adata's
     crc_adata.obs['annotations'] = 'Unlabeled'
