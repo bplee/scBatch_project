@@ -409,13 +409,13 @@ if __name__ == "__main__":
     preds_y = [np.argmax(i) for i in a]
     # a = pd.DataFrame({"preds": preds_y, "actuals": labels_y})
     a = pd.DataFrame(preds_y)
-    a.to_csv("210221_test_label_preds.csv")
+    a.to_csv("210304_test_label_preds.csv")
 
     b = torch.cat(predictions_d).cpu().numpy()
     preds_d = [np.argmax(i) for i in b]
     # b = pd.DataFrame({"preds": preds_d, "actuals": labels_d})
     b = pd.DataFrame(preds_d)
-    b.to_csv("210221_test_batch_preds.csv")
+    b.to_csv("210304_test_batch_preds.csv")
 
     empty_zx = False
     # trying to plot training data
@@ -439,7 +439,8 @@ if __name__ == "__main__":
             # getting integer labels here
             actuals_d.append(np.argmax(ds, axis=1))
             actuals_y.append(np.argmax(ys, axis=1))
-            if i == 50:
+            # if i == 50:
+            if i == len(data_loaders['sup']):
                 break
         zy = np.vstack(zy_)
         zd = np.vstack(zd_)
@@ -454,6 +455,7 @@ if __name__ == "__main__":
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
+        train_cell_type_encoding = zy
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
@@ -483,7 +485,8 @@ if __name__ == "__main__":
             # getting integer labels here
             actuals_d.append(np.argmax(ds, axis=1))
             actuals_y.append(np.argmax(ys, axis=1))
-            if i == 50:
+            # if i == 50:
+            if i == len(data_loaders['unsup']):
                 break
         zy = np.vstack(zy_)
         zd = np.vstack(zd_)
@@ -498,6 +501,7 @@ if __name__ == "__main__":
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
+        test_cell_type_encoding = zy
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
