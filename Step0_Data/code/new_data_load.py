@@ -29,7 +29,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
     This is for DIVA
     Counts get log normalized
     """
-    def __init__(self, test_patient, x_dim, train=True, train_patient=None, ssl=True, starspace=False, scanvi=False, convolutions=True, libsize_norm=False):
+    def __init__(self, test_patient, x_dim, train=True, train_patient=None, ssl=True, starspace=False, scanvi=False, convolutions=True, libsize_norm=False, shuffle=True):
         self.test_patient = test_patient
         self.train = train
         self.x_dim = x_dim
@@ -42,6 +42,7 @@ class NewRccDatasetSemi(data_utils.Dataset):
         self.batch_indices = None # used for scANVI
         self.convolutions = convolutions
         self.libsize_norm = libsize_norm
+        self.shuffle = shuffle
 
         if self.scanvi:
             self.GeneExpressionDataset, self.batch_indices, self.cell_types, self.patients = self._get_data()
@@ -257,17 +258,18 @@ class NewRccDatasetSemi(data_utils.Dataset):
             batch_test = torch.as_tensor(batch_test.astype(int))
 
             # Shuffle everything one more time
-            inds = np.arange(n_train)
-            np.random.shuffle(inds)
-            data_train = data_train[inds]
-            labels_train = labels_train[inds]
-            batch_train = batch_train[inds]
+            if self.shuffle:
+                inds = np.arange(n_train)
+                np.random.shuffle(inds)
+                data_train = data_train[inds]
+                labels_train = labels_train[inds]
+                batch_train = batch_train[inds]
 
-            inds = np.arange(n_test)
-            np.random.shuffle(inds)
-            data_test = data_test[inds]
-            labels_test = labels_test[inds]
-            batch_test = batch_test[inds]
+                inds = np.arange(n_test)
+                np.random.shuffle(inds)
+                data_test = data_test[inds]
+                labels_test = labels_test[inds]
+                batch_test = batch_test[inds]
 
             # Convert to onehot
             y = torch.eye(n_labels)
