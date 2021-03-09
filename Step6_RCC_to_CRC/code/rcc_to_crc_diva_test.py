@@ -189,10 +189,10 @@ if __name__ == "__main__":
     #                    help='domains used during training')
     #parser.add_argument('--list_test_domain', type=str, default='75',
     #                    help='domain used during testing')
-    # parser.add_argument('--test_patient', type=int, default=5,
-    #                     help='test domain')
-    # parser.add_argument('--train_patient', type=int, default=None,
-    #                     help='train domain')
+    parser.add_argument('--test_patient', type=int, default=5,
+                        help='test domain')
+    parser.add_argument('--train_patient', type=int, default=None,
+                        help='train domain')
     # data loading args
     # parser.add_argument('--clean_data', type=bool, default=True,
     #                     help='gets rid of any labels that arent shared by every patient')
@@ -357,19 +357,19 @@ if __name__ == "__main__":
 
     data_loaders = {}
 
-    train = RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
-                       train=True, x_dim=784)
-    test = RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
-                       train=False, x_dim=784)
+    train_loader = RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
+                       train=True, x_dim=784, convolutions=False)
+    test_loader = RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
+                       train=False, x_dim=784, convolutions=False)
     # Load supervised training
     train_loader_sup = data_utils.DataLoader(
-        train,
+        train_loader,
         batch_size=args.batch_size,
         shuffle=True)
 
     # Load unsupervised training (test set with no labels)
     train_loader_unsup = data_utils.DataLoader(
-        test,
+        test_loader,
         batch_size=args.batch_size,
         shuffle=True)
 
