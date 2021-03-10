@@ -259,100 +259,100 @@ if __name__ == "__main__":
 
 
     #####################################################
-    # # loading CRC RCC merged data from rcc_to_crc_test.py
-    # # train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders(shuffle=False)
-    # old_load = False
-    # shuffle = False
-    # cell_types_to_remove = ["Plasma"]
-    #
-    # pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
-    # all_data = pd.read_pickle(pkl_path)
-    # patient_subset = ["TS-101T",
-    #                   "TS-104T",
-    #                   "TS-106T",
-    #                   "TS-108T",
-    #                   "TS-109T",
-    #                   "TS-125T"]
-    # og_pat_inds = all_data['PATIENT'].isin(patient_subset)
-    # og_data = all_data[og_pat_inds]
-    #
-    # crc_adata = clean_data_qc(og_data, old_load=old_load)
-    #
-    # crc_genes = set(crc_adata.var.index.values)
-    # crc_adata.obsm["X_umap"] = np.array(load_umap())
-    #
-    # if old_load:
-    #     crc_adata.obs['cell_type'] = load_louvain().cell_types
-    # else:
-    #     crc_adata.obs['cell_type'] = load_louvain().chirag
-    #
-    # if not old_load:
-    #     cells_to_remove = crc_adata.obs['cell_type'].isin(cell_types_to_remove)
-    #     if cell_types_to_remove is not None:
-    #         crc_adata = crc_adata[~cells_to_remove, :]
-    #
-    # crc_patient = crc_adata.obs.batch
-    #
-    # # RCC DATA
-    # # --------
-    # # loading training set RCC, removing ccRCC cells
-    # rcc_obj = PdRccAllData(labels_to_remove=["Ambiguous", "Megakaryocyte", "TAM/TCR (Ambiguos)", "CD45- ccRCC CA9+"])
-    # rcc_patient = rcc_obj.data.patient
-    # rcc_cell_type = rcc_obj.data.cell_type
-    # rcc_raw_counts = rcc_obj.data.drop(["cell_type", "patient"], axis=1)
-    #
-    # # these are the ensembl.gene names
-    # rcc_genes = set(rcc_raw_counts.columns.values)
-    #
-    # # comparing set of gene names:
-    # print(f" Unique CRC gene names: {len(crc_genes)}\n Unique RCC gene names: {len(rcc_genes)}")
-    #
-    # universe = crc_genes.intersection(rcc_genes)
-    # print(f" Genes in both datasets: {len(universe)}")
-    #
-    # universe = list(universe)
-    # universe.sort()
-    #
-    # crc_adata = crc_adata[:, np.array(universe)]
-    #
-    # # getting rid of non shared genes and making adata's
-    # crc_adata.obs['annotations'] = 'Unlabeled'
-    #
-    # rcc_raw_counts = rcc_raw_counts[universe]
-    #
-    # rcc_adata = anndata.AnnData(rcc_raw_counts)
-    # rcc_adata.obs['cell_type'] = rcc_cell_type
-    # rcc_adata.obs['annotations'] = rcc_cell_type
-    # rcc_adata.obs['patient'] = np.array(rcc_patient)
-    # del rcc_raw_counts
-    #
-    # adata = rcc_adata.concatenate(crc_adata)
-    # # adata.obs['batch'] = np.array(pd.concat([rcc_patient, crc_patient]))
-    #
-    # pats = np.append(np.array(rcc_patient), np.array(crc_patient))
-    # adata.obs['patient'] = pats
-    # gene_ds = GeneExpressionDataset()
-    # gene_ds.populate_from_data(X=adata.X,
-    #                            gene_names=np.array(adata.var.index),
-    #                            batch_indices=pd.factorize(pats)[0],
-    #                            remap_attributes=False)
-    # gene_ds.subsample_genes(784)
-    #
-    # # adata = adata[:, gene_ds.gene_names]
-    # rcc_adata = rcc_adata[:, gene_ds.gene_names]
-    #
-    # rcc_adata.obs['batch'] = "0"
-    # rcc_adata.obs['batch'][rcc_adata.obs.patient == "UT2"] = "1"
-    #
-    # train_loader, test_loader = get_diva_loaders(rcc_adata)
-    # # Empty data loader dict763gv
-    # data_loaders = {}
-    # # No shuffling here
-    # data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=False)
-    # data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=False)
+    # loading CRC RCC merged data from rcc_to_crc_test.py
+    # train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders(shuffle=False)
+    old_load = False
+    shuffle = False
+    cell_types_to_remove = ["Plasma"]
 
-    # cell_types = train_loader.cell_types
-    # patients = test_loader.patients
+    pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+    all_data = pd.read_pickle(pkl_path)
+    patient_subset = ["TS-101T",
+                      "TS-104T",
+                      "TS-106T",
+                      "TS-108T",
+                      "TS-109T",
+                      "TS-125T"]
+    og_pat_inds = all_data['PATIENT'].isin(patient_subset)
+    og_data = all_data[og_pat_inds]
+
+    crc_adata = clean_data_qc(og_data, old_load=old_load)
+
+    crc_genes = set(crc_adata.var.index.values)
+    crc_adata.obsm["X_umap"] = np.array(load_umap())
+
+    if old_load:
+        crc_adata.obs['cell_type'] = load_louvain().cell_types
+    else:
+        crc_adata.obs['cell_type'] = load_louvain().chirag
+
+    if not old_load:
+        cells_to_remove = crc_adata.obs['cell_type'].isin(cell_types_to_remove)
+        if cell_types_to_remove is not None:
+            crc_adata = crc_adata[~cells_to_remove, :]
+
+    crc_patient = crc_adata.obs.batch
+
+    # RCC DATA
+    # --------
+    # loading training set RCC, removing ccRCC cells
+    rcc_obj = PdRccAllData(labels_to_remove=["Ambiguous", "Megakaryocyte", "TAM/TCR (Ambiguos)", "CD45- ccRCC CA9+"])
+    rcc_patient = rcc_obj.data.patient
+    rcc_cell_type = rcc_obj.data.cell_type
+    rcc_raw_counts = rcc_obj.data.drop(["cell_type", "patient"], axis=1)
+
+    # these are the ensembl.gene names
+    rcc_genes = set(rcc_raw_counts.columns.values)
+
+    # comparing set of gene names:
+    print(f" Unique CRC gene names: {len(crc_genes)}\n Unique RCC gene names: {len(rcc_genes)}")
+
+    universe = crc_genes.intersection(rcc_genes)
+    print(f" Genes in both datasets: {len(universe)}")
+
+    universe = list(universe)
+    universe.sort()
+
+    crc_adata = crc_adata[:, np.array(universe)]
+
+    # getting rid of non shared genes and making adata's
+    crc_adata.obs['annotations'] = 'Unlabeled'
+
+    rcc_raw_counts = rcc_raw_counts[universe]
+
+    rcc_adata = anndata.AnnData(rcc_raw_counts)
+    rcc_adata.obs['cell_type'] = rcc_cell_type
+    rcc_adata.obs['annotations'] = rcc_cell_type
+    rcc_adata.obs['patient'] = np.array(rcc_patient)
+    del rcc_raw_counts
+
+    adata = rcc_adata.concatenate(crc_adata)
+    # adata.obs['batch'] = np.array(pd.concat([rcc_patient, crc_patient]))
+
+    pats = np.append(np.array(rcc_patient), np.array(crc_patient))
+    adata.obs['patient'] = pats
+    gene_ds = GeneExpressionDataset()
+    gene_ds.populate_from_data(X=adata.X,
+                               gene_names=np.array(adata.var.index),
+                               batch_indices=pd.factorize(pats)[0],
+                               remap_attributes=False)
+    gene_ds.subsample_genes(784)
+
+    # adata = adata[:, gene_ds.gene_names]
+    rcc_adata = rcc_adata[:, gene_ds.gene_names]
+
+    rcc_adata.obs['batch'] = "0"
+    rcc_adata.obs['batch'][rcc_adata.obs.patient == "t4"] = "1"
+
+    train_loader, test_loader = get_diva_loaders(rcc_adata)
+    # Empty data loader dict763gv
+    data_loaders = {}
+    # No shuffling here
+    data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=False)
+    data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=False)
+
+    cell_types = train_loader.cell_types
+    patients = test_loader.patients
     ###########################################
 
     data_loaders = {}
@@ -375,6 +375,9 @@ if __name__ == "__main__":
 
     data_loaders['sup'] = train_loader_sup
     data_loaders['unsup'] = train_loader_unsup
+
+    cell_types = train_loader.cell_types
+    patients = test_loader.patients
 
     # data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
     # data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
@@ -563,13 +566,14 @@ if __name__ == "__main__":
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
         train_cell_type_encoding = zy
+        train_batch_encoding = zd
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
             save_name = f"_{fig_name}_train_set_{name[i]}.png"
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
-            sc.pl.umap(_, color=['batch', 'cell_type'], size=15, alpha=.8, save=save_name)
+            sc.pl.umap(_, color=['batch', 'cell_type'], save=save_name)
 
 
     actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
@@ -609,10 +613,21 @@ if __name__ == "__main__":
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
         test_cell_type_encoding = zy
+        test_batch_encoding = zd
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
             save_name = f"_{fig_name}_test_set_{name[i]}.png"
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
-            sc.pl.umap(_, color=['batch', 'cell_type'], size=15, alpha=.8, save=save_name)
+            sc.pl.umap(_, color=['batch', 'cell_type'], save=save_name)
+
+    full_zy = train_cell_type_encoding.concatenate(test_cell_type_encoding)
+    full_zd = train_batch_encoding.concatenate(test_batch_encoding)
+
+    sc.pp.neighbors(full_zy, n_neighbors=15)
+    sc.pp.neighbors(full_zd, n_neighbots=15)
+    sc.tl.umap(full_zy, min_dist=.3)
+    sc.tl.umap(full_zd, min_dist=.3)
+    sc.pl.umap(full_zy, color=['batch', 'cell_type'], save=f"_{fig_name}_train+test_zy.png")
+    sc.pl.umap(full_zd, color=['batch', 'cell_type'], save=f"_{fig_name}_train+test_zd.png")
