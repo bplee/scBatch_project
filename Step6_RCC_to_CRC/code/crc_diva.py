@@ -465,17 +465,15 @@ if __name__ == "__main__":
     print(f"d accuracy:{accuracy_d}")
     labels_d = torch.cat(actuals_d).cpu().numpy()
     labels_y = torch.cat(actuals_y).cpu().numpy()
-    a = torch.cat(predictions_y).cpu().numpy()
-    preds_y = [np.argmax(i) for i in a]
-    # a = pd.DataFrame({"preds": preds_y, "actuals": labels_y})
-    a = pd.DataFrame(preds_y)
-    a.to_csv("210304_test_label_preds.csv")
+    # a = torch.cat(predictions_y).cpu().numpy()
+    # preds_y = [np.argmax(i) for i in a]
+    # a = pd.DataFrame(preds_y)
+    # a.to_csv(f"{model_name}_label_preds.csv")
 
-    b = torch.cat(predictions_d).cpu().numpy()
-    preds_d = [np.argmax(i) for i in b]
-    # b = pd.DataFrame({"preds": preds_d, "actuals": labels_d})
-    b = pd.DataFrame(preds_d)
-    b.to_csv("210304_test_batch_preds.csv")
+    # b = torch.cat(predictions_d).cpu().numpy()
+    # preds_d = [np.argmax(i) for i in b]
+    # b = pd.DataFrame(preds_d)
+    # b.to_csv(f"{model_name}_batch_preds.csv")
 
     empty_zx = False
     # trying to plot training data
