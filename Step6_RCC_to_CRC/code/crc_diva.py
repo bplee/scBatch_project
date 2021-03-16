@@ -515,8 +515,8 @@ if __name__ == "__main__":
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
-        train_cell_type_encoding = zy
-        train_batch_encoding = zd
+        train_cell_type_encoding = zy_adata
+        train_batch_encoding = zd_adata
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
@@ -562,8 +562,8 @@ if __name__ == "__main__":
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
-        test_cell_type_encoding = zy
-        test_batch_encoding = zd
+        test_cell_type_encoding = zy_adata
+        test_batch_encoding = zd_adata
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
