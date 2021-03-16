@@ -298,6 +298,15 @@ if __name__ == "__main__":
     print(f"Selecting test patient: {args.test_patient} ({patients[args.test_patient]})")
     crc_adata.obs.batch[crc_adata.obs.patient == patients[args.test_patient]] = "1"
 
+    gene_ds = GeneExpressionDataset()
+    gene_ds.populate_from_data(X=crc_adata.X,
+                               gene_names=np.array(crc_adata.var.index),
+                               batch_indices=pd.factorize(crc_patient)[0],
+                               remap_attributes=False)
+    gene_ds.subsample_genes(784)
+
+    crc_adata = crc_adata[:, gene_ds.gene_names]
+
     train_loader, test_loader = get_diva_loaders(crc_adata)
 
     data_loaders = {}
