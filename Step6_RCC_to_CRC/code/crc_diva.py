@@ -574,7 +574,7 @@ if __name__ == "__main__":
     full_zd = train_batch_encoding.concatenate(test_batch_encoding)
 
     sc.pp.neighbors(full_zy, n_neighbors=15)
-    sc.pp.neighbors(full_zd, n_neighbots=15)
+    sc.pp.neighbors(full_zd, n_neighbors=15)
     sc.tl.umap(full_zy, min_dist=.3)
     sc.tl.umap(full_zd, min_dist=.3)
     sc.pl.umap(full_zy, color=['batch', 'cell_type'], save=f"_{fig_name}_train+test_zy.png")
