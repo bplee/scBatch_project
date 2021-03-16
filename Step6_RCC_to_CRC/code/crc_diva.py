@@ -244,8 +244,8 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = f"{args.outpath}210309_crc_diva_test_pat_{args.test_patient}_semi_sup_seed_{args.seed}"
-    fig_name = f"210309_crc_diva_test_pat_{args.test_patient}_semi_sup_seed_{args.seed}"
+    model_name = f"{args.outpath}210316_crc_diva_test_pat_{args.test_patient}_semi_sup_seed_{args.seed}"
+    fig_name = f"210316_crc_diva_test_pat_{args.test_patient}_semi_sup_seed_{args.seed}"
     print(model_name)
 
     # Choose training domains
