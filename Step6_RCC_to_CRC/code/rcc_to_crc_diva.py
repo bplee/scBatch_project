@@ -32,6 +32,7 @@ import scanpy as sc
 from CRC_dataset.code.crc_data_load import *
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
+from rcc_to_crc_diva import *
 
 def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     model.train()
@@ -243,8 +244,8 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = f"{args.outpath}210304_rcc_to_crc_no_conv_semi_sup_seed_{args.seed}"
-    fig_name = f"210304_rcc_to_crc_no_conv_semi_sup_seed_{args.seed}"
+    model_name = f"{args.outpath}210317_rcc_to_crc_no_conv_semi_sup_seed_{args.seed}"
+    fig_name = f"210317_rcc_to_crc_no_conv_semi_sup_seed_{args.seed}"
     print(model_name)
 
     # Choose training domains
@@ -256,9 +257,6 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = False
     np.random.seed(args.seed)
 
-    # Empty data loader dict763gv
-    data_loaders = {}
-
     # loading CRC RCC merged data from rcc_to_crc_test.py
     train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders(shuffle=False)
 
@@ -268,6 +266,8 @@ if __name__ == "__main__":
     # data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
     # data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
 
+    # Empty data loader dict763gv
+    data_loaders = {}
     # No shuffling here
     data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=False)
     data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=False)
@@ -405,17 +405,15 @@ if __name__ == "__main__":
     print(f"d accuracy:{accuracy_d}")
     labels_d = torch.cat(actuals_d).cpu().numpy()
     labels_y = torch.cat(actuals_y).cpu().numpy()
-    a = torch.cat(predictions_y).cpu().numpy()
-    preds_y = [np.argmax(i) for i in a]
-    # a = pd.DataFrame({"preds": preds_y, "actuals": labels_y})
-    a = pd.DataFrame(preds_y)
-    a.to_csv("210304_test_label_preds.csv")
+    # a = torch.cat(predictions_y).cpu().numpy()
+    # preds_y = [np.argmax(i) for i in a]
+    # a = pd.DataFrame(preds_y)
+    # a.to_csv(f"{model_name}_label_preds.csv")
 
-    b = torch.cat(predictions_d).cpu().numpy()
-    preds_d = [np.argmax(i) for i in b]
-    # b = pd.DataFrame({"preds": preds_d, "actuals": labels_d})
-    b = pd.DataFrame(preds_d)
-    b.to_csv("210304_test_batch_preds.csv")
+    # b = torch.cat(predictions_d).cpu().numpy()
+    # preds_d = [np.argmax(i) for i in b]
+    # b = pd.DataFrame(preds_d)
+    # b.to_csv(f"{model_name}_batch_preds.csv")
 
     empty_zx = False
     # trying to plot training data
@@ -455,14 +453,15 @@ if __name__ == "__main__":
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
-        train_cell_type_encoding = zy
+        train_cell_type_encoding = zy_adata
+        train_batch_encoding = zd_adata
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
             save_name = f"_{fig_name}_train_set_{name[i]}.png"
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
-            sc.pl.umap(_, color=['batch', 'cell_type'], size=15, alpha=.8, save=save_name)
+            sc.pl.umap(_, color=['batch', 'cell_type'], save=save_name)
 
 
     actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
@@ -501,11 +500,22 @@ if __name__ == "__main__":
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
-        test_cell_type_encoding = zy
+        test_cell_type_encoding = zy_adata
+        test_batch_encoding = zd_adata
         for i, _ in enumerate(adatas):
             _.obs['batch'] = patients[labels_d]
             _.obs['cell_type'] = cell_types[labels_y]
             save_name = f"_{fig_name}_test_set_{name[i]}.png"
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
-            sc.pl.umap(_, color=['batch', 'cell_type'], size=15, alpha=.8, save=save_name)
+            sc.pl.umap(_, color=['batch', 'cell_type'], save=save_name)
+
+    full_zy = train_cell_type_encoding.concatenate(test_cell_type_encoding)
+    full_zd = train_batch_encoding.concatenate(test_batch_encoding)
+
+    sc.pp.neighbors(full_zy, n_neighbors=15)
+    sc.pp.neighbors(full_zd, n_neighbors=15)
+    sc.tl.umap(full_zy, min_dist=.3)
+    sc.tl.umap(full_zd, min_dist=.3)
+    sc.pl.umap(full_zy, color=['batch', 'cell_type'], save=f"_{fig_name}_train+test_zy.png")
+    sc.pl.umap(full_zd, color=['batch', 'cell_type'], save=f"_{fig_name}_train+test_zd.png")
