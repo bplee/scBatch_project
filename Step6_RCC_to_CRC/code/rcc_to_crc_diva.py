@@ -175,6 +175,7 @@ def get_accuracy(data_loader, model, device, save=None):
             ax.get_ylim()
             ax.set_ylim(n_labels, 0)
             save_name = f"./cm_figs/cm_{save}.png"
+            plt.savefig(save_name)
         return accuracy_d, accuracy_y, accuracy_y_weighted
 
 
