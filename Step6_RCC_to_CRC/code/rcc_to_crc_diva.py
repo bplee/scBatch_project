@@ -1,4 +1,4 @@
-from rcc_to_crc_test import *
+from Step6_RCC_to_CRC.code.rcc_to_crc_test import *
 import pandas as pd
 import os
 import sys
@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data_utils
-
+import seaborn as sns
 from Step6_RCC_to_CRC.code.rcc_to_crc_test import load_rcc_to_crc_data_loaders
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
@@ -32,7 +32,7 @@ import scanpy as sc
 from CRC_dataset.code.crc_data_load import *
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
-from rcc_to_crc_diva import *
+from Step6_RCC_to_CRC.code.rcc_to_crc_diva import *
 
 def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     model.train()
@@ -117,11 +117,12 @@ def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     return epoch_losses_sup, epoch_losses_unsup, epoch_class_y_loss
 
 
-def get_accuracy(data_loader, model, device):
+def get_accuracy(data_loader, model, device, save=None):
     model.eval()
     classifier_fn = model.classifier
     n_labels = len(data_loader.dataset[0][1])
     n_batches = len(data_loader.dataset[0][2])
+    cell_types = data_loader.dataset.cell_types
     """
     compute the accuracy over the supervised training set or the testing set
     """
@@ -160,9 +161,20 @@ def get_accuracy(data_loader, model, device):
         # true and predicted labels for calculating confusion matrix
         labels_pred = np.array(labels_pred).astype(int)
         labels_true = np.array(labels_true).astype(int)
-        cm = confusion_matrix(labels_true, labels_pred)
+        cm = confusion_matrix(labels_true, labels_pred, labels=np.arange(n_labels))
         cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        accuracy_y_weighted = np.mean(np.diag(cm_norm))
+        diag = np.diag(cm_norm)
+        # removing nans
+        diag = diag[~np.isnan(diag)]
+        accuracy_y_weighted = np.mean(diag)
+        if save is not None:
+            cm_norm_df = pd.DataFrame(cm_norm, index=cell_types, columns=cell_types)
+            plt.figure(figsize=(20, 20))
+            ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
+                            linewidths=.5, annot=True, fmt='4.2f', square=True)
+            ax.get_ylim()
+            ax.set_ylim(n_labels, 0)
+            save_name = f"./cm_figs/cm_{save}.png"
         return accuracy_d, accuracy_y, accuracy_y_weighted
 
 
