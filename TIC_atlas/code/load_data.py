@@ -37,7 +37,7 @@ def load_data(data_path=TIC_DATA_PATH):
     anndata.Dataframe
         has sparse matrix in the count part
         has a 'percent.mt' column
-        gender, source (where the sample comes from), subtype (tumor type)
+        gender, source (where the sample comes from), subtype (tumor type), patient
     """
     return anndata.read_h5ad(data_path)
 
@@ -49,7 +49,7 @@ def load_downsampled(data_path=TIC_DOWNSAMPLED_PATH):
     return anndata.read_h5ad(data_path)
 
 
-def clean_tic(adata):
+def clean_tic(adata, labels_to_remove=["Proliferative B Cells"], domains_to_remove=['EA', 'SCC']):
     """
 
     Parameters
@@ -62,7 +62,10 @@ def clean_tic(adata):
     anndata.AnnData
 
     """
-    print(f"Adata Starting Shape: {adata.shape}")
+    label_name = "patient"
+    domain_name = "subtype"
+    start_shape = adata.shape
+
     adata.var['mt'] = adata.var_names.str.startswith('MT-')
     adata.var['ribo'] = adata.var_names.str.startswith(("RP"))
     # no mt genes in this data, but they have percent mt from prior analysis
@@ -79,8 +82,22 @@ def clean_tic(adata):
     keep_genes = ~adata.var.mt & ~adata.var.ribo & ~extra_bools
 
     adata = adata[:, keep_genes]
-    print(f"Adata Ending Shape: {adata.shape}")
 
+    if labels_to_remove is not None:
+        print(f" Removing labels: {labels_to_remove}")
+        # removing proliferating B-cells
+        labels = adata.obs[label_name]
+        keep_labels = ~(labels.isin(labels_to_remove))
+    adata = adata[keep_labels,:]
+
+    if domains_to_remove is not None:
+        print(f" Removing domains: {domains_to_remove}")
+        domains = adata.obs[domain_name]
+        keep_domains = ~(domains.isin(domains_to_remove))
+    adata = adata[keep_domains,:]
+
+    print(f" Adata Starting Shape: {start_shape}")
+    print(f" Adata Final Shape: {adata.shape}")
     return adata
 
 def get_label_counts(adata, domain_name="subtype", label_name="cell_type"):
