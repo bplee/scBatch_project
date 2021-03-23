@@ -38,24 +38,21 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
         for (xs, ys, ds) in data_loader:
             # To device
             xs, ys, ds = xs.to(device), ys.to(device), ds.to(device)
-
             # use classification function to compute all predictions for each batch
             pred_d, pred_y = classifier_fn(xs)
             predictions_d.append(pred_d)
             actuals_d.append(ds)
             predictions_y.append(pred_y)
             actuals_y.append(ys)
-
-        ## compute the number of accurate predictions
-        #accurate_preds_d = 0
-        #for pred, act in zip(predictions_d, actuals_d):
+        # # compute the number of accurate predictions
+        # accurate_preds_d = 0
+        # for pred, act in zip(predictions_d, actuals_d):
         #    for i in range(pred.size(0)):
         #        v = torch.sum(pred[i] == act[i])
         #        accurate_preds_d += (v.item() == 5)
-
-        ## calculate the accuracy between 0 and 1
-        #accuracy_d = (accurate_preds_d * 1.0) / len(data_loader.dataset)
-
+        #
+        # ## calculate the accuracy between 0 and 1
+        # accuracy_d = (accurate_preds_d * 1.0) / len(data_loader.dataset)
         # compute the number of accurate predictions
         accurate_preds_y = 0
         labels_true = []
@@ -66,10 +63,8 @@ def get_accuracy(data_loader, classifier_fn, batch_size, test_patient, cell_type
                 accurate_preds_y += (v.item() == num_labels)
                 labels_pred.append(torch.argmax(pred[i]))
                 labels_true.append(torch.argmax(act[i]))
-
         # calculate the accuracy between 0 and 1
         accuracy_y = (accurate_preds_y * 1.0) / len(data_loader.dataset)
-
         # true and predicted labels for calculating confusion matrix
         labels_pred = np.array(labels_pred).astype(int)
         labels_true = np.array(labels_true).astype(int)
@@ -111,15 +106,16 @@ if __name__ == "__main__":
         main_dir = main_dir[5:]
 
     # if the folder to save cm figs to doesn't exist, then create it:
-    if not os.path.exists(out_dir):
-        print('Directory {out_dir} does not exist. Creating directory in {main_dir}.')
-        os.makedirs(out_dir)
+    ensure_dir(out_dir)
+    # if not os.path.exists(out_dir):
+    #     print('Directory {out_dir} does not exist. Creating directory in {main_dir}.')
+    #     os.makedirs(out_dir)
     
     # Starting loop
-    for test_patient in range(6):
-        for train_patient in [4]:
-            if train_patient == test_patient:
-                continue
+    # for test_patient in range(6):
+    #     for train_patient in [4]:
+    #         if train_patient == test_patient:
+    #             continue
     diva_models = get_valid_diva_models()
     for f in diva_models:
     #for test_patient in [0,4]:
@@ -157,12 +153,12 @@ if __name__ == "__main__":
                      shuffle=True)
             cell_types, _ = my_dataset.cell_types_batches()
         else:
-           my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False, convolutions=conv)
-           test_loader_sup = data_utils.DataLoader(
+            my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False, convolutions=conv)
+            test_loader_sup = data_utils.DataLoader(
                      my_dataset,
                      batch_size=args.batch_size,
                      shuffle=True)
-           cell_types, _ = my_dataset.cell_types_batches()
+            cell_types, _ = my_dataset.cell_types_batches()
 
         # Set seed
         torch.manual_seed(args.seed)
@@ -319,3 +315,45 @@ if __name__ == "__main__":
 #     unweighted.append(test_accuracy_y)
 #     weighted.append(test_accuracy_y_weighted)
 # print(f"SUPERVISED\nWeighted Accur: {weighted}\n Unweighted Accur: {unweighted}")
+
+
+# code for the 512 embedding layer
+test_accuracy_y_list = []
+test_accuracy_y_list_weighted = []
+supervised = 0
+for i in range(6):
+    model_name = f"rcc_no_conv_test_domain_{i}_encoding_dim_512_semi_sup_seed_0"
+    model = torch.load(model_name + '.model')
+    args = torch.load(model_name + '.config')
+    print(model_name)
+    print(args)
+    # catching any cases where --conv wasnt an arg and setting it to be true
+    try:
+        conv = args.conv
+    except:
+        conv = True
+    args.cuda = not args.no_cuda and torch.cuda.is_available()
+    device = torch.device("cuda" if args.cuda else "cpu")
+    kwargs = {'num_workers': 2, 'pin_memory': True} if args.cuda else {}
+    # Load test
+    if supervised:
+        my_dataset = RccDataset(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False, convolutions=conv)
+        test_loader_sup = data_utils.DataLoader(
+                 my_dataset,
+                 batch_size=args.batch_size,
+                 shuffle=True)
+        cell_types, _ = my_dataset.cell_types_batches()
+    else:
+        my_dataset = RccDatasetSemi(args.test_patient, args.x_dim, train_patient=args.train_patient, train=False, convolutions=conv)
+        test_loader_sup = data_utils.DataLoader(
+                 my_dataset,
+                 batch_size=args.batch_size,
+                 shuffle=True)
+        cell_types, _ = my_dataset.cell_types_batches()
+    # Set seed
+    torch.manual_seed(args.seed)
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(args.seed)
+    test_accuracy_y, test_accuracy_y_weighted = get_accuracy(test_loader_sup, model.classifier, args.batch_size, i, cell_types, args.y_dim, model_name, device)
+    test_accuracy_y_list.append(test_accuracy_y)
+    test_accuracy_y_list_weighted.append(test_accuracy_y_weighted)
