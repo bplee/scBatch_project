@@ -122,15 +122,18 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
     adata.obs.batch[test_inds] = "1"
 
     if train is None:
+        print(f"Test labels: {[labels_map[i] for i in test]}")
+        print(f"Train labels: None}")
         return adata
     else:
         train = wrap(train)
         train_inds = np.isin(labels, train)
         adata = adata[(train_inds | test_inds),:]
+        print(f"Test labels: {[label_map[i] for i in test]}")
+        print(f"Train labels: {[label_map[i] for i in test]}")
         return adata
 
 if __name__ == "__main__":
-    test_tumor_type = "BC"
 
     adata = load_data()
     adata = clean_tic(adata)
@@ -144,7 +147,8 @@ if __name__ == "__main__":
 
     adata = adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
-    adata.obs['batch'] = "0"
-    adata.obs.batch[tumor_types == test_tumor_type] = "1"
+
+    adata = set_adata_train_test_batches(adata, test=test_label, train=None)
+
     adata.X = adata.X.toarray()
     a = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
