@@ -1,4 +1,3 @@
-from rcc_to_crc_test import *
 import pandas as pd
 import os
 import sys
@@ -32,7 +31,8 @@ import scanpy as sc
 from CRC_dataset.code.crc_data_load import *
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
-from rcc_to_crc_diva import *
+from Step6_RCC_to_CRC.code.rcc_to_crc_diva import *
+from Step6_RCC_to_CRC.code.rcc_to_crc_test import *
 
 def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     model.train()
