@@ -14,6 +14,7 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 
+from Step0_Data.code.starter import *
 from Step6_RCC_to_CRC.code.rcc_to_crc_test import get_diva_loaders
 
 # this data is from: https://zenodo.org/record/4263972#.YFjtJS1h1B0
@@ -81,6 +82,51 @@ def clean_tic(adata):
     print(f"Adata Ending Shape: {adata.shape}")
 
     return adata
+
+def get_label_counts(adata, domain_name="subtype", label_name="cell_type"):
+    return adata.obs[[domain_name, label_name]].value_counts(sort=False).to_frame().pivot_table(index=domain_name,
+                                                                                               columns=label_name,
+                                                                                               fill_value=0).T
+
+
+def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
+    """
+    Gives back adata with training ("0") and test ("1") labels specified in adata.obs.batch
+
+    Parameters
+    ----------
+    adata : anndata.AnnData
+    test : list
+        contains integers corresponding to which labels are going to be test domains
+    train : list (default: None)
+        contains integers corresponding to which labels are going to be train_domains
+    label_name: str (default: "subtype")
+        name of adata.obs column that contains information that you want to use to stratify domains
+
+    Returns
+    -------
+    anndata.AnnData
+        with added adata.obs.batch column with "0" for training data and "1" for test data
+
+    """
+    # creating the column
+    adata.obs['batch'] = "0"
+
+    # getting the ints:
+    labels, label_map = pd.factorize(adata.obs[label_name])
+
+    # make sure the type of test and train are lists:
+    test = wrap(test)
+    # mark all test data
+    adata.obs.batch[labels.isin(test)] = "1"
+
+    if train is None:
+        return adata
+    else:
+        train = wrap(train)
+        train_data = labels.isin(train)
+        adata = adata[train_data,:]
+        return adata
 
 if __name__ == "__main__":
     test_tumor_type = "BC"

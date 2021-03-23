@@ -57,3 +57,19 @@ def ensure_dir(filepath):
     if not os.path.exists(filepath):
         print(f'Directory {filepath} does not exist. Creating directory in {os.getcwd()}.')
         os.makedirs(filepath)
+
+def wrap(a):
+    """
+
+    Parameters
+    ----------
+    a : something
+
+    Returns
+    -------
+    list
+        wraps a if it isn't a list already
+    """
+
+    rtn = a if type(a) == list else [a]
+    return rtn
