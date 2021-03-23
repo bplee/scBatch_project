@@ -118,14 +118,15 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
     # make sure the type of test and train are lists:
     test = wrap(test)
     # mark all test data
-    adata.obs.batch[labels.isin(test)] = "1"
+    test_inds = np.isin(labels, test)
+    adata.obs.batch[test_inds] = "1"
 
     if train is None:
         return adata
     else:
         train = wrap(train)
-        train_data = labels.isin(train)
-        adata = adata[train_data,:]
+        train_inds = np.isin(labels, train)
+        adata = adata[(train_inds | test_inds),:]
         return adata
 
 if __name__ == "__main__":
