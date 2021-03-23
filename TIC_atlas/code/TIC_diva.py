@@ -250,8 +250,8 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = f"{args.outpath}210317_rcc_to_crc_no_conv_semi_sup_seed_{args.seed}"
-    fig_name = f"210317_rcc_to_crc_no_conv_semi_sup_seed_{args.seed}"
+    model_name = f"{args.outpath}210323_TIC_no_conv_semi_sup_seed_{args.seed}"
+    fig_name = f"210323_TIC_no_conv_semi_sup_seed_{args.seed}"
     print(model_name)
 
     # Choose training domains
