@@ -113,27 +113,28 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
     adata.obs['batch'] = "0"
 
     # getting the ints:
-    labels, label_map = pd.factorize(adata.obs[label_name])
+    domains, domain_map = pd.factorize(adata.obs[label_name])
 
     # make sure the type of test and train are lists:
     test = wrap(test)
     # mark all test data
-    test_inds = np.isin(labels, test)
+    test_inds = np.isin(domains, test)
     adata.obs.batch[test_inds] = "1"
 
     if train is None:
-        print(f"Test labels: {[labels_map[i] for i in test]}")
-        print(f"Train labels: None}")
+        print(f"Test labels: {[domain_map[i] for i in test]}")
+        print(f"Train labels: None")
         return adata
     else:
         train = wrap(train)
-        train_inds = np.isin(labels, train)
+        train_inds = np.isin(domains, train)
         adata = adata[(train_inds | test_inds),:]
-        print(f"Test labels: {[label_map[i] for i in test]}")
-        print(f"Train labels: {[label_map[i] for i in test]}")
+        print(f"Test labels: {[domain_map[i] for i in test]}")
+        print(f"Train labels: {[domain_map[i] for i in test]}")
         return adata
 
 if __name__ == "__main__":
+    test_domain = 3
 
     adata = load_data()
     adata = clean_tic(adata)
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     adata = adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
 
-    adata = set_adata_train_test_batches(adata, test=test_label, train=None)
+    adata = set_adata_train_test_batches(adata, test=test_domain, train=None)
 
     adata.X = adata.X.toarray()
     a = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
