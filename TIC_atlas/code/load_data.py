@@ -49,8 +49,10 @@ def load_downsampled(data_path=TIC_DOWNSAMPLED_PATH):
     return anndata.read_h5ad(data_path)
 
 
-def clean_tic(adata, labels_to_remove=["Proliferative B Cells"], domains_to_remove=['EA', 'SCC']):
+def clean_tic(adata, labels_to_remove=["Proliferative B Cells"], domains_to_remove=['EA', 'SCC', 'OC']):
     """
+    Removes MT and RB genes
+    Removes specific labels and domains
 
     Parameters
     ----------
