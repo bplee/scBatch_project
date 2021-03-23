@@ -283,14 +283,8 @@ if __name__ == "__main__":
     adata.X = adata.X.toarray()
     train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
 
-    # loading CRC RCC merged data from rcc_to_crc_test.py
-    train_loader, test_loader, crc_adata = load_rcc_to_crc_data_loaders(shuffle=False)
-
     cell_types = test_loader.cell_types
     patients = test_loader.patients
-
-    # data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
-    # data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
 
     # Empty data loader dict763gv
     data_loaders = {}
