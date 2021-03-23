@@ -17,8 +17,9 @@ import scanpy as sc
 from CRC_dataset.code.crc_data_load import *
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
+from Step0_Data.code.pkl_load_data import PdRccAllData
 
-def get_diva_loaders(adata, shuffle=False):
+def get_diva_loaders(adata, domain_name="patient", label_name="cell_types", shuffle=False):
     """
 
     Parameters
@@ -38,8 +39,8 @@ def get_diva_loaders(adata, shuffle=False):
     n_test = sum(test_inds)
 
     data = adata.X
-    patients, patient_map = pd.factorize(adata.obs.patient)
-    labels, label_map = pd.factorize(adata.obs.cell_type)
+    patients, patient_map = pd.factorize(adata.obs[domain_name])
+    labels, label_map = pd.factorize(adata.obs[label_name])
 
     data_train = data[train_inds,:]
     data_test = data[test_inds,:]
