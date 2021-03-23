@@ -1,4 +1,3 @@
-from rcc_to_crc_test import *
 import pandas as pd
 import os
 import sys
@@ -21,6 +20,7 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 
+from Step6_RCC_to_CRC.code.rcc_to_crc_test import *
 from ForBrennan.DIVA.model.model_diva_no_convolutions import DIVA
 from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 from Step0_Data.code.pkl_load_data import PdRccAllData
@@ -32,7 +32,10 @@ import scanpy as sc
 from CRC_dataset.code.crc_data_load import *
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
-from rcc_to_crc_diva import *
+from Step6_RCC_to_CRC.code.rcc_to_crc_diva import *
+
+# this is now for running different debugging tests of rcc to crc diva
+# (like performing diva on rcc with gene subset from ssl)
 
 def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     model.train()
@@ -355,12 +358,13 @@ if __name__ == "__main__":
     patients = test_loader.patients
     ###########################################
 
-    data_loaders = {}
+    # data_loaders = {}
+    #
+    # train_loader = RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
+    #                    train=True, x_dim=784, convolutions=False)
+    # test_loader = RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
+    #                    train=False, x_dim=784, convolutions=False)
 
-    train_loader = RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
-                       train=True, x_dim=784, convolutions=False)
-    test_loader = RccDatasetSemi(args.test_patient, train_patient=args.train_patient,
-                       train=False, x_dim=784, convolutions=False)
     # Load supervised training
     train_loader_sup = data_utils.DataLoader(
         train_loader,
