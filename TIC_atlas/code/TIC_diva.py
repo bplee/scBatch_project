@@ -1,4 +1,3 @@
-from Step6_RCC_to_CRC.code.rcc_to_crc_test import *
 import pandas as pd
 import os
 import sys
@@ -12,7 +11,6 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data_utils
 import seaborn as sns
-from Step6_RCC_to_CRC.code.rcc_to_crc_test import load_rcc_to_crc_data_loaders
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 # adding the project dir to the path to import relevant modules below
@@ -22,14 +20,12 @@ if WORKING_DIR not in sys.path:
     print("\tWorking dir appended to Sys path.")
 
 from ForBrennan.DIVA.model.model_diva_no_convolutions import DIVA
-from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
-from Step0_Data.code.pkl_load_data import PdRccAllData
+from Step6_RCC_to_CRC.code.rcc_to_crc_test import *
 import anndata
 import torch
 import torch.utils.data as data_utils
 from scvi.dataset import GeneExpressionDataset
 import scanpy as sc
-from CRC_dataset.code.crc_data_load import *
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
 from Step6_RCC_to_CRC.code.rcc_to_crc_diva import *
