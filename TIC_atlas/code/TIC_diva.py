@@ -279,8 +279,7 @@ if __name__ == "__main__":
 
     adata = adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
-    adata.obs['batch'] = "0"
-    adata.obs.batch[tumor_types == test_tumor_type] = "1"
+    adata = set_adata_train_test_batches(adata, test=args.test_patient, train=args.train_patient)
     adata.X = adata.X.toarray()
     train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
 
