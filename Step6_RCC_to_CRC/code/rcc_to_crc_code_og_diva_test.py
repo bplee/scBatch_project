@@ -33,6 +33,8 @@ from CRC_dataset.code.crc_data_load import *
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
 
+# this is for running diva on the original rcc data matrix
+
 def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     model.train()
     """
