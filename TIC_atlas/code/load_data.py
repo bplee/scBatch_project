@@ -5,6 +5,7 @@ import scanpy as sc
 import numpy as np
 import pandas as pd
 from scvi.dataset import GeneExpressionDataset
+import scipy
 
 WORKING_DIR = "/data/leslie/bplee/scBatch"
 # adding the project dir to the path to import relevant modules below
@@ -12,6 +13,8 @@ if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
+
+from Step6_RCC_to_CRC.code.rcc_to_crc_test import get_diva_loaders
 
 # this data is from: https://zenodo.org/record/4263972#.YFjtJS1h1B0
 
@@ -58,6 +61,7 @@ def clean_tic(adata):
     anndata.AnnData
 
     """
+    print(f"Adata Starting Shape: {adata.shape}")
     adata.var['mt'] = adata.var_names.str.startswith('MT-')
     adata.var['ribo'] = adata.var_names.str.startswith(("RP"))
     # no mt genes in this data, but they have percent mt from prior analysis
@@ -74,10 +78,13 @@ def clean_tic(adata):
     keep_genes = ~adata.var.mt & ~adata.var.ribo & ~extra_bools
 
     adata = adata[:, keep_genes]
+    print(f"Adata Ending Shape: {adata.shape}")
 
     return adata
 
 if __name__ == "__main__":
+    test_tumor_type = "BC"
+
     adata = load_data()
     adata = clean_tic(adata)
     gene_ds = GeneExpressionDataset()
@@ -89,3 +96,8 @@ if __name__ == "__main__":
     gene_ds.subsample_genes(784)
 
     adata = adata[:, gene_ds.gene_names]
+    # batches are going to be built off of adata.obs.subtype
+    adata.obs['batch'] = "0"
+    adata.obs.batch[tumor_types == test_tumor_type] = "1"
+    adata.X = adata.X.toarray()
+    a = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
