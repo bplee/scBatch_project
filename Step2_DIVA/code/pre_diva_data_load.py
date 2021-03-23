@@ -21,8 +21,8 @@ from ForBrennan.DIVA.model.model_diva import DIVA
 from DIVA.dataset.rcc_loader_semi_sup import RccDatasetSemi
 from Step0_Data.code.new_data_load import NewRccDatasetSemi
 
-test_patient =5
-batch_size=100
+test_patient = 5
+batch_size = 100
 train_patient = 2
 
 
