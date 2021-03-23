@@ -66,7 +66,7 @@ def clean_tic(adata):
     print(f" Removing ribo and mitochondrial genes")
 
     print(f" Number of cells with MT%>20: {sum(adata.obs['percent.mt'] > 20)} ")
-    adata = adata[adata.obs['percent.mt' < 20, :]]
+    adata = adata[adata.obs['percent.mt'] < 20, :]
 
     extra_removing = ["NEAT1", "MALAT1"]
     print(f" Removing {extra_removing} from list")
