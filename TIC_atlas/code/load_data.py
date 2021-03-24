@@ -115,9 +115,9 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
     Parameters
     ----------
     adata : anndata.AnnData
-    test : list
+    test : list or int
         contains integers corresponding to which labels are going to be test domains
-    train : list (default: None)
+    train : list or int (default: None)
         contains integers corresponding to which labels are going to be train_domains
     label_name: str (default: "subtype")
         name of adata.obs column that contains information that you want to use to stratify domains
@@ -152,8 +152,40 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
         print(f"Train labels: {[domain_map[i] for i in test]}")
         return adata
 
+def load_TIC_diva_datasets(test_domain, train_domain=None):
+    """
+    Just one function to load all diva stuff
+
+    Parameters
+    ----------
+    test_domain :
+    train_domain
+
+    Returns
+    -------
+
+    """
+    adata = load_data()
+    adata = clean_tic(adata)
+    gene_ds = GeneExpressionDataset()
+    tumor_types = adata.obs.subtype
+    gene_ds.populate_from_data(X=adata.X,
+                               gene_names=np.array(adata.var.index),
+                               batch_indices=pd.factorize(tumor_types)[0],
+                               remap_attributes=False)
+    gene_ds.subsample_genes(784)
+
+    adata = adata[:, gene_ds.gene_names]
+    # batches are going to be built off of adata.obs.subtype
+
+    adata = set_adata_train_test_batches(adata, test=test_domain, train=train_domain)
+
+    adata.X = adata.X.toarray()
+    train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
+    return train_loader, test_loader
+
 if __name__ == "__main__":
-    test_domain = 3
+    test_domain = 0
 
     adata = load_data()
     adata = clean_tic(adata)
@@ -171,4 +203,4 @@ if __name__ == "__main__":
     adata = set_adata_train_test_batches(adata, test=test_domain, train=None)
 
     adata.X = adata.X.toarray()
-    a = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
+    train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
