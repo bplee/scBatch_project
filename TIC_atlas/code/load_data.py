@@ -64,7 +64,7 @@ def clean_tic(adata, labels_to_remove=["Proliferative B Cells"], domains_to_remo
     anndata.AnnData
 
     """
-    label_name = "patient"
+    label_name = "cell_type"
     domain_name = "subtype"
     start_shape = adata.shape
 
@@ -128,6 +128,8 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
         with added adata.obs.batch column with "0" for training data and "1" for test data
 
     """
+    print(f" Setting training domain: {train}")
+    print(f" Setting testing domain: {test}")
     # creating the column
     adata.obs['batch'] = "0"
 
