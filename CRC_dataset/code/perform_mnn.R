@@ -78,7 +78,7 @@ run_mnn = function(sce_obj){
 #batch_sce = sce_cbind(all_data, "union") # performs gene cutoffs
 #out = fastMNN(batch_sce, batch=colData(batch_sce)$batch)
 
-batch_sce = read_python_cleaned_data("210126_cleaned_counts.csv", "210126_obs_batch_data.csv")
+batch_sce = read_python_cleaned_data("210222_cleaned_counts.csv", "210222_obs_batch_data.csv")
 
 out = run_mnn(batch_sce)
 
