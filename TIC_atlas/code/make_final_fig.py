@@ -33,6 +33,8 @@ from sklearn.metrics import confusion_matrix
 from Step6_RCC_to_CRC.code.rcc_to_crc_diva import *
 from TIC_atlas.code.load_data import *
 
+os.chdir("210323_tic_1_heldout")
+
 for test_pat in range(10):
     model_name = f"210323_TIC_no_conv_test_pat_[{test_pat}]"
     print(model_name)
