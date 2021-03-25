@@ -469,6 +469,11 @@ if __name__ == "__main__":
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
+        train_labels = patients[labels_d]
+        zy_adata.obs['batch'] = patients[labels_d]
+        zy_adata.obs['cell_type'] = cell_types[labels_y]
+        zd_adata.obs['batch'] = patients[labels_d]
+        zd_adata.obs['cell_type'] = cell_types[labels_y]
         train_cell_type_encoding = zy_adata
         train_batch_encoding = zd_adata
         for i, _ in enumerate(adatas):
@@ -478,8 +483,6 @@ if __name__ == "__main__":
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color=['batch', 'cell_type'], save=save_name)
-
-
     actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
     with torch.no_grad():
         # test
@@ -516,6 +519,11 @@ if __name__ == "__main__":
             zy_adata, zd_adata = [anndata.AnnData(_) for _ in [zy, zd]]
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
+        test_labels = patients[labels_d]
+        zy_adata.obs['batch'] = patients[labels_d]
+        zy_adata.obs['cell_type'] = cell_types[labels_y]
+        zd_adata.obs['batch'] = patients[labels_d]
+        zd_adata.obs['cell_type'] = cell_types[labels_y]
         test_cell_type_encoding = zy_adata
         test_batch_encoding = zd_adata
         for i, _ in enumerate(adatas):
@@ -525,10 +533,10 @@ if __name__ == "__main__":
             sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
             sc.tl.umap(_, min_dist=.3)
             sc.pl.umap(_, color=['batch', 'cell_type'], save=save_name)
-
     full_zy = train_cell_type_encoding.concatenate(test_cell_type_encoding)
     full_zd = train_batch_encoding.concatenate(test_batch_encoding)
-
+    all_patients = np.hstack(train_labels, test_labels)
+    full_zy.obs['batch'] = all_patients
     sc.pp.neighbors(full_zy, n_neighbors=15)
     sc.pp.neighbors(full_zd, n_neighbors=15)
     sc.tl.umap(full_zy, min_dist=.3)
