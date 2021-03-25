@@ -129,7 +129,7 @@ for test_pat in range(10):
         test_batch_encoding = zd_adata
     full_zy = train_cell_type_encoding.concatenate(test_cell_type_encoding)
     full_zd = train_batch_encoding.concatenate(test_batch_encoding)
-    all_patients = np.hstack(train_labels, test_labels)
+    all_patients = np.hstack([train_labels, test_labels])
     full_zy.obs['batch'] = all_patients
     sc.pp.neighbors(full_zy, n_neighbors=15)
     sc.pp.neighbors(full_zd, n_neighbors=15)
