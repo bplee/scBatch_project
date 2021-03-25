@@ -41,6 +41,7 @@ def load_data(data_path=TIC_DATA_PATH):
     """
     return anndata.read_h5ad(data_path)
 
+
 def load_meta_data(meta_data_path=TIC_META_DATA_PATH):
     return pd.read_csv(meta_data_path, index_col=0)
 
@@ -90,17 +91,18 @@ def clean_tic(adata, labels_to_remove=["Proliferative B cells"], domains_to_remo
         # removing proliferating B-cells
         labels = adata.obs[label_name]
         keep_labels = ~(labels.isin(labels_to_remove))
-    adata = adata[keep_labels,:]
+        adata = adata[keep_labels,:]
 
     if domains_to_remove is not None:
         print(f" Removing domains: {domains_to_remove}")
         domains = adata.obs[domain_name]
         keep_domains = ~(domains.isin(domains_to_remove))
-    adata = adata[keep_domains,:]
+        adata = adata[keep_domains,:]
 
     print(f" Adata Starting Shape: {start_shape}")
     print(f" Adata Final Shape: {adata.shape}")
     return adata
+
 
 def get_label_counts(adata, domain_name="subtype", label_name="cell_type"):
     return adata.obs[[domain_name, label_name]].value_counts(sort=False).to_frame().pivot_table(index=domain_name,
@@ -154,6 +156,7 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
         print(f"Train labels: {[domain_map[i] for i in test]}")
         return adata
 
+
 def load_TIC_diva_datasets(test_domain, train_domain=None):
     """
     Just one function to load all diva stuff
@@ -180,9 +183,9 @@ def load_TIC_diva_datasets(test_domain, train_domain=None):
     adata = adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
 
+    adata.X = adata.X.toarray()
     adata = set_adata_train_test_batches(adata, test=test_domain, train=train_domain)
 
-    adata.X = adata.X.toarray()
     train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
     return train_loader, test_loader
 
