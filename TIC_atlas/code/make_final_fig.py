@@ -33,11 +33,13 @@ from sklearn.metrics import confusion_matrix
 from Step6_RCC_to_CRC.code.rcc_to_crc_diva import *
 from TIC_atlas.code.load_data import *
 
+# os.chdir("210324_tic_1_heldout_no_prolif_b_cells")
 os.chdir("210323_tic_1_heldout")
 
 for test_pat in range(10):
     model_name = f"210323_TIC_no_conv_test_pat_[{test_pat}]"
     print(model_name)
+    fig_name = model_name
     model = torch.load(model_name + ".model")
     args = torch.load(model_name + ".config")
     args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -83,20 +85,14 @@ for test_pat in range(10):
         adatas = [zy_adata, zd_adata, zx_adata]
         name = ['zy', 'zd', 'zx']
         zy_adata.obs['batch'] = patients[labels_d]
+        zy_adata.obs['cell_type'] = cell_types[labels_y]
+        zd_adata.obs['batch'] = patients[labels_d]
         zd_adata.obs['cell_type'] = cell_types[labels_y]
         train_cell_type_encoding = zy_adata
         train_batch_encoding = zd_adata
-        # for i, _ in enumerate(adatas):
-        #     _.obs['batch'] = patients[labels_d]
-        #     _.obs['cell_type'] = cell_types[labels_y]
-        #     save_name = f"_{fig_name}_train_set_{name[i]}.png"
-        #     sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
-        #     sc.tl.umap(_, min_dist=.3)
-        #     sc.pl.umap(_, color=['batch', 'cell_type'], save=save_name)
     actuals_d, actuals_y, zy_, zd_, zx_ = [], [], [], [], []
     with torch.no_grad():
         # test
-        # patients_train = np.delete(patients, test_patient)
         i = 0
         for (xs, ys, ds) in data_loaders['unsup']:
             i = i + 1
@@ -124,16 +120,11 @@ for test_pat in range(10):
         adatas = [zy_adata, zd_adata, zx_adata]
         name = ['zy', 'zd', 'zx']
         zy_adata.obs['batch'] = patients[labels_d]
+        zy_adata.obs['cell_type'] = cell_types[labels_y]
+        zd_adata.obs['batch'] = patients[labels_d]
         zd_adata.obs['cell_type'] = cell_types[labels_y]
         test_cell_type_encoding = zy_adata
         test_batch_encoding = zd_adata
-        # for i, _ in enumerate(adatas):
-        #     _.obs['batch'] = patients[labels_d]
-        #     _.obs['cell_type'] = cell_types[labels_y]
-        #     save_name = f"_{fig_name}_test_set_{name[i]}.png"
-        #     sc.pp.neighbors(_, use_rep="X", n_neighbors=15)
-        #     sc.tl.umap(_, min_dist=.3)
-        #     sc.pl.umap(_, color=['batch', 'cell_type'], save=save_name)
     full_zy = train_cell_type_encoding.concatenate(test_cell_type_encoding)
     full_zd = train_batch_encoding.concatenate(test_batch_encoding)
     sc.pp.neighbors(full_zy, n_neighbors=15)
