@@ -84,6 +84,7 @@ for test_pat in range(10):
         zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
         adatas = [zy_adata, zd_adata, zx_adata]
         name = ['zy', 'zd', 'zx']
+        train_labels = patients[labels_d]
         zy_adata.obs['batch'] = patients[labels_d]
         zy_adata.obs['cell_type'] = cell_types[labels_y]
         zd_adata.obs['batch'] = patients[labels_d]
@@ -119,6 +120,7 @@ for test_pat in range(10):
         zy_adata, zd_adata, zx_adata = [anndata.AnnData(_) for _ in [zy, zd, zx]]
         adatas = [zy_adata, zd_adata, zx_adata]
         name = ['zy', 'zd', 'zx']
+        test_labels = patients[labels_d]
         zy_adata.obs['batch'] = patients[labels_d]
         zy_adata.obs['cell_type'] = cell_types[labels_y]
         zd_adata.obs['batch'] = patients[labels_d]
@@ -127,6 +129,8 @@ for test_pat in range(10):
         test_batch_encoding = zd_adata
     full_zy = train_cell_type_encoding.concatenate(test_cell_type_encoding)
     full_zd = train_batch_encoding.concatenate(test_batch_encoding)
+    all_patients = np.hstack(train_labels, test_labels)
+    full_zy.obs['batch'] = all_patients
     sc.pp.neighbors(full_zy, n_neighbors=15)
     sc.pp.neighbors(full_zd, n_neighbors=15)
     sc.tl.umap(full_zy, min_dist=.3)
