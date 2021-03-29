@@ -39,6 +39,9 @@ def load_data(data_path=TIC_DATA_PATH):
         has a 'percent.mt' column
         gender, source (where the sample comes from), subtype (tumor type), patient
     """
+    # rtn = anndata.read_h5ad(data_path)
+    # rtn.X = rtn.X.todense()
+    # return rtn
     return anndata.read_h5ad(data_path)
 
 
@@ -183,14 +186,18 @@ def load_TIC_diva_datasets(test_domain, train_domain=None):
     adata = adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
 
-    adata.X = adata.X.toarray()
+    # adata.X = adata.X.toarray()
     adata = set_adata_train_test_batches(adata, test=test_domain, train=train_domain)
+    temp = anndata.AnnData(adata.X.todense())
+    temp.obs = adata.obs
+    temp.raw = adata.raw
 
-    train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
+    train_loader, test_loader = get_diva_loaders(temp, domain_name="subtype", label_name="cell_type")
     return train_loader, test_loader
 
 if __name__ == "__main__":
     test_domain = 0
+    train_domain = None
 
     adata = load_data()
     adata = clean_tic(adata)
@@ -205,7 +212,7 @@ if __name__ == "__main__":
     adata = adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
 
-    adata = set_adata_train_test_batches(adata, test=test_domain, train=None)
+    adata = set_adata_train_test_batches(adata, test=test_domain, train=train_domain)
 
-    adata.X = adata.X.toarray()
+    adata.X = adata.X.todense()
     train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
