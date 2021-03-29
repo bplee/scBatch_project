@@ -250,8 +250,8 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = f"{args.outpath}210323_TIC_no_conv_test_pat_{args.test_patient}"
-    fig_name = f"210323_TIC_no_conv_test_pat_{args.test_patient}"
+    model_name = f"{args.outpath}210329_TIC_no_conv_test_pat_{args.test_patient}_train_pat_{args.train_pat}"
+    fig_name = f"210329_TIC_no_conv_test_pat_{args.test_patient}_train_pat_{args.train_pat}"
     print(model_name)
 
     # Choose training domains
