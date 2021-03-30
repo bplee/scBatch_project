@@ -107,13 +107,22 @@ def clean_tic(adata, labels_to_remove=["Proliferative B cells"], domains_to_remo
     return adata
 
 
+def get_patient_subset(adata, min_cell_count=1000):
+    print(f" Taking patients with minimum cell count > {min_cell_count}")
+    pat_counts = adata.obs.patient.value_counts()
+    pats = pat_counts.index.values[pat_counts>min_cell_count]
+    keep_pats = adata.obs.patient.isin(pats)
+    print(f" Returning adata with {len(pats)} patients left")
+    return adata[keep_pats, :]
+
+
 def get_label_counts(adata, domain_name="subtype", label_name="cell_type"):
     return adata.obs[[domain_name, label_name]].value_counts(sort=False).to_frame().pivot_table(index=domain_name,
                                                                                                columns=label_name,
                                                                                                fill_value=0).T
 
 
-def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
+def set_adata_train_test_batches(adata, test, train=None, domain_name="subtype"):
     """
     Gives back adata with training ("0") and test ("1") labels specified in adata.obs.batch
 
@@ -124,7 +133,7 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
         contains integers corresponding to which labels are going to be test domains
     train : list or int (default: None)
         contains integers corresponding to which labels are going to be train_domains
-    label_name: str (default: "subtype")
+    domain_name: str (default: "subtype")
         name of adata.obs column that contains information that you want to use to stratify domains
 
     Returns
@@ -139,7 +148,7 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
     adata.obs['batch'] = "0"
 
     # getting the ints:
-    domains, domain_map = pd.factorize(adata.obs[label_name])
+    domains, domain_map = pd.factorize(adata.obs[domain_name])
 
     # make sure the type of test and train are lists:
     test = wrap(test)
@@ -194,6 +203,29 @@ def load_TIC_diva_datasets(test_domain, train_domain=None):
 
     train_loader, test_loader = get_diva_loaders(temp, domain_name="subtype", label_name="cell_type")
     return train_loader, test_loader
+
+
+def load_patient_TIC_diva_datasets(test_domain, train_domain=None):
+    adata = load_data()
+    adata = clean_tic(adata)
+    adata = get_patient_subset(adata)
+    gene_ds = GeneExpressionDataset()
+    patient_batches = adata.obs.patient
+    gene_ds.populate_from_data(X=adata.X,
+                               gene_names=np.array(adata.var.index),
+                               batch_indices=pd.factorize(patient_batches)[0],
+                               remap_attributes=False)
+    gene_ds.subsample_genes(784)
+    adata = adata[:, gene_ds.gene_names]
+    # batches are going to be built off of adata.obs.subtype
+    # adata.X = adata.X.toarray()
+    adata = set_adata_train_test_batches(adata, test=test_domain, train=train_domain, domain_name="patient")
+    temp = anndata.AnnData(adata.X.todense())
+    temp.obs = adata.obs
+    temp.var = adata.var
+    train_loader, test_loader = get_diva_loaders(temp, domain_name="subtype", label_name="cell_type")
+    return train_loader, test_loader
+
 
 if __name__ == "__main__":
     test_domain = 0
