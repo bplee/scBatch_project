@@ -156,7 +156,7 @@ def set_adata_train_test_batches(adata, test, train=None, label_name="subtype"):
         train_inds = np.isin(domains, train)
         adata = adata[(train_inds | test_inds),:]
         print(f"Test labels: {[domain_map[i] for i in test]}")
-        print(f"Train labels: {[domain_map[i] for i in test]}")
+        print(f"Train labels: {[domain_map[i] for i in train]}")
         return adata
 
 
