@@ -263,21 +263,22 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = False
     np.random.seed(args.seed)
 
-    adata = load_data()
-    adata = clean_tic(adata)
-    gene_ds = GeneExpressionDataset()
-    tumor_types = adata.obs.subtype
-    gene_ds.populate_from_data(X=adata.X,
-                               gene_names=np.array(adata.var.index),
-                               batch_indices=pd.factorize(tumor_types)[0],
-                               remap_attributes=False)
-    gene_ds.subsample_genes(784)
-
-    adata = adata[:, gene_ds.gene_names]
-    # batches are going to be built off of adata.obs.subtype
-    adata = set_adata_train_test_batches(adata, test=args.test_patient, train=args.train_patient)
-    adata.X = adata.X.toarray()
-    train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
+    # adata = load_data()
+    # adata = clean_tic(adata)
+    # gene_ds = GeneExpressionDataset()
+    # tumor_types = adata.obs.subtype
+    # gene_ds.populate_from_data(X=adata.X,
+    #                            gene_names=np.array(adata.var.index),
+    #                            batch_indices=pd.factorize(tumor_types)[0],
+    #                            remap_attributes=False)
+    # gene_ds.subsample_genes(784)
+    #
+    # adata = adata[:, gene_ds.gene_names]
+    # # batches are going to be built off of adata.obs.subtype
+    # adata = set_adata_train_test_batches(adata, test=args.test_patient, train=args.train_patient)
+    # adata.X = adata.X.toarray()
+    # train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
+    train_loader, test_loader = load_TIC_diva_datasets(args.test_patient, args.train_patient)
 
     cell_types = test_loader.cell_types
     patients = test_loader.patients
