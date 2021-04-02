@@ -1,0 +1,12 @@
+,cell_types,TS-101T,TS-104T,TS-106T,TS-108T,TS-109T,TS-125T
+0,Ambiguous,48,5,6,28,6,0
+0,B cell,29,953,473,690,2478,480
+0,CD4+ Effector,333,136,271,847,242,125
+0,CD45- Stromal/Epithelial,6,8,36,51,9,8
+0,CD8A+ Exhausted,737,52,54,306,35,135
+0,Conventional NK,523,14,9,62,4,1
+0,Immature B cell,0,10,83,23,165,75
+0,Plasma,16,568,590,21,8,883
+0,Proliferating B cell,90,7,115,52,104,141
+0,TAM HLAhi,173,106,98,338,279,117
+0,Unknown (mast?),0,8,8,34,7,2
