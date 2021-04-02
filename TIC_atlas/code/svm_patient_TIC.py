@@ -21,7 +21,7 @@ from TIC_atlas.code.load_data import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='svm_TIC')
-    parser.add_argument('--test_patient', nargs="+", default=0,
+    parser.add_argument('--test_patient', nargs="+", type=int, default=0,
                          help='test domain')
     # parser.add_argument('--train_patient', nargs="+", default=None,
     #                     help='test domain')
