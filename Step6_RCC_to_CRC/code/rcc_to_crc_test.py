@@ -19,7 +19,7 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
 from Step0_Data.code.pkl_load_data import PdRccAllData
 
-def get_diva_loaders(adata, domain_name="patient", label_name="cell_types", shuffle=False):
+def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuffle=False):
     """
 
     Parameters
@@ -124,6 +124,28 @@ class EmptyDIVALoader(data_utils.Dataset):
         return x, y, d
 
 
+def get_validation_from_training(train_loader_obj, percentage_validation=.1):
+
+    validation_loader = EmptyDIVALoader()
+    new_train_loader = EmptyDIVALoader()
+    n = len(train_loader_obj)
+    n_valid = int(n*percentage_validation)
+    valid_ints = np.random.choice(range(n), n_valid, replace=False)
+    train_ints = np.setdiff1d(np.arange(n), valid_ints)
+
+    valid_data, valid_labels, valid_domain = train_loader_obj[valid_ints]
+    new_train_data, new_train_labels, new_train_domain = train_loader_obj[train_ints]
+
+    validation_loader.train_data = valid_data
+    validation_loader.train_labels = valid_labels
+    validation_loader.train_domain = valid_domain
+
+    new_train_loader.train_data = new_train_data
+    new_train_loader.train_labels = new_train_labels
+    new_train_loader.train_domain = new_train_domain
+
+    return new_train_loader, validation_loader
+
 def load_rcc_to_crc_data_loaders(cell_types_to_remove=["Plasma"],old_load=False, shuffle=False):
     """
     Function made from scratch code, returns DIVA RCC training and CRC test loaders for SSL training as well as
@@ -218,7 +240,7 @@ def load_rcc_to_crc_data_loaders(cell_types_to_remove=["Plasma"],old_load=False,
 
     adata = adata[:, gene_ds.gene_names]
 
-    train_loader, test_loader = get_diva_loaders(adata, shuffle=shuffle)
+    train_loader, test_loader = get_diva_loaders(adata, label_name="cell_type", shuffle=shuffle)
 
     return train_loader, test_loader, crc_adata
 
