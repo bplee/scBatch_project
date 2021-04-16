@@ -1,0 +1,151 @@
+"""
+Contains functions for training diva
+"""
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+
+def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
+    model.train()
+    """
+    runs the inference algorithm for an epoch
+    returns the values of all losses separately on supervised and unsupervised parts
+    """
+
+    # compute number of batches for an epoch
+    sup_batches = len(data_loaders["sup"])
+    unsup_batches = len(data_loaders["unsup"])
+    batches_per_epoch = sup_batches + unsup_batches
+
+    # initialize variables to store loss values
+    epoch_losses_sup = 0
+    epoch_losses_unsup = 0
+    epoch_class_y_loss = 0
+
+    # setup the iterators for training data loaders
+    sup_iter = iter(data_loaders["sup"])
+    unsup_iter = iter(data_loaders["unsup"])
+
+    # count the number of supervised batches seen in this epoch
+    ctr_unsup = 0
+    ctr_sup = 0
+    for i in range(batches_per_epoch):
+
+        # whether this batch is supervised or not
+        # is_unsupervised = (i % (periodic_interval_batches + 1) == 0) and ctr_unsup < unsup_batches
+        is_unsupervised = (i % (periodic_interval_batches) == 0) and ctr_unsup < unsup_batches
+
+        # extract the corresponding batch
+        if is_unsupervised:
+            ctr_unsup += 1
+            if ctr_unsup > unsup_batches:
+                print(f"ctr_unsup > unsup_batches, {ctr_unsup} > {unsup_batches}")
+                print(f" i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
+                is_unsupervised = False
+            (x, y, d) = next(unsup_iter)
+
+        if not is_unsupervised:
+            ctr_sup += 1
+            if ctr_sup > sup_batches:
+                print(f"ctr_sup > sup_batches, {ctr_sup} > {sup_batches}")
+                print(f" i: {i}\n ctr_unsup: {ctr_unsup}\n ctr_sup: {ctr_sup}")
+                break
+            (x, y, d) = next(sup_iter)
+
+        # To device
+        x, y, d = x.to(device), y.to(device), d.to(device)
+        # run the inference for each loss with supervised or un-supervised
+        # data as arguments
+        optimizer.zero_grad()
+
+        if is_unsupervised:
+            new_loss = model.loss_function(d, x)
+            epoch_losses_unsup += new_loss
+
+        else:
+            new_loss, class_y_loss = model.loss_function(d, x, y)
+            epoch_losses_sup += new_loss
+            epoch_class_y_loss += class_y_loss
+
+        # print(epoch_losses_sup, epoch_losses_unsup)
+        new_loss.backward()
+        optimizer.step()
+
+    # return the values of all losses
+    return epoch_losses_sup, epoch_losses_unsup, epoch_class_y_loss
+
+
+def get_accuracy(data_loader, model, device, save=None):
+    """
+    computes accuracy for a dataloader and a model
+    has the option to save a confusion matrix of the results
+
+    Parameters
+    ----------
+    data_loader
+    model
+    device
+    save
+
+    Returns
+    -------
+
+    """
+    model.eval()
+    classifier_fn = model.classifier
+    n_labels = len(data_loader.dataset[0][1])
+    n_batches = len(data_loader.dataset[0][2])
+    cell_types = data_loader.dataset.cell_types
+
+    predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
+    with torch.no_grad():
+        # use the right data loader
+        for (xs, ys, ds) in data_loader:
+            # To device
+            xs, ys, ds = xs.to(device), ys.to(device), ds.to(device)
+            # use classification function to compute all predictions for each batch
+            pred_d, pred_y = classifier_fn(xs)
+            predictions_d.append(pred_d)
+            actuals_d.append(ds)
+            predictions_y.append(pred_y)
+            actuals_y.append(ys)
+        # compute the number of accurate predictions
+        accurate_preds_d = 0
+        for pred, act in zip(predictions_d, actuals_d):
+            for i in range(pred.size(0)):
+                v = torch.sum(pred[i] == act[i])
+                accurate_preds_d += (v.item() == n_batches)
+        # calculate the accuracy between 0 and 1
+        accuracy_d = (accurate_preds_d * 1.0) / len(data_loader.dataset)
+        # compute the number of accurate predictions
+        accurate_preds_y = 0
+        labels_true = []
+        labels_pred = []
+        for pred, act in zip(predictions_y, actuals_y):
+            for i in range(pred.size(0)):
+                v = torch.sum(pred[i] == act[i])
+                accurate_preds_y += (v.item() == n_labels)
+                labels_pred.append(torch.argmax(pred[i]))
+                labels_true.append(torch.argmax(act[i]))
+        # calculate the accuracy between 0 and 1
+        accuracy_y = (accurate_preds_y * 1.0) / len(data_loader.dataset)
+        # true and predicted labels for calculating confusion matrix
+        labels_pred = np.array(labels_pred).astype(int)
+        labels_true = np.array(labels_true).astype(int)
+        cm = confusion_matrix(labels_true, labels_pred, labels=np.arange(n_labels))
+        cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        diag = np.diag(cm_norm)
+        # removing nans
+        diag = diag[~np.isnan(diag)]
+        accuracy_y_weighted = np.mean(diag)
+        if save is not None:
+            cm_norm_df = pd.DataFrame(cm_norm, index=cell_types, columns=cell_types)
+            plt.figure(figsize=(20, 20))
+            ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
+                            linewidths=.5, annot=True, fmt='4.2f', square=True)
+            ax.get_ylim()
+            ax.set_ylim(n_labels, 0)
+            save_name = f"./cm_figs/cm_{save}.png"
+            plt.savefig(save_name)
+        return accuracy_d, accuracy_y, accuracy_y_weighted
