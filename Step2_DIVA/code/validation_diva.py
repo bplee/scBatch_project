@@ -29,7 +29,7 @@ import scanpy as sc
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
 from Step6_RCC_to_CRC.code.rcc_to_crc_diva import *
-from TIC_atlas.code.load_data import *
+from Step0_Data.code.new_data_load import NewRccDatasetSemi as RccDatasetSemi
 
 def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
     model.train()
