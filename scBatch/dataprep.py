@@ -6,6 +6,7 @@ Contains functions for prepping data from anndata.AnnData objs to DIVALoader obj
 import anndata
 import torch
 import numpy as np
+import pandas as pd
 import scanpy as sc
 import torch.utils.data as data_utils
 
@@ -147,10 +148,12 @@ def get_validation_from_training(train_loader_obj, percentage_validation=.1):
     validation_loader.train_data = valid_data
     validation_loader.train_labels = valid_labels
     validation_loader.train_domain = valid_domain
+    validation_loader.cell_types = train_loader_obj.cell_types
 
     new_train_loader.train_data = new_train_data
     new_train_loader.train_labels = new_train_labels
     new_train_loader.train_domain = new_train_domain
+    new_train_loader.cell_types = train_loader_obj.cell_types
 
     return new_train_loader, validation_loader
 
