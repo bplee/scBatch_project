@@ -250,34 +250,15 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = f"{args.outpath}210329_TIC_no_conv_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
-    fig_name = f"210329_TIC_no_conv_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
+    model_name = f"{args.outpath}210422_TIC_validation_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
+    fig_name = f"210422_TIC_validation_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
     print(model_name)
-
-    # Choose training domains
-
-    # print('test domain: '+str(args.test_patient))
 
     # Set seed
     torch.manual_seed(args.seed)
     torch.backends.cudnn.benchmark = False
     np.random.seed(args.seed)
 
-    # adata = load_data()
-    # adata = clean_tic(adata)
-    # gene_ds = GeneExpressionDataset()
-    # tumor_types = adata.obs.subtype
-    # gene_ds.populate_from_data(X=adata.X,
-    #                            gene_names=np.array(adata.var.index),
-    #                            batch_indices=pd.factorize(tumor_types)[0],
-    #                            remap_attributes=False)
-    # gene_ds.subsample_genes(784)
-    #
-    # adata = adata[:, gene_ds.gene_names]
-    # # batches are going to be built off of adata.obs.subtype
-    # adata = set_adata_train_test_batches(adata, test=args.test_patient, train=args.train_patient)
-    # adata.X = adata.X.toarray()
-    # train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
     train_loader, test_loader = load_TIC_diva_datasets(args.test_patient, args.train_patient)
     train_loader, validation_loader = get_validation_from_training(train_loader)
 
@@ -287,8 +268,8 @@ if __name__ == "__main__":
     # Empty data loader dict763gv
     data_loaders = {}
     # No shuffling here
-    data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=False)
-    data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=False)
+    data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=True)
+    data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=True)
     data_loaders['valid'] = data_utils.DataLoader(validation_loader, batch_size=args.batch_size, shuffle=False)
 
     # how often would a supervised batch be encountered during inference
@@ -401,39 +382,7 @@ if __name__ == "__main__":
     print(get_accuracy(data_loaders['valid'], model, device))
 
     print("accuracy for test set:")
-    print(get_accuracy(data_loaders['test'], model, device, model_name))
-    # predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
-    # with torch.no_grad():
-    #     # use the right data loader
-    #     for (xs, ys, ds) in data_loaders['unsup']:
-    #         # To device
-    #         xs, ys, ds = xs.to(device), ys.to(device), ds.to(device)
-    #         # use classification function to compute all predictions for each batch
-    #         pred_d, pred_y = classifier_fn(xs)
-    #         predictions_d.append(pred_d)
-    #         actuals_d.append(ds)
-    #         predictions_y.append(pred_y)
-    #         actuals_y.append(ys)
-    # num_batches = len(data_loaders['unsup'].dataset[0][2])
-    # accurate_preds_d = 0
-    # for pred, act in zip(predictions_d, actuals_d):
-    #     for i in range(pred.size(0)):
-    #         v = torch.sum(pred[i] == act[i])
-    #         accurate_preds_d += (v.item() == num_batches)
-    # # calculate the accuracy between 0 and 1
-    # accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
-    # print(f"d accuracy:{accuracy_d}")
-    # labels_d = torch.cat(actuals_d).cpu().numpy()
-    # labels_y = torch.cat(actuals_y).cpu().numpy()
-    # # a = torch.cat(predictions_y).cpu().numpy()
-    # # preds_y = [np.argmax(i) for i in a]
-    # # a = pd.DataFrame(preds_y)
-    # # a.to_csv(f"{model_name}_label_preds.csv")
-    #
-    # # b = torch.cat(predictions_d).cpu().numpy()
-    # # preds_d = [np.argmax(i) for i in b]
-    # # b = pd.DataFrame(preds_d)
-    # # b.to_csv(f"{model_name}_batch_preds.csv")
+    print(get_accuracy(data_loaders['unsup'], model, device, fig_name))
 
     empty_zx = False
     # trying to plot training data
