@@ -387,7 +387,7 @@ if __name__ == "__main__":
     print(get_accuracy(data_loaders['valid'], model, device))
 
     print("accuracy for test set:")
-    print(get_accuracy(data_loaders['unsup'], model, device, model_name))
+    print(get_accuracy(data_loaders['unsup'], model, device, fig_name))
 
     empty_zx = False
     # trying to plot training data
