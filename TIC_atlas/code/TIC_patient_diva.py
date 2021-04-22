@@ -399,29 +399,31 @@ if __name__ == "__main__":
     print(get_accuracy(data_loaders['sup'], model, device))
 
     print("accuracy for test set:")
-    predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
-    with torch.no_grad():
-        # use the right data loader
-        for (xs, ys, ds) in data_loaders['unsup']:
-            # To device
-            xs, ys, ds = xs.to(device), ys.to(device), ds.to(device)
-            # use classification function to compute all predictions for each batch
-            pred_d, pred_y = classifier_fn(xs)
-            predictions_d.append(pred_d)
-            actuals_d.append(ds)
-            predictions_y.append(pred_y)
-            actuals_y.append(ys)
-    num_batches = len(data_loaders['unsup'].dataset[0][2])
-    accurate_preds_d = 0
-    for pred, act in zip(predictions_d, actuals_d):
-        for i in range(pred.size(0)):
-            v = torch.sum(pred[i] == act[i])
-            accurate_preds_d += (v.item() == num_batches)
-    # calculate the accuracy between 0 and 1
-    accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
-    print(f"d accuracy:{accuracy_d}")
-    labels_d = torch.cat(actuals_d).cpu().numpy()
-    labels_y = torch.cat(actuals_y).cpu().numpy()
+    print(get_accuracy(data_loaders['unsup'], model, device))
+    # this line above replaces all the commented line below?
+    # predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
+    # with torch.no_grad():
+    #     # use the right data loader
+    #     for (xs, ys, ds) in data_loaders['unsup']:
+    #         # To device
+    #         xs, ys, ds = xs.to(device), ys.to(device), ds.to(device)
+    #         # use classification function to compute all predictions for each batch
+    #         pred_d, pred_y = classifier_fn(xs)
+    #         predictions_d.append(pred_d)
+    #         actuals_d.append(ds)
+    #         predictions_y.append(pred_y)
+    #         actuals_y.append(ys)
+    # num_batches = len(data_loaders['unsup'].dataset[0][2])
+    # accurate_preds_d = 0
+    # for pred, act in zip(predictions_d, actuals_d):
+    #     for i in range(pred.size(0)):
+    #         v = torch.sum(pred[i] == act[i])
+    #         accurate_preds_d += (v.item() == num_batches)
+    # # calculate the accuracy between 0 and 1
+    # accuracy_d = (accurate_preds_d * 1.0) / len(data_loaders['unsup'].dataset)
+    # print(f"d accuracy:{accuracy_d}")
+    # labels_d = torch.cat(actuals_d).cpu().numpy()
+    # labels_y = torch.cat(actuals_y).cpu().numpy()
     # a = torch.cat(predictions_y).cpu().numpy()
     # preds_y = [np.argmax(i) for i in a]
     # a = pd.DataFrame(preds_y)
@@ -538,6 +540,7 @@ if __name__ == "__main__":
     full_zd = train_batch_encoding.concatenate(test_batch_encoding)
     all_patients = np.hstack([train_labels, test_labels])
     full_zy.obs['batch'] = all_patients
+    full_zd.obs['batch'] = all_patients
     sc.pp.neighbors(full_zy, n_neighbors=15)
     sc.pp.neighbors(full_zd, n_neighbors=15)
     sc.tl.umap(full_zy, min_dist=.3)
