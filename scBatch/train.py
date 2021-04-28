@@ -1,22 +1,40 @@
 """
 Contains functions for training diva
 """
-
+import time
+import numpy as np
+import pandas as pd
+import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
+import torch.optim as optim
 
-def train(data_loaders, model, optimizer, periodic_interval_batches, epoch):
-    model.train()
+
+def train(data_loaders, model, optimizer, device):
     """
     runs the inference algorithm for an epoch
     returns the values of all losses separately on supervised and unsupervised parts
+
+    Parameters
+    ----------
+    data_loaders
+    model
+    optimizer
+    periodic_interval_batches
+    device
+
+    Returns
+    -------
+
     """
+    model.train()
 
     # compute number of batches for an epoch
     sup_batches = len(data_loaders["sup"])
     unsup_batches = len(data_loaders["unsup"])
     batches_per_epoch = sup_batches + unsup_batches
+    periodic_interval_batches = int(np.around(sup_batches / unsup_batches))
 
     # initialize variables to store loss values
     epoch_losses_sup = 0
@@ -90,6 +108,7 @@ def get_accuracy(data_loader, model, device, save=None):
 
     Returns
     -------
+    sup d accuracy, y accuracy, weighted y accuracy
 
     """
     model.eval()
@@ -149,3 +168,75 @@ def get_accuracy(data_loader, model, device, save=None):
             save_name = f"./cm_figs/cm_{save}.png"
             plt.savefig(save_name)
         return accuracy_d, accuracy_y, accuracy_y_weighted
+
+
+def epoch_procedure(model_name, args, model, data_loaders, device):
+    # init
+    best_loss = 1000.
+    best_y_acc = 0.
+
+    early_stopping_counter = 1
+    max_early_stopping = 100
+    t0 = time.time()
+    lr = args.lr
+
+    sup_num = len(data_loaders['sup'])
+    unsup_num = len(data_loaders['unsup'])
+
+    print('\nStart training:', args)
+    torch.save(args, model_name + '.config')
+    for epoch in range(1, args.epochs + 1):
+
+        beta = min([args.max_beta, args.max_beta * (epoch * 1.) / args.warmup])
+        model.beta_d = beta
+        model.beta_y = beta
+        model.beta_x = beta
+
+        # train
+        if epoch > 100:
+            lr = .97 * lr
+            optimizer = optim.Adam(model.parameters(), lr=lr)
+        epoch_losses_sup, epoch_losses_unsup, epoch_class_y_loss = train(data_loaders,
+                                                                         model,
+                                                                         optimizer,
+                                                                         epoch)
+
+        # compute average epoch losses i.e. losses per example
+        avg_epoch_losses_sup = epoch_losses_sup / sup_num
+        avg_epoch_losses_unsup = epoch_losses_unsup / unsup_num
+        avg_epoch_class_y_loss = epoch_class_y_loss / sup_num
+
+        # store the loss and validation/testing accuracies in the logfile
+        print(f"{epoch} epoch: avg losses {avg_epoch_losses_sup} {avg_epoch_losses_unsup}, class y loss {avg_epoch_class_y_loss}")
+
+        # looking at new losses and accuracies on the validation set:
+        valid_accur_d, valid_accur_y, valid_accur_y_weighted = get_accuracy(data_loaders["valid"], model, device)
+        print(f" Valid accuracy d {valid_accur_d}\tValid accuracy y: {valid_accur_y}\tValid accuracy y weighted {valid_accur_y_weighted}")
+
+        if valid_accur_y > best_y_acc:
+            early_stopping_counter = 1
+
+            best_y_acc = valid_accur_y
+            best_loss = avg_epoch_class_y_loss
+            print(f"Saving Model, epoch: {epoch}")
+            torch.save(model, model_name + '.model')
+
+        elif valid_accur_y == best_y_acc:
+            if avg_epoch_class_y_loss < best_loss:
+                early_stopping_counter = 1
+                best_loss = avg_epoch_class_y_loss
+                torch.save(model, model_name + '.model')
+
+            else:
+                early_stopping_counter += 1
+                if early_stopping_counter == max_early_stopping:
+                    print(f"Early Stopping reached max counter: {max_early_stopping}")
+                    break
+
+        else:
+            early_stopping_counter += 1
+            if early_stopping_counter == max_early_stopping:
+                print(f"Early Stopping reached max counter: {max_early_stopping}")
+                break
+        print(f"time passed: {(time.time() - t0)/60} mins")
+    print("Completed Training")
