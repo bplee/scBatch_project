@@ -37,12 +37,20 @@ class DIVAModel:
         print(f" loading model from args: {self.args}")
         self.model = model.DIVA(self.args)
 
-    def set_model_arg(self, arg, value):
-        if self.args.arg is not None:
-            print(f" changing {arg} from {self.args.arg} to {value}")
-            self.args.arg = value
-        else:
-            print(f" {arg} does not exist. No changes.")
+    # def set_model_arg(self, arg, value):
+    #     if self.args.arg is not None:
+    #         print(f" changing {arg} from {self.args.arg} to {value}")
+    #         self.args.arg = value
+    #     else:
+    #         print(f" {arg} does not exist. No changes.")
+
+    def set_model_d_dim(self, value):
+        print(f" changing d_dim from {self.args.d_dim} to {value}")
+        self.args.d_dim = value
+
+    def set_model_y_dim(self, value):
+        print(f" changing y_dim from {self.args.y_dim} to {value}")
+        self.args.y_dim = value
 
     def set_model_name(self, name):
         self.model_name = name
@@ -97,8 +105,8 @@ class DIVAModel:
 
         num_labels = len(train_loader[0][1])
         num_domains = len(train_loader[0][2])
-        self.set_model_arg("d_dim", num_domains)
-        self.set_model_arg("y_dim", num_labels)
+        self.set_model_d_dim(num_domains)
+        self.set_model_y_dim(num_labels)
         self.load_model_from_args()
 
         train.epoch_procedure(self.model_name, self.args, self.model, data_loaders, device)
