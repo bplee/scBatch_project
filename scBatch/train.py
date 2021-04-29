@@ -172,6 +172,7 @@ def get_accuracy(data_loader, model, device, save=None):
 
 def epoch_procedure(model_name, args, model, data_loaders, device):
     # init
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
     best_loss = 1000.
     best_y_acc = 0.
 
