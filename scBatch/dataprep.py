@@ -51,15 +51,14 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
     if 'log1p' not in adata.uns:
         print("Looks you haven't taken the log of the data, doing it for you")
         sc.pp.log1p(adata)
+
     train_inds = adata.obs.batch == "0"
     test_inds = ~train_inds
     n_train = sum(train_inds)
     n_test = sum(test_inds)
-
     data = adata.X
     patients, patient_map = pd.factorize(adata.obs[domain_name])
     labels, label_map = pd.factorize(adata.obs[label_name])
-
     data_train = data[train_inds,:]
     data_test = data[test_inds,:]
     labels_train = labels[train_inds]
