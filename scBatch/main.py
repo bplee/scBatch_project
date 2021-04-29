@@ -10,21 +10,53 @@ import torch.utils.data as data_utils
 
 class DIVAModel:
     def __init__(self, args=None):
-        self.model = model.DIVA(args=args)
-        self.args = self.args
 
-    def adata_to_diva_loader(self, adata):
+        if args is None:
+            from args import default_args
+            self.args = default_args
+        else:
+            # allow user to input their own args file
+            self.args = args
+
+        self.model = None
+        self.train_loader, self.test_loader, self.valid_loader = None, None, None
+
+    def set_data_loaders(self, train, valid, test):
+        self.train_loader = train
+        self.valid_loader = valid
+        self.test_loader = test
+
+    def create_model_from_args(self):
+        self.model = model.DIVA(self.args)
+
+    def create_model_from_config(self, config_filepath):
+        # TODO
+        pass
+
+    def load_model_from_args(self):
+        print(f" loading model from args: {self.args}")
+        self.model = model.DIVA(self.args)
+
+    def set_model_arg(self, arg, value):
+        if self.args.arg is not None:
+            print(f" changing {arg} from {self.args.arg} to {value}")
+            self.args.arg = value
+        else:
+            print(f" {arg} does not exist. No changes.")
+
+    def set_model_name(self, name):
+        self.model_name = name
+
+    @staticmethod
+    def adata_to_diva_loaders(adata):
         train_loader, test_loader = dataprep.get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuffle=True)
         new_train_loader, validation_loader = dataprep.get_validation_from_training(train_loader)
-        self.train_loader = new_train_loader
-        self.test_loader = test_loader
-        self.valid_loader = validation_loader
 
         return new_train_loader, validation_loader, test_loader
 
-    @staticmethod
-    def fit(self, model, adata, epochs=200):
-        train_loader, validation_loader, test_loader = DIVAModel.adata_to_diva_loader(adata)
+    def fit(self, adata, epochs=200, model_name=None):
+        train_loader, validation_loader, test_loader = DIVAModel.adata_to_diva_loaders(adata)
+        self.set_data_loaders(train_loader, validation_loader, test_loader)
 
         self.args.cuda = not self.args.no_cuda and torch.cuda.is_available()
         device = torch.device("cuda" if self.args.cuda else "cpu")
@@ -32,10 +64,14 @@ class DIVAModel:
 
         # Model name
         print(self.args.outpath)
-        # TODO change the name stuff, put it in as an arg or something
-        model_name = f"{self.args.outpath}210317_rcc_to_crc_no_conv_semi_sup_seed_{self.args.seed}"
-        fig_name = f"210317_rcc_to_crc_no_conv_semi_sup_seed_{self.args.seed}"
+        if model_name is None:
+            model_name = f"{self.args.outpath}DIVAModel_seed_{self.args.seed}"
+            fig_name = f"DIVAModel_seed_{self.args.seed}"
+        else:
+            model_name = f"{self.args.outpath}{model_name}_seed_{self.args.seed}"
+            fig_name = f"{model_name}_seed_{self.args.seed}"
         print(model_name)
+        self.set_model_name(model_name)
 
         # Set seed
         torch.manual_seed(self.args.seed)
@@ -56,10 +92,16 @@ class DIVAModel:
         data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=self.args.batch_size, shuffle=True)
         data_loaders['valid'] = data_utils.DataLoader(validation_loader, batch_size=self.args.batch_size, shuffle=False)
 
-        train.epoch_procedure(epochs, self.args, model, data_loaders)
+        cell_types = test_loader.cell_types
+        patients = test_loader.patients
 
+        num_labels = len(train_loader[0][1])
+        num_domains = len(train_loader[0][2])
+        self.set_model_arg("d_dim", num_domains)
+        self.set_model_arg("y_dim", num_labels)
+        self.load_model_from_args()
 
-        pass
+        train.epoch_procedure(self.model_name, self.args, self.model, data_loaders, device)
 
     def transform(self, y):
         pass
