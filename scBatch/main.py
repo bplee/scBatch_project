@@ -109,7 +109,7 @@ class DIVAModel:
 
         num_labels = len(train_loader[0][1])
         num_domains = len(train_loader[0][2])
-        num_dims = len(train_loader[0][2])
+        num_dims = train_loader[0][0].shape[1]
         self.set_model_d_dim(num_domains)
         self.set_model_y_dim(num_labels)
         self.set_model_x_dim(num_dims)
