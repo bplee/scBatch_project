@@ -5,6 +5,7 @@ import model
 import dataprep
 import train
 import torch
+import visualization
 import numpy as np
 import torch.utils.data as data_utils
 
@@ -104,8 +105,8 @@ class DIVAModel:
         data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=self.args.batch_size, shuffle=True)
         data_loaders['valid'] = data_utils.DataLoader(validation_loader, batch_size=self.args.batch_size, shuffle=False)
 
-        cell_types = test_loader.cell_types
-        patients = test_loader.patients
+        cell_types = test_loader.labels
+        patients = test_loader.domains
 
         num_labels = len(train_loader[0][1])
         num_domains = len(train_loader[0][2])
@@ -116,6 +117,15 @@ class DIVAModel:
         self.load_model_from_args()
 
         train.epoch_procedure(self.model_name, self.args, self.model, data_loaders, device)
+
+        print("Training Accuracy")
+        print(train.get_accuracy(data_loaders['sup'], self.model, device))
+        print("Validation Accuracy")
+        print(train.get_accuracy(data_loaders['valid'], self.model, device))
+        print("Testing Accuracy")
+        print(train.get_accuracy(data_loaders['unsup'], self.model, device))
+
+        visualization.plot_embedings(self.model, data_loaders, device, self.model_name)
 
     def transform(self, y):
         pass
