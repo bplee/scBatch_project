@@ -200,7 +200,7 @@ def epoch_procedure(model_name, args, model, data_loaders, device):
         epoch_losses_sup, epoch_losses_unsup, epoch_class_y_loss = train(data_loaders,
                                                                          model,
                                                                          optimizer,
-                                                                         epoch)
+                                                                         device)
 
         # compute average epoch losses i.e. losses per example
         avg_epoch_losses_sup = epoch_losses_sup / sup_num
