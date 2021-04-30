@@ -52,6 +52,10 @@ class DIVAModel:
         print(f" changing y_dim from {self.args.y_dim} to {value}")
         self.args.y_dim = value
 
+    def set_model_x_dim(self, value):
+        print(f" changing x_dim from {self.args.x_dim} to {value}")
+        self.args.x_dim = value
+
     def set_model_name(self, name):
         self.model_name = name
 
@@ -105,8 +109,10 @@ class DIVAModel:
 
         num_labels = len(train_loader[0][1])
         num_domains = len(train_loader[0][2])
+        num_dims = len(train_loader[0][2])
         self.set_model_d_dim(num_domains)
         self.set_model_y_dim(num_labels)
+        self.set_model_x_dim(num_dims)
         self.load_model_from_args()
 
         train.epoch_procedure(self.model_name, self.args, self.model, data_loaders, device)
