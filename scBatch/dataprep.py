@@ -112,8 +112,11 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
     train_data_loader.train_data, test_data_loader.test_data        = data_train.unsqueeze(1), data_test.unsqueeze(1)
     train_data_loader.train_labels, test_data_loader.test_labels    = labels_train, labels_test
     train_data_loader.train_domain, test_data_loader.test_domain    = batch_train, batch_test
-    train_data_loader.cell_types, test_data_loader.cell_types       = label_map, label_map
-    train_data_loader.patients, test_data_loader.patients           = patient_map, patient_map
+    # train_data_loader.cell_types, test_data_loader.cell_types       = label_map, label_map
+    # train_data_loader.patients, test_data_loader.patients           = patient_map, patient_map
+
+    train_data_loader.labels, test_data_loader.labels       = label_map, label_map
+    train_data_loader.domains, test_data_loader.domains           = patient_map, patient_map
 
     return train_data_loader, test_data_loader
 
@@ -147,12 +150,14 @@ def get_validation_from_training(train_loader_obj, percentage_validation=.1):
     validation_loader.train_data = valid_data
     validation_loader.train_labels = valid_labels
     validation_loader.train_domain = valid_domain
-    validation_loader.cell_types = train_loader_obj.cell_types
+    validation_loader.labels = train_loader_obj.labels
+    validation_loader.domains = train_loader_obj.domains
 
     new_train_loader.train_data = new_train_data
     new_train_loader.train_labels = new_train_labels
     new_train_loader.train_domain = new_train_domain
-    new_train_loader.cell_types = train_loader_obj.cell_types
+    new_train_loader.labels = train_loader_obj.labels
+    new_train_loader.domains = train_loader_obj.domains
 
     return new_train_loader, validation_loader
 

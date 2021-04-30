@@ -212,7 +212,7 @@ def epoch_procedure(model_name, args, model, data_loaders, device):
 
         # looking at new losses and accuracies on the validation set:
         valid_accur_d, valid_accur_y, valid_accur_y_weighted = get_accuracy(data_loaders["valid"], model, device)
-        print(f" Valid accuracy d {valid_accur_d}\tValid accuracy y: {valid_accur_y}\tValid accuracy y weighted {valid_accur_y_weighted}")
+        print(f" Valid accuracy y: {valid_accur_y}\tValid accuracy y weighted {valid_accur_y_weighted}\tValid accuracy d {valid_accur_d}\t")
 
         if valid_accur_y > best_y_acc:
             early_stopping_counter = 1
