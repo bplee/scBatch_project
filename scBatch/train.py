@@ -115,7 +115,7 @@ def get_accuracy(data_loader, model, device, save=None):
     classifier_fn = model.classifier
     n_labels = len(data_loader.dataset[0][1])
     n_batches = len(data_loader.dataset[0][2])
-    cell_types = data_loader.dataset.cell_types
+    cell_types = data_loader.dataset.labels
 
     predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
     with torch.no_grad():
