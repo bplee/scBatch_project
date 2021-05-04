@@ -217,7 +217,7 @@ if __name__ == "__main__":
                         help='size of latent space 2')
     parser.add_argument('--zy-dim', type=int, default=64,
                         help='size of latent space 3')
-    parser.add_argument('--encoding-dim', type=int, default=1024,
+    parser.add_argument('--encoding-dim', type=int, default=512,
                         help='dimension encoding layers work down to')
 
     # Aux multipliers
@@ -280,7 +280,6 @@ if __name__ == "__main__":
     # train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
     train_loader, test_loader = load_patient_TIC_diva_datasets(args.test_patient, args.train_patient)
 
-    from scBatch.dataprep import get_validation_from_training
     train_loader, valid_loader = get_validation_from_training(train_loader)
 
     cell_types = test_loader.cell_types

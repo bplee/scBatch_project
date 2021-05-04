@@ -140,11 +140,13 @@ def get_validation_from_training(train_loader_obj, percentage_validation=.1):
     validation_loader.train_labels = valid_labels
     validation_loader.train_domain = valid_domain
     validation_loader.cell_types = train_loader_obj.cell_types
+    validation_loader.patients = train_loader_obj.patients
 
     new_train_loader.train_data = new_train_data
     new_train_loader.train_labels = new_train_labels
     new_train_loader.train_domain = new_train_domain
     new_train_loader.cell_types = train_loader_obj.cell_types
+    new_train_loader.patients = train_loader_obj.patients
 
     return new_train_loader, validation_loader
 
