@@ -280,6 +280,9 @@ if __name__ == "__main__":
     # train_loader, test_loader = get_diva_loaders(adata, domain_name="subtype", label_name="cell_type")
     train_loader, test_loader = load_patient_TIC_diva_datasets(args.test_patient, args.train_patient)
 
+    from scBatch.dataprep import get_validation_from_training
+    train_loader, valid_loader = get_validation_from_training(train_loader)
+
     cell_types = test_loader.cell_types
     patients = test_loader.patients
 
@@ -288,6 +291,7 @@ if __name__ == "__main__":
     # No shuffling here
     data_loaders['sup'] = data_utils.DataLoader(train_loader, batch_size=args.batch_size, shuffle=False)
     data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=args.batch_size, shuffle=False)
+    data_loaders['valid'] = data_utils.DataLoader(valid_loader, batch_size=args.batch_size, shuffle=False)
 
     # how often would a supervised batch be encountered during inference
     sup_batches = len(data_loaders["sup"])
@@ -354,10 +358,8 @@ if __name__ == "__main__":
         str_print += ", class y loss {}".format(avg_epoch_class_y_loss)
 
         # str_print = str(epoch)
-        sup_accuracy_d, sup_accuracy_y, sup_accuracy_y_weighted = get_accuracy(data_loaders["sup"], model, device)
-        str_print += " sup accuracy d {}".format(sup_accuracy_d)
-        str_print += ", y {}".format(sup_accuracy_y)
-        str_print += ", y_weighted {}".format(sup_accuracy_y_weighted)
+        sup_accuracy_d, sup_accuracy_y, sup_accuracy_y_weighted = get_accuracy(data_loaders["valid"], model, device)
+        str_print = f" validation accuracy d {sup_accuracy_d}, y {sup_accuracy_y}, y_weighted {sup_accuracy_y_weighted}"
 
         print(str_print)
 
@@ -393,13 +395,15 @@ if __name__ == "__main__":
 
     print(f"Done training testing some predicions")
 
-    classifier_fn = model.classifier
-
     print(f"accuracy for training set:")
     print(get_accuracy(data_loaders['sup'], model, device))
 
+    print(f"accuracy for validation set:")
+    print(get_accuracy(data_loaders['valid'], model, device))
+
     print("accuracy for test set:")
-    print(get_accuracy(data_loaders['unsup'], model, device))
+    print(get_accuracy(data_loaders['unsup'], model, device, fig_name))
+
     # this line above replaces all the commented line below?
     # predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
     # with torch.no_grad():
