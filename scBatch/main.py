@@ -1,11 +1,18 @@
 """
 Main class for trianing a DIVA model, stores the model runs training, testing, creation of figs
 """
-import model
+# import model
 import dataprep
 import train
 import torch
 import visualization
+
+from model_2layers import *
+# from dataprep import *
+# from train import *
+# from torch import *
+# from visualization import *
+
 import numpy as np
 import torch.utils.data as data_utils
 
@@ -28,7 +35,7 @@ class DIVAModel:
         self.test_loader = test
 
     def create_model_from_args(self):
-        self.model = model.DIVA(self.args)
+        self.model = DIVA(self.args)
 
     def create_model_from_config(self, config_filepath):
         # TODO
@@ -36,7 +43,7 @@ class DIVAModel:
 
     def load_model_from_args(self):
         print(f" loading model from args: {self.args}")
-        self.model = model.DIVA(self.args)
+        self.model = DIVA(self.args)
 
     # def set_model_arg(self, arg, value):
     #     if self.args.arg is not None:
@@ -70,7 +77,9 @@ class DIVAModel:
     def fit(self, adata, epochs=200, model_name=None):
         train_loader, validation_loader, test_loader = DIVAModel.adata_to_diva_loaders(adata)
         self.set_data_loaders(train_loader, validation_loader, test_loader)
-
+    #     self._fit_diva_loaders(train_loader, validation_loader, epochs, model_name)
+    #
+    # def _fit_diva_loaders(self, train_loader, validation_loader, epochs=200, model_name=None):
         self.args.cuda = not self.args.no_cuda and torch.cuda.is_available()
         device = torch.device("cuda" if self.args.cuda else "cpu")
         kwargs = {'num_workers': 1, 'pin_memory': False} if self.args.cuda else {}
