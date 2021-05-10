@@ -94,8 +94,8 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = f"{args.outpath}210329_TIC_no_conv_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
-    fig_name = f"210329_TIC_no_conv_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
+    model_name = f"{args.outpath}210510_diva_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
+    fig_name = f"210510_diva_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
     print(model_name)
 
     # Choose training domains
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = False
     np.random.seed(args.seed)
 
-    rcc_obj = PdRccAllData(labels_to_remove=["Ambiguous", "Megakaryocyte", "TAM/TCR (Ambiguos)", "CD45- ccRCC CA9+"])
+    rcc_obj = PdRccAllData(labels_to_remove=["Ambiguous", "Megakaryocyte", "TAM/TCR (Ambiguos)",])
     rcc_patient = rcc_obj.data.patient
     rcc_cell_type = rcc_obj.data.cell_type
     rcc_raw_counts = rcc_obj.data.drop(["cell_type", "patient"], axis=1)
@@ -121,18 +121,18 @@ if __name__ == "__main__":
     rcc_adata.obs['patient'] = rcc_obj.data.patient
     del rcc_raw_counts
     gene_ds = GeneExpressionDataset()
-    tumor_types = rcc_adata.obs.subtype
+    pats = rcc_adata.obs.patient
     gene_ds.populate_from_data(X=rcc_adata.X,
                                gene_names=np.array(rcc_adata.var.index),
-                               batch_indices=pd.factorize(tumor_types)[0],
+                               batch_indices=pd.factorize(pats)[0],
                                remap_attributes=False)
     gene_ds.subsample_genes(784)
 
     rcc_adata = rcc_adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
-    rcc_adata = set_adata_train_test_batches(rcc_adata, test=args.test_patient, train=args.train_patient, domain_name="domain")
+    rcc_adata = set_adata_train_test_batches(rcc_adata, test=args.test_patient, train=args.train_patient, domain_name="patient")
 
     adata = rcc_adata
 
     diva_obj = DIVAModel(args)
-    diva_obj.fit(adata, model_name="210510_scBatch_test_model")
+    diva_obj.fit(adata, model_name=f"210510_scBatch_RCC_test_pat_{args.test_patient}")
