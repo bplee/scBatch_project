@@ -1,6 +1,7 @@
 """
-DIVA model architecture
+DIVA model architecture for 2 layers
 """
+print("Loaded 2layer DIVA encoding model")
 
 import torch
 import torch.nn as nn
@@ -47,7 +48,7 @@ class qzx(nn.Module):
 
         self.encoder = nn.Sequential(
             nn.Linear(x_dim, encoding_dim), nn.ReLU(),
-            nn.Linear(x_dim, 384), nn.ReLU()
+            nn.Linear(encoding_dim, 384), nn.ReLU()
         )
 
         self.fc11 = nn.Sequential(nn.Linear(384, zx_dim))
