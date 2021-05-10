@@ -34,7 +34,7 @@ class qzd(nn.Module):
 
     def forward(self, x):
         h = self.encoder(x)
-        h = h.view(-1, self.encoding_dim)
+        h = h.view(-1, 384)
         zd_loc = self.fc11(h)
         zd_scale = self.fc12(h) + 1e-7
 
@@ -62,7 +62,7 @@ class qzx(nn.Module):
 
     def forward(self, x):
         h = self.encoder(x)
-        h = h.view(-1, self.encoding_dim)
+        h = h.view(-1, 384)
         zx_loc = self.fc11(h)
         zx_scale = self.fc12(h) + 1e-7
 
@@ -100,8 +100,9 @@ class px(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim, encoding_dim):
         super(px, self).__init__()
 
-        self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, encoding_dim, bias=False), nn.ReLU())
-        self.fc2 = nn.Sequential(nn.Linear(encoding_dim, x_dim, bias=False), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, 384, bias=False), nn.ReLU())
+        self.fc2 = nn.Sequential(nn.Linear(384, encoding_dim, bias=False), nn.ReLU())
+        self.fc3 = nn.Sequential(nn.Linear(encoding_dim, x_dim, bias=False), nn.ReLU())
 
         torch.nn.init.xavier_uniform_(self.fc1[0].weight)
 
@@ -113,7 +114,7 @@ class px(nn.Module):
             zdzxzy = torch.cat((zd, zx, zy), dim=-1)
         h = self.fc1(zdzxzy)
         h = self.fc2(h)
-
+        h = self.fc3(h)
         return h
 
 
