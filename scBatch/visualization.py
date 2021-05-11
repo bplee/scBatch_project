@@ -11,7 +11,7 @@ import pandas as pd
 import anndata
 
 
-def plot_embedings(model, data_loaders, device, fig_name):
+def plot_embeddings(model, data_loaders, device, fig_name):
     empty_zx = False
     patients = data_loaders['sup'].dataset.domains
     cell_types = data_loaders['sup'].dataset.labels

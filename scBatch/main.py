@@ -21,7 +21,7 @@ class DIVAModel:
 
         if args is None:
             from args import default_args
-            self.args = default_args
+            self.set_args(default_args)
         else:
             # allow user to input their own args file
             self.args = args
@@ -34,8 +34,11 @@ class DIVAModel:
         self.valid_loader = valid
         self.test_loader = test
 
+    def set_args(self, args):
+        self.args = args
+
     def create_model_from_args(self):
-        self.model = DIVA(self.args)
+        self.set_model(DIVA(self.args))
 
     def create_model_from_config(self, config_filepath):
         # TODO
@@ -67,6 +70,19 @@ class DIVAModel:
     def set_model_name(self, name):
         self.model_name = name
 
+    def set_fig_name(self, str):
+        self.fig_name = str
+
+    def set_model(self, model):
+        self.model = model
+
+    def load_model_from_file(self, name):
+        args = torch.load(name + ".config")
+        model = torch.load(name + ".model")
+        self.set_model(model)
+        self.set_args(args)
+        self.set_model_name(name)
+
     @staticmethod
     def adata_to_diva_loaders(adata):
         train_loader, test_loader = dataprep.get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuffle=True)
@@ -94,6 +110,7 @@ class DIVAModel:
             fig_name = f"{model_name}_seed_{self.args.seed}"
         print(model_name)
         self.set_model_name(model_name)
+        self.set_fig_name(fig_name)
 
         # Set seed
         torch.manual_seed(self.args.seed)
@@ -134,7 +151,7 @@ class DIVAModel:
         print("Testing Accuracy")
         print(train.get_accuracy(data_loaders['unsup'], self.model, device))
 
-        visualization.plot_embedings(self.model, data_loaders, device, self.model_name)
+        visualization.plot_embedings(self.model, data_loaders, device, self.fig_name)
 
     def transform(self, y):
         pass
