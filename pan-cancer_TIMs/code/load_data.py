@@ -27,6 +27,7 @@ def get_valid_datasets(dir_path):
         curr = lst.pop()
         if os.path.exists(dir_path+curr+"_metadata.csv") and os.path.exists(dir_path+curr+"_metadata.csv"):
             rtn.append(curr)
+            lst.remove(curr)
     return rtn
 
 
@@ -42,6 +43,7 @@ def load_data(data_dir):
     print(f" found {len(datasets)} datasets in {data_dir}")
     for name in get_valid_datasets(data_dir):
         rtn.append(read_dataset(os.path.join(data_dir, name)))
+        print(f" added {name} dataset")
     return rtn
 
 if __name__ == "__main__":
