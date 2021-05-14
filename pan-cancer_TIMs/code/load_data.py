@@ -36,8 +36,13 @@ def suffix(word, suf):
     return False
 
 
-def load_data():
+def load_data(data_dir):
     rtn = []
+    datasets = get_valid_datasets(data_dir)
+    print(f" found {len(datasets)} datasets in {data_dir}")
     for name in get_valid_datasets(data_dir):
-        rtn.append(read_dataset(name))
+        rtn.append(read_dataset(os.path.join(data_dir, name)))
     return rtn
+
+if __name__ == "__main__":
+    data = load_data(data_dir)
