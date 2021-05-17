@@ -4,6 +4,7 @@ import os
 import anndata
 
 data_dir = "../data/"
+TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch/pan-cancer_TIMs/quickload_data/TIMs_all_data.h5ad"
 
 
 def read_dataset(name):
@@ -47,10 +48,9 @@ def load_data(data_dir):
     return rtn
 
 
-def quick_load(filepath):
+def quick_load(filepath=TIM_DATA_FILEPATH):
     return anndata.read_h5ad(filepath)
 
 if __name__ == "__main__":
-    TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch/pan-cancer_TIMs/quickload_data/TIMs_all_data.h5ad"
     data = quick_load(TIM_DATA_FILEPATH)
     print(f" loaded all TIM data into anndata obj named: `data`")
