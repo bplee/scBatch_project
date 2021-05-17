@@ -51,6 +51,6 @@ def quick_load(filepath):
     return anndata.read_h5ad(filepath)
 
 if __name__ == "__main__":
-    TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch/pan-cancer_TIMs/code"
+    TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch/pan-cancer_TIMs/quickload_data/TIMs_all_data.h5ad"
     data = quick_load(TIM_DATA_FILEPATH)
     print(f" loaded all TIM data into anndata obj named: `data`")
