@@ -162,3 +162,48 @@ def get_validation_from_training(train_loader_obj, percentage_validation=.1):
     return new_train_loader, validation_loader
 
 
+def set_adata_train_test_batches(adata, test, train=None, domain_name="patient"):
+    """
+    Gives back adata with training ("0") and test ("1") labels specified in adata.obs.batch
+
+    Parameters
+    ----------
+    adata : anndata.AnnData
+    test : list or int
+        contains integers corresponding to which labels are going to be test domains
+    train : list or int (default: None)
+        contains integers corresponding to which labels are going to be train_domains
+    domain_name: str (default: "subtype")
+        name of adata.obs column that contains information that you want to use to stratify domains
+
+    Returns
+    -------
+    anndata.AnnData
+        with added adata.obs.batch column with "0" for training data and "1" for test data
+
+    """
+    print(f" Setting training domain: {train}")
+    print(f" Setting testing domain: {test}")
+    # creating the column
+    adata.obs['batch'] = "0"
+
+    # getting the ints:
+    domains, domain_map = pd.factorize(adata.obs[domain_name])
+
+    # make sure the type of test and train are lists:
+    test = wrap(test)
+    # mark all test data
+    test_inds = np.isin(domains, test)
+    adata.obs.batch[test_inds] = "1"
+
+    if train is None:
+        print(f"Test labels: {[domain_map[i] for i in test]}")
+        print(f"Train labels: None")
+        return adata
+    else:
+        train = wrap(train)
+        train_inds = np.isin(domains, train)
+        adata = adata[(train_inds | test_inds),:]
+        print(f"Test domains: {[domain_map[i] for i in test]}")
+        print(f"Train domains: {[domain_map[i] for i in train]}")
+        return adata
