@@ -1,17 +1,15 @@
 """
 Main class for trianing a DIVA model, stores the model runs training, testing, creation of figs
 """
-# import model
-import dataprep
-import train
 import torch
-import visualization
 
-from model_2layers import *
-# from dataprep import *
-# from train import *
-# from torch import *
-# from visualization import *
+# importing package contents
+from . import dataprep
+from . import train
+from . import visualization
+# from . import model
+
+from .model_2layers import DIVA
 
 import numpy as np
 import torch.utils.data as data_utils
