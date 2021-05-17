@@ -46,5 +46,11 @@ def load_data(data_dir):
         print(f" added {name} dataset")
     return rtn
 
+
+def quick_load(filepath):
+    return anndata.read_h5ad(filepath)
+
 if __name__ == "__main__":
-    data = load_data(data_dir)
+    TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch/pan-cancer_TIMs/code"
+    data = quick_load(TIM_DATA_FILEPATH)
+    print(f" loaded all TIM data into anndata obj named: `data`")
