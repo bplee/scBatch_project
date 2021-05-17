@@ -198,8 +198,8 @@ def load_TIC_diva_datasets(test_domain, train_domain=None):
     # adata.X = adata.X.toarray()
     adata = set_adata_train_test_batches(adata, test=test_domain, train=train_domain)
     temp = anndata.AnnData(adata.X.todense())
-    temp.obs = adata.obs
-    temp.var = adata.var
+    temp.obs = adata.obs.copy()
+    temp.var = adata.var.copy()
 
     train_loader, test_loader = get_diva_loaders(temp, domain_name="subtype", label_name="cell_type")
     return train_loader, test_loader
