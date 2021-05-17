@@ -1,5 +1,5 @@
 """
-DIVA model architecture for 2 layers
+DIVA model architecture for 2 linear layers
 """
 print("Loaded 2layer DIVA encoding model")
 
