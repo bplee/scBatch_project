@@ -118,5 +118,8 @@ if __name__ == '__main__':
                                          train=args.train_patient,
                                          domain_name="patient")
 
+    adata.obs['patient'] = adata.obs['MajorCluster']
+    del adata.obs['MajorCluster']
+
     diva_obj = DIVAModel(args)
     diva_obj.fit(adata, model_name=f"210517_scBatch_TIMs_test_pat_{args.test_patient}")
