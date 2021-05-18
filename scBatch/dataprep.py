@@ -10,6 +10,7 @@ import pandas as pd
 import scanpy as sc
 import torch.utils.data as data_utils
 
+from .helper_functions import wrap
 
 class DIVALoader(data_utils.Dataset):
     """
