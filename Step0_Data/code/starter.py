@@ -73,3 +73,22 @@ def wrap(a):
 
     rtn = a if type(a) == list else [a]
     return rtn
+
+
+def get_label_counts(df, label_col="cell_type", conditional_col="patient"):
+    """
+    will show you label distribution (counts) conditional on some column
+
+    Parameters
+    ----------
+    df : pandas df (long)
+    label_col : the name of the column in df that contains the things you want to count
+
+
+    Returns
+    -------
+
+    """
+    return df[[label_col, conditional_col]].value_counts(sort=False).to_frame().pivot_table(index=conditional_col,
+                                                                                               columns=label_col,
+                                                                                               fill_value=0).T
