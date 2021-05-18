@@ -118,7 +118,7 @@ if __name__ == '__main__':
                                          train=args.train_patient,
                                          domain_name="patient")
 
-    adata.obs['patient'] = adata.obs['MajorCluster']
+    adata.obs['cell_type'] = adata.obs['MajorCluster']
     del adata.obs['MajorCluster']
 
     diva_obj = DIVAModel(args)
