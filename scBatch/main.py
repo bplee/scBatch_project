@@ -18,7 +18,7 @@ class DIVAModel:
     def __init__(self, args=None):
 
         if args is None:
-            from args import default_args
+            from .args import default_args
             self.set_args(default_args)
         else:
             # allow user to input their own args file
