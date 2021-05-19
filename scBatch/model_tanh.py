@@ -1,5 +1,5 @@
 """
-DIVA model architecture for 2 linear layers
+DIVA model architecture for 2 linear layers and tanh used for activations in the embeddings
 """
 print("Loaded 2layer DIVA encoding model")
 
@@ -79,8 +79,8 @@ class qzy(nn.Module):
             nn.Linear(encoding_dim, 384), nn.ReLU()
         )
 
-        self.fc11 = nn.Sequential(nn.Linear(encoding_dim, zy_dim))
-        self.fc12 = nn.Sequential(nn.Linear(encoding_dim, zy_dim), nn.Softplus())
+        self.fc11 = nn.Sequential(nn.Linear(384, zy_dim))
+        self.fc12 = nn.Sequential(nn.Linear(384, zy_dim), nn.Softplus())
 
         torch.nn.init.xavier_uniform_(self.encoder[0].weight)
         torch.nn.init.xavier_uniform_(self.fc11[0].weight)
