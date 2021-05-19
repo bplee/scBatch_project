@@ -75,7 +75,8 @@ class qzy(nn.Module):
         self.encoding_dim = encoding_dim
 
         self.encoder = nn.Sequential(
-            nn.Linear(x_dim, encoding_dim), nn.ReLU()
+            nn.Linear(x_dim, encoding_dim), nn.ReLU(),
+            nn.Linear(encoding_dim, 384), nn.ReLU()
         )
 
         self.fc11 = nn.Sequential(nn.Linear(encoding_dim, zy_dim))
@@ -89,7 +90,7 @@ class qzy(nn.Module):
 
     def forward(self, x):
         h = self.encoder(x)
-        h = h.view(-1, self.encoding_dim)
+        h = h.view(-1, 384)
         zy_loc = self.fc11(h)
         zy_scale = self.fc12(h) + 1e-7
 
