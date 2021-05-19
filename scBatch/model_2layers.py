@@ -75,8 +75,8 @@ class qzy(nn.Module):
         self.encoding_dim = encoding_dim
 
         self.encoder = nn.Sequential(
-            nn.Linear(x_dim, encoding_dim), nn.ReLU(),
-            nn.Linear(encoding_dim, 384), nn.ReLU()
+            nn.Linear(x_dim, encoding_dim), nn.Tanh(),
+            nn.Linear(encoding_dim, 384), nn.Tanh()
         )
 
         self.fc11 = nn.Sequential(nn.Linear(encoding_dim, zy_dim))
