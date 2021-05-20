@@ -149,7 +149,7 @@ class DIVAModel:
         print("Testing Accuracy")
         print(train.get_accuracy(data_loaders['unsup'], self.model, device))
 
-        visualization.plot_embedings(self.model, data_loaders, device, self.fig_name)
+        visualization.plot_embeddings(self.model, data_loaders, device, self.fig_name)
 
     def transform(self, y):
         pass
