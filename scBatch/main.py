@@ -10,6 +10,7 @@ from . import visualization
 # from . import model
 
 from .model_2layers import DIVA
+# from .model_tanh import DIVA
 
 import numpy as np
 import torch.utils.data as data_utils
