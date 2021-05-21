@@ -1,7 +1,7 @@
 """
 DIVA model architecture for 2 linear layers and tanh used for activations in the embeddings
 """
-print("Loaded 2layer DIVA encoding model")
+print("Loaded tanh 2layer DIVA encoding model")
 
 import torch
 import torch.nn as nn
@@ -75,8 +75,8 @@ class qzy(nn.Module):
         self.encoding_dim = encoding_dim
 
         self.encoder = nn.Sequential(
-            nn.Linear(x_dim, encoding_dim), nn.ReLU(),
-            nn.Linear(encoding_dim, 384), nn.ReLU()
+            nn.Linear(x_dim, encoding_dim), nn.Tanh(),
+            nn.Linear(encoding_dim, 384), nn.Tanh()
         )
 
         self.fc11 = nn.Sequential(nn.Linear(384, zy_dim))
@@ -101,9 +101,9 @@ class px(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim, encoding_dim):
         super(px, self).__init__()
 
-        self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, 384, bias=False), nn.ReLU())
-        self.fc2 = nn.Sequential(nn.Linear(384, encoding_dim, bias=False), nn.ReLU())
-        self.fc3 = nn.Sequential(nn.Linear(encoding_dim, x_dim, bias=False), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Linear(zd_dim + zx_dim + zy_dim, 384, bias=False), nn.Tanh())
+        self.fc2 = nn.Sequential(nn.Linear(384, encoding_dim, bias=False), nn.Tanh())
+        self.fc3 = nn.Sequential(nn.Linear(encoding_dim, x_dim, bias=False), nn.Tanh())
 
         torch.nn.init.xavier_uniform_(self.fc1[0].weight)
 
@@ -122,7 +122,7 @@ class px(nn.Module):
 class pzd(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
         super(pzd, self).__init__()
-        self.fc1 = nn.Sequential(nn.Linear(d_dim, zd_dim, bias=False), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Linear(d_dim, zd_dim, bias=False), nn.Tanh())
 
         self.fc21 = nn.Sequential(nn.Linear(zd_dim, zd_dim))
         self.fc22 = nn.Sequential(nn.Linear(zd_dim, zd_dim), nn.Softplus())
@@ -144,7 +144,7 @@ class pzd(nn.Module):
 class pzy(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
         super(pzy, self).__init__()
-        self.fc1 = nn.Sequential(nn.Linear(y_dim, zy_dim, bias=False), nn.ReLU())
+        self.fc1 = nn.Sequential(nn.Linear(y_dim, zy_dim, bias=False), nn.Tanh())
         self.fc21 = nn.Sequential(nn.Linear(zy_dim, zy_dim))
         self.fc22 = nn.Sequential(nn.Linear(zy_dim, zy_dim), nn.Softplus())
 
