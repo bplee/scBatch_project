@@ -54,9 +54,9 @@ def plot_embeddings(model, data_loaders, device, fig_name):
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
         train_labels = patients[labels_d]
-        zy_adata.obs['batch'] = patients[labels_d]
+        zy_adata.obs['batch'] = train_labels
         zy_adata.obs['cell_type'] = cell_types[labels_y]
-        zd_adata.obs['batch'] = patients[labels_d]
+        zd_adata.obs['batch'] = train_labels
         zd_adata.obs['cell_type'] = cell_types[labels_y]
         train_cell_type_encoding = zy_adata
         train_batch_encoding = zd_adata
@@ -104,9 +104,9 @@ def plot_embeddings(model, data_loaders, device, fig_name):
             adatas = [zy_adata, zd_adata]
         name = ['zy', 'zd', 'zx']
         test_labels = patients[labels_d]
-        zy_adata.obs['batch'] = patients[labels_d]
+        zy_adata.obs['batch'] = test_labels
         zy_adata.obs['cell_type'] = cell_types[labels_y]
-        zd_adata.obs['batch'] = patients[labels_d]
+        zd_adata.obs['batch'] = test_labels
         zd_adata.obs['cell_type'] = cell_types[labels_y]
         test_cell_type_encoding = zy_adata
         test_batch_encoding = zd_adata
@@ -121,6 +121,7 @@ def plot_embeddings(model, data_loaders, device, fig_name):
     full_zd = train_batch_encoding.concatenate(test_batch_encoding)
     all_patients = np.hstack([train_labels, test_labels])
     full_zy.obs['batch'] = all_patients
+    full_zd.obs['batch'] = all_patients
     sc.pp.neighbors(full_zy, n_neighbors=15)
     sc.pp.neighbors(full_zd, n_neighbors=15)
     sc.tl.umap(full_zy, min_dist=.3)
