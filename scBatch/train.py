@@ -10,6 +10,8 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import torch.optim as optim
 
+from .helper_functions import ensure_dir
+
 
 def train(data_loaders, model, optimizer, device):
     """
@@ -165,6 +167,7 @@ def get_accuracy(data_loader, model, device, save=None):
                             linewidths=.5, annot=True, fmt='4.2f', square=True)
             ax.get_ylim()
             ax.set_ylim(n_labels, 0)
+            ensure_dir("./cm_figs")
             save_name = f"./cm_figs/cm_{save}.png"
             plt.savefig(save_name)
         return accuracy_d, accuracy_y, accuracy_y_weighted
