@@ -166,11 +166,11 @@ class DIVAModel:
         print(f"Train domain: {self.args.train_patient}")
         print(f"Test domain: {self.args.test_patient}")
         print("Training Accuracy")
-        print(train.get_accuracy(data_loaders['sup'], self.model, device))
+        print(train.get_accuracy(data_loaders['sup'], self.model, device, save=self.fig_name))
         print("Validation Accuracy")
-        print(train.get_accuracy(data_loaders['valid'], self.model, device))
+        print(train.get_accuracy(data_loaders['valid'], self.model, device, save=self.fig_name))
         print("Testing Accuracy")
-        print(train.get_accuracy(data_loaders['unsup'], self.model, device))
+        print(train.get_accuracy(data_loaders['unsup'], self.model, device, save=self.fig_name))
 
         visualization.plot_embeddings(self.model, data_loaders, device, self.fig_name)
 
