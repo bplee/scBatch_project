@@ -36,11 +36,11 @@ class DIVAModel:
         print(self.model)
         print("Data")
         if self.train_loader is not None:
-            print(f" Training set shape: {self.train_loader.shape}")
+            print(f" Training set shape: {self.train_loader.train_data.shape}")
         if self.valid_loader is not None:
-            print(f" Validation set shape: {self.valid_loader.shape}")
+            print(f" Validation set shape: {self.valid_loader.train_data.shape}")
         if self.test_loader is not None:
-            print(f" Testing set shape: {self.test_loader.shape}")
+            print(f" Testing set shape: {self.test_loader.test_data.shape}")
 
     def set_data_loaders(self, train_loader, valid_loader, test_loader):
         self.train_loader = train_loader
@@ -84,13 +84,6 @@ class DIVAModel:
 
     def set_model(self, model):
         self.model = model
-
-    def load_model_from_file(self, name):
-        args = torch.load(name + ".config")
-        model = torch.load(name + ".model")
-        self.set_model(model)
-        self.set_args(args)
-        self.set_model_path(name)
 
     @staticmethod
     def adata_to_diva_loaders(adata):
@@ -178,3 +171,10 @@ class DIVAModel:
         print(train.get_accuracy(data_loaders['unsup'], self.model, device))
 
         visualization.plot_embeddings(self.model, data_loaders, device, self.fig_name)
+
+def load_model_from_file(self, name):
+    args = torch.load(name + ".config")
+    model = torch.load(name + ".model")
+    self.set_model(model)
+    self.set_args(args)
+    self.set_model_path(name)
