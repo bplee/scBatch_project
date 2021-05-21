@@ -163,6 +163,8 @@ class DIVAModel:
 
         train.epoch_procedure(self.model_path, self.args, self.model, data_loaders, device)
 
+        print(f"Train domain: {self.args.train_patient}")
+        print(f"Test domain: {self.args.test_patient}")
         print("Training Accuracy")
         print(train.get_accuracy(data_loaders['sup'], self.model, device))
         print("Validation Accuracy")
