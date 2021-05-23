@@ -18,8 +18,11 @@ COUNTS_FILEPATH = "/data/leslie/bplee/scBatch/broad_rcc/data/SCP1288/expression/
 METADATA_FILEPATH = "/data/leslie/bplee/scBatch/broad_rcc/data/SCP1288/metadata/Final_SCP_Metadata.txt"
 
 def load_data(counts_path=COUNTS_FILEPATH, metadata_path=METADATA_FILEPATH):
-    adata = anndata.read_text(counts_path)
-    adata.obs = pd.read_csv(metadata_path, sep="\t")
+    # this is read in transposed (cells as columns)
+    adata = anndata.read_text(counts_path).T
+    meta = pd.read_csv(metadata_path, sep="\t", index_col=0)
+    # the first row is just a type
+    adata.obs = meta.iloc[1:, :]
     return adata
 
 if __name__ == "__main__":
