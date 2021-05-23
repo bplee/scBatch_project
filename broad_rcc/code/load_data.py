@@ -21,3 +21,6 @@ def load_data(counts_path=COUNTS_FILEPATH, metadata_path=METADATA_FILEPATH):
     adata = anndata.read_text(counts_path)
     adata.obs = pd.read_csv(metadata_path, sep="\t")
     return adata
+
+if __name__ == "__main__":
+    adata = load_data()
