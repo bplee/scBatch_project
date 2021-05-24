@@ -40,14 +40,14 @@ class DIVAObject:
 
 
     def __repr__(self):
-        print(self.model)
-        print("Data")
-        if self.train_loader is not None:
-            print(f" Training set shape: {self.train_loader.train_data.shape}")
-        if self.valid_loader is not None:
-            print(f" Validation set shape: {self.valid_loader.train_data.shape}")
-        if self.test_loader is not None:
-            print(f" Testing set shape: {self.test_loader.test_data.shape}")
+        return(self.model)
+        # print("Data")
+        # if self.train_loader is not None:
+        #     print(f" Training set shape: {self.train_loader.train_data.shape}")
+        # if self.valid_loader is not None:
+        #     print(f" Validation set shape: {self.valid_loader.train_data.shape}")
+        # if self.test_loader is not None:
+        #     print(f" Testing set shape: {self.test_loader.test_data.shape}")
 
     def set_data_loaders(self, train_loader, valid_loader, test_loader):
         self.train_loader = train_loader
@@ -146,12 +146,9 @@ class DIVAObject:
         data_loaders['unsup'] = data_utils.DataLoader(test_loader, batch_size=self.args.batch_size, shuffle=True)
         data_loaders['valid'] = data_utils.DataLoader(validation_loader, batch_size=self.args.batch_size, shuffle=False)
 
-        labels = test_loader.labels
-        domains = test_loader.domains
-
-        # setting the model to retain the integer to name matches
-        self.model.labels = labels
-        self.model.domains = domains
+        labels = train_loader.labels
+        domains = train_loader.domains
+        # these are set after the DIVA model is initiated
 
         num_labels = len(train_loader[0][1])
         num_domains = len(train_loader[0][2])
@@ -160,6 +157,10 @@ class DIVAObject:
         self.set_args_y_dim(num_labels)
         self.set_args_x_dim(num_dims)
         self.load_model_from_args()
+
+        # setting the model to retain the integer to name matches
+        self.model.labels = labels
+        self.model.domains = domains
 
         train.epoch_procedure(model_path, self.args, self.model, data_loaders, device)
 
@@ -210,8 +211,11 @@ class DIVAObject:
         return d_preds, y_preds
 
 def load_model_from_file(name):
+    if torch.cuda.is_available():
+        device = 'cuda'
+    device = 'cpu'
     args = torch.load(name + ".config")
-    model = torch.load(name + ".model")
+    model = torch.load(name + ".model", map_location=torch.device(device))
     obj = DIVAObject(args)
     obj.set_model(model)
     obj.set_model_name(name)
