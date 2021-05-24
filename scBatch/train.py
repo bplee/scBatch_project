@@ -117,7 +117,7 @@ def get_accuracy(data_loader, model, device, save=None):
     classifier_fn = model.classifier
     n_labels = len(data_loader.dataset[0][1])
     n_batches = len(data_loader.dataset[0][2])
-    cell_types = data_loader.dataset.labels
+    labels = data_loader.dataset.labels
 
     predictions_d, actuals_d, predictions_y, actuals_y = [], [], [], []
     with torch.no_grad():
@@ -161,7 +161,7 @@ def get_accuracy(data_loader, model, device, save=None):
         diag = diag[~np.isnan(diag)]
         accuracy_y_weighted = np.mean(diag)
         if save is not None:
-            cm_norm_df = pd.DataFrame(cm_norm, index=cell_types, columns=cell_types)
+            cm_norm_df = pd.DataFrame(cm_norm, index=labels, columns=labels)
             plt.figure(figsize=(20, 20))
             ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
                             linewidths=.5, annot=True, fmt='4.2f', square=True)
