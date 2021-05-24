@@ -61,7 +61,7 @@ parser.add_argument('--max_beta', type=float, default=1., metavar='MB',
                     help='max beta for warm-up')
 parser.add_argument('--min_beta', type=float, default=0.0, metavar='MB',
                     help='min beta for warm-up')
-parser.add_argument('--outpath', type=str, default='./',
-                    help='where to save')
+# parser.add_argument('--outpath', type=str, default='./',
+#                     help='where to save')
 
 default_args = parser.parse_args()
