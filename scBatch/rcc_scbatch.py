@@ -8,7 +8,6 @@ if WORKING_DIR not in sys.path:
 import argparse
 import pandas as pd
 import numpy as np
-from Step0_Data.code.pkl_load_data import PdRccAllData
 import anndata
 import torch
 import torch.utils.data as data_utils
@@ -18,7 +17,7 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
 from Step0_Data.code.pkl_load_data import PdRccAllData
 from TIC_atlas.code.load_data import set_adata_train_test_batches
-from scBatch.main import DIVAModel
+from scBatch.main import DIVAObject
 
 if __name__ == "__main__":
     # Training settings
@@ -134,5 +133,5 @@ if __name__ == "__main__":
 
     adata = rcc_adata
 
-    diva_obj = DIVAModel(args)
-    diva_obj.fit(adata, model_name=f"210510_scBatch_RCC_test_pat_{args.test_patient}")
+    diva_obj = DIVAObject(args)
+    diva_obj.fit(adata, model_name=f"210510_scBatch_RCC_test_pat_{args.test_patient}", outpath="./")
