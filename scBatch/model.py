@@ -227,6 +227,10 @@ class DIVA(nn.Module):
         self.beta_x = args.beta_x
         self.beta_y = args.beta_y
 
+        # these are lists that will map integers to their names, set during fitting
+        self.labels = None
+        self.domains = None
+
         self.cuda()
 
     def forward(self, d, x, y):

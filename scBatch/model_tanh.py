@@ -123,7 +123,6 @@ class pzd(nn.Module):
     def __init__(self, d_dim, x_dim, y_dim, zd_dim, zx_dim, zy_dim):
         super(pzd, self).__init__()
         self.fc1 = nn.Sequential(nn.Linear(d_dim, zd_dim, bias=False), nn.Tanh())
-
         self.fc21 = nn.Sequential(nn.Linear(zd_dim, zd_dim))
         self.fc22 = nn.Sequential(nn.Linear(zd_dim, zd_dim), nn.Softplus())
 
@@ -227,6 +226,10 @@ class DIVA(nn.Module):
         self.beta_d = args.beta_d
         self.beta_x = args.beta_x
         self.beta_y = args.beta_y
+
+        # these are lists that will map integers to their names, set during fitting
+        self.labels = None
+        self.domains = None
 
         self.cuda()
 
