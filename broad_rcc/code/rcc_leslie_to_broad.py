@@ -44,7 +44,7 @@ if __name__ == "__main__":
     #                    help="number of supervised examples, /10 = samples per class")
 
     # Choose domains
-    parser.add_argument('--test_patient', nargs='+', type=int, default=5,
+    parser.add_argument('--test_patient', nargs='+', type=int, default=None,
                         help='test domain')
     parser.add_argument('--train_patient', nargs='+', type=int, default=None,
                         help='train domain')
