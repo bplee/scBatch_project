@@ -18,8 +18,10 @@ COUNTS_FILEPATH = "/data/leslie/bplee/scBatch/broad_rcc/data/SCP1288/expression/
 METADATA_FILEPATH = "/data/leslie/bplee/scBatch/broad_rcc/data/SCP1288/metadata/Final_SCP_Metadata.txt"
 H5AD_FILEPATH = "/data/leslie/bplee/scBatch/broad_rcc/quickload_data/ccRCC_broad_normalized_counts.h5ad"
 
+domain_name = "donor_id"
+label_name = "FinalCellType"
 
-def load_data(counts_path=COUNTS_FILEPATH, metadata_path=METADATA_FILEPATH):
+def broad_load_data(counts_path=COUNTS_FILEPATH, metadata_path=METADATA_FILEPATH):
     # this is read in transposed (cells as columns)
     adata = anndata.read_text(counts_path).T
     meta = pd.read_csv(metadata_path, sep="\t", index_col=0)
@@ -28,13 +30,13 @@ def load_data(counts_path=COUNTS_FILEPATH, metadata_path=METADATA_FILEPATH):
     return adata
 
 
-def quick_load(h5ad_fp = H5AD_FILEPATH):
+def broad_quick_load(h5ad_fp = H5AD_FILEPATH):
     adata = anndata.read_h5ad(h5ad_fp)
     return adata
 
 
 # def filter_broad_data(adata):
-
+#     ["CLEC9A + DC", "Cycling Tumor", "Fibroblast", "Mast cell"]
 
 
 if __name__ == "__main__":
