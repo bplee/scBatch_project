@@ -53,18 +53,20 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
         print("Looks you haven't taken the log of the data, doing it for you")
         sc.pp.log1p(adata)
 
-    train_inds = adata.obs.batch == "0"
-    test_inds = ~train_inds
-    n_train = sum(train_inds)
-    n_test = sum(test_inds)
     data = adata.X
     patients, patient_map = pd.factorize(adata.obs[domain_name])
     labels, label_map = pd.factorize(adata.obs[label_name])
-    data_train = data[train_inds,:]
-    data_test = data[test_inds,:]
+
+    train_inds = adata.obs.batch == "0"
+    n_train = sum(train_inds)
+    data_train = data[train_inds, :]
     labels_train = labels[train_inds]
-    labels_test = labels[test_inds]
     batch_train = patients[train_inds]
+
+    test_inds = ~train_inds
+    n_test = sum(test_inds)
+    data_test = data[test_inds,:]
+    labels_test = labels[test_inds]
     batch_test = patients[test_inds]
 
     # doing the normalization thing
@@ -113,8 +115,6 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
     train_data_loader.train_data, test_data_loader.test_data        = data_train.unsqueeze(1), data_test.unsqueeze(1)
     train_data_loader.train_labels, test_data_loader.test_labels    = labels_train, labels_test
     train_data_loader.train_domain, test_data_loader.test_domain    = batch_train, batch_test
-    # train_data_loader.cell_types, test_data_loader.cell_types       = label_map, label_map
-    # train_data_loader.patients, test_data_loader.patients           = patient_map, patient_map
 
     train_data_loader.labels, test_data_loader.labels       = label_map, label_map
     train_data_loader.domains, test_data_loader.domains           = patient_map, patient_map
@@ -174,7 +174,7 @@ def set_adata_train_test_batches(adata, test, train=None, domain_name="patient")
         contains integers corresponding to which labels are going to be test domains
     train : list or int (default: None)
         contains integers corresponding to which labels are going to be train_domains
-    domain_name: str (default: "subtype")
+    domain_name: str (default: "patient")
         name of adata.obs column that contains information that you want to use to stratify domains
 
     Returns
