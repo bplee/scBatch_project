@@ -40,7 +40,7 @@ class DIVAObject:
 
 
     def __repr__(self):
-        return(self.model)
+         return str(self.model)
         # print("Data")
         # if self.train_loader is not None:
         #     print(f" Training set shape: {self.train_loader.train_data.shape}")
