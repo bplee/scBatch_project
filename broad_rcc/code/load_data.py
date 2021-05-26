@@ -40,4 +40,4 @@ def broad_quick_load(h5ad_fp = H5AD_FILEPATH):
 
 
 if __name__ == "__main__":
-    adata = quick_load()
+    adata = broad_quick_load()
