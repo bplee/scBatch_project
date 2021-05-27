@@ -155,4 +155,4 @@ if __name__ == "__main__":
     adata = adata[:, gene_ds.gene_names]
 
     diva_obj = DIVAObject(args)
-    diva_obj.fit(adata, model_name=f"210525_scBatch_broach_transfer")
+    diva_obj.fit(adata, model_name=f"210525_scBatch_broad_transfer")
