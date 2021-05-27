@@ -140,7 +140,51 @@ class PdRccAllData:
 if __name__ == "__main__":
 
     data_obj = PdRccAllData()
-    
+    test_patient = 5
+    raw_counts = data_obj.data.drop(['patient', 'cell_type'], axis=1)
+    patients = data_obj.data.patient
+    cell_types = data_obj.data.cell_type
+
+    # cell_type_names = np.unique(cell_types)
+
+    n_data_all = raw_counts.shape[0]
+    n_gene_all = raw_counts.shape[1]
+
+    print('Re-writing labels and patients as indices')
+
+    labels, cell_type_names = pd.factorize(cell_types)
+    batch_indices, patient_names = pd.factorize(patients)
+
+    gene_names = raw_counts.columns.values
+
+    idx_batch_train = ~(batch_indices == test_patient).ravel()
+    idx_batch_test = (batch_indices == test_patient).ravel()
+
+    batch_train = batch_indices[idx_batch_train].ravel()
+    batch_test = batch_indices[idx_batch_test].ravel()
+
+    labels_train = labels[idx_batch_train].ravel()
+    labels_test = labels[idx_batch_test].ravel()
+
+    data_train = raw_counts[idx_batch_train]
+    data_test = raw_counts[idx_batch_test]
+
+    n_train = len(labels_train)
+    n_test = len(labels_test)
+
+    # Shuffle everything one more time
+    inds = np.arange(n_train)
+    np.random.shuffle(inds)
+    data_train = data_train[inds]
+    labels_train = labels_train[inds]
+    batch_train = batch_train[inds]
+
+    inds = np.arange(n_test)
+    np.random.shuffle(inds)
+    data_test = data_test[inds]
+    labels_test = labels_test[inds]
+    batch_test = batch_test[inds]
+
     # readRDS = robjects.r['readRDS']
     # pandas2ri.activate()
     # print('Loading annotations...')
