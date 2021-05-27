@@ -28,7 +28,7 @@ class Network(nn.Module):
 
 if __name__ == "__main__":
     test_pat=5
-    data_obj = RccDatasetSemi(test_pat, 784. starspace=True)
+    data_obj = RccDatasetSemi(test_pat, 784, starspace=True)
 
     test_set = torch.tensor(data_obj.test_data)
     x = torch.tensor(data_obj.train_data)
