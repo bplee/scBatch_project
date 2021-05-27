@@ -13,6 +13,6 @@ conda env list
 source activate test
 conda env list
 
-python run_scnym.py
+python run_scnym.py --test_patient 0
 
 conda deactivate
