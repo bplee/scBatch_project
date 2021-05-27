@@ -3,7 +3,7 @@ SSL for leslie to Broad
 """
 
 import sys
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")

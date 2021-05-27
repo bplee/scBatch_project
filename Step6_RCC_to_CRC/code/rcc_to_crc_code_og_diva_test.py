@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data_utils
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")
@@ -269,10 +269,10 @@ if __name__ == "__main__":
     ###########################################################
     # CRC DATA
     # --------
-    # crc_dir = "/data/leslie/bplee/scBatch/CRC_dataset/code"
+    # crc_dir = "/data/leslie/bplee/scBatch_project/CRC_dataset/code"
     #
     # # loading testing set crc data
-    # crc_pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+    # crc_pkl_path = "/data/leslie/bplee/scBatch_project/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     # crc_all_data = pd.read_pickle(crc_pkl_path)
     #
     # # getting one test patien
@@ -281,7 +281,7 @@ if __name__ == "__main__":
     # crc_raw_counts = crc_data.drop(["CLUSTER", "PATIENT"], axis=1)
     #
     # crc_gene_names = crc_raw_counts.columns.values
-    pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+    pkl_path = "/data/leslie/bplee/scBatch_project/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     #all_data = pd.read_pickle(pkl_path)
     patient_subset = ["TS-101T",
                       "TS-104T",

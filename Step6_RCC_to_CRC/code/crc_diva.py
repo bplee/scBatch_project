@@ -13,7 +13,7 @@ import torch.utils.data as data_utils
 
 from Step6_RCC_to_CRC.code.rcc_to_crc_test import load_rcc_to_crc_data_loaders
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     shuffle = False
     cell_types_to_remove = ["Plasma"]
 
-    pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+    pkl_path = "/data/leslie/bplee/scBatch_project/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     all_data = pd.read_pickle(pkl_path)
     patient_subset = ["TS-101T",
                       "TS-104T",

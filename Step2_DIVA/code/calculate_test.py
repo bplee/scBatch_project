@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import torch
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     # test_patient = 5
     # seed = 0
     # scnym_exp = True
-    # main_dir = '/data/leslie/bplee/scBatch/Step2_DIVA/code/'
+    # main_dir = '/data/leslie/bplee/scBatch_project/Step2_DIVA/code/'
     main_dir = os.getcwd()
     
     out_dir = 'cm_figs'

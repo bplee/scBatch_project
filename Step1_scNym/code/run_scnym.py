@@ -24,7 +24,7 @@ tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
 # changing directory to project dir
 print(os.getcwd())
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:

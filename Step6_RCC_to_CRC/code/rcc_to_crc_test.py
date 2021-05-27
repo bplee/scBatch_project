@@ -1,5 +1,5 @@
 import sys
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")
@@ -159,7 +159,7 @@ def load_rcc_to_crc_data_loaders(cell_types_to_remove=["Plasma"],old_load=False,
     train loader, test loader, crc adata
 
     """
-    pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+    pkl_path = "/data/leslie/bplee/scBatch_project/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     all_data = pd.read_pickle(pkl_path)
     patient_subset = ["TS-101T",
                       "TS-104T",
@@ -255,7 +255,7 @@ if __name__ == "__main__":
     # cell_types_to_remove = ["Plasma"]
     # old_load = False
     # shuffle = False
-    # pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+    # pkl_path = "/data/leslie/bplee/scBatch_project/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     # all_data = pd.read_pickle(pkl_path)
     # patient_subset = ["TS-101T",
     #                   "TS-104T",

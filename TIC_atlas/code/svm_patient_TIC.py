@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import argparse
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("CHANGING PATH")

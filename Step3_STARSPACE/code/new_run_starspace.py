@@ -19,7 +19,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 #from scvi.dataset import GeneExpressionDataset
 save_path = '/data/leslie/alireza/scRNAseq_ccRCC/data/ccRCC'
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("CHANGING PATH:")
@@ -144,11 +144,11 @@ if __name__ == "__main__":
     print('Training time of StarSpace: {} mins'.format((time.time() - t0)/60)) 
 
     # Save the model:
-    # added in the prior folder path, since were operating out of bplee/scBatch/ccRCC
-    # changing folder to  /bplee/scBatch/starspace_models
+    # added in the prior folder path, since were operating out of bplee/scBatch_project/ccRCC
+    # changing folder to  /bplee/scBatch_project/starspace_models
 
-    ensure_dir("/data/leslie/bplee/scBatch/Step3_STARSPACE/code/starspace_models")
-    # os.chdir("/data/leslie/bplee/scBatch/Step3_STARSPACE/code/starspace_models")
+    ensure_dir("/data/leslie/bplee/scBatch_project/Step3_STARSPACE/code/starspace_models")
+    # os.chdir("/data/leslie/bplee/scBatch_project/Step3_STARSPACE/code/starspace_models")
     
     sp.saveModel('./starspace_models/starspace_model_'+str(args_starspace.test_patient))
     sp.saveModelTsv('./starspace_models/starspace_model_'+str(args_starspace.test_patient)+'.tsv')

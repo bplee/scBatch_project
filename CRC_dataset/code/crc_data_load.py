@@ -10,14 +10,14 @@ import matplotlib.pyplot as plt
 from scvi.dataset import GeneExpressionDataset
 
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("CHANGING PATH")
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 
-data_dir = "/data/leslie/bplee/scBatch/CRC_dataset/data/raw_count_files"
+data_dir = "/data/leslie/bplee/scBatch_project/CRC_dataset/data/raw_count_files"
 
 def get_pat_id_from_filepath(f):
     return os.path.split(f)[-1].split("_")[0]
@@ -40,7 +40,7 @@ def read_data(f):
     rtn["PATIENT"] = get_pat_id_from_filepath(f)
     return rtn
 
-def concat_data(directory="/data/leslie/bplee/scBatch/CRC_dataset/data/raw_count_files"):
+def concat_data(directory="/data/leslie/bplee/scBatch_project/CRC_dataset/data/raw_count_files"):
     """
 
     Parameters
@@ -79,7 +79,7 @@ def concat_data(directory="/data/leslie/bplee/scBatch/CRC_dataset/data/raw_count
 
     return rtn
 
-def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"):
+def save_pd_to_pickle(df, pkl_path="/data/leslie/bplee/scBatch_project/CRC_dataset/pkl_files/201204_CRC_data.pkl"):
     print("Saving dataframe to pickle")
     df.to_pickle(pkl_path, protocol=4)
     print(f"Saved to {pkl_path}")
@@ -387,19 +387,19 @@ def assess_marker_genes(df, markers, n_genes=30):
 #     subset of the pandas df that was inputted, where you only select specified genes
 #
 #     """
-#     vianne_genes_file_path = '/data/leslie/bplee/scBatch/CRC_dataset/metadata/vianne_gene_subset.txt'
+#     vianne_genes_file_path = '/data/leslie/bplee/scBatch_project/CRC_dataset/metadata/vianne_gene_subset.txt'
 #
 #     vianne_genes = pd.read_csv(vianne_genes_file_path).to_numpy().T[0]
 #     df.columns
 
-def load_louvain(path="/data/leslie/bplee/scBatch/CRC_dataset/code/DEG_analysis/210222_adata_obs_clusters.pkl"):
+def load_louvain(path="/data/leslie/bplee/scBatch_project/CRC_dataset/code/DEG_analysis/210222_adata_obs_clusters.pkl"):
     return pd.read_pickle(path)
 
-def load_umap(path="/data/leslie/bplee/scBatch/CRC_dataset/code/DEG_analysis/210222_patient_umap.pkl"):
+def load_umap(path="/data/leslie/bplee/scBatch_project/CRC_dataset/code/DEG_analysis/210222_patient_umap.pkl"):
     return pd.read_pickle(path)
 
 if __name__ == "__main__":
-    pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+    pkl_path = "/data/leslie/bplee/scBatch_project/CRC_dataset/pkl_files/201204_CRC_data.pkl"
     # all_data = concat_data()
     all_data = pd.read_pickle(pkl_path)
     # patient_subset = ["TS-101T",
@@ -434,7 +434,7 @@ if __name__ == "__main__":
     # test = get_ranked_marker_genes(ex_pat)
     # a = get_pval_df(test)
     
-    gene_markers_path = "/data/leslie/bplee/scBatch/CRC_dataset/metadata/immune_markers.xlsx"
+    gene_markers_path = "/data/leslie/bplee/scBatch_project/CRC_dataset/metadata/immune_markers.xlsx"
     
     # here columns are the different cell types and rows are diff genes
     # no correspondence between genes in the same row

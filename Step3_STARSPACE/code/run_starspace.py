@@ -1,7 +1,7 @@
 import os
 try:
     # changing dir to get to allow relative filepaths in the python file work
-	os.chdir("/data/leslie/bplee/scBatch/ccRCC")
+	os.chdir("/data/leslie/bplee/scBatch_project/ccRCC")
 	print(os.getcwd())
 except:
 	pass
@@ -214,9 +214,9 @@ if __name__ == "__main__":
     print('Training time of StarSpace: {} mins'.format((time.time() - t0)/60)) 
 
     # Save the model:
-    # added in the prior folder path, since were operating out of bplee/scBatch/ccRCC
-    # changing folder to  /bplee/scBatch/starspace_models
-    os.chdir("/data/leslie/bplee/scBatch/starspace_models")
+    # added in the prior folder path, since were operating out of bplee/scBatch_project/ccRCC
+    # changing folder to  /bplee/scBatch_project/starspace_models
+    os.chdir("/data/leslie/bplee/scBatch_project/starspace_models")
     
     sp.saveModel('starspace_model_'+str(args_starspace.test_patient))
     sp.saveModelTsv('starspace_model_'+str(args_starspace.test_patient)+'.tsv')

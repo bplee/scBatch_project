@@ -12,7 +12,7 @@ import torch
 import anndata
 import scanpy as sc
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 
 # adding the project dir to the path to import relevant modules below
 print("________CHANGING PATH_________")

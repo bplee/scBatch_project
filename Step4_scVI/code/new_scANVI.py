@@ -21,7 +21,7 @@ from scvi.dataset import CsvDataset, GeneExpressionDataset
 from scvi.models import SCANVI, VAE
 from scvi.inference import UnsupervisedTrainer, JointSemiSupervisedTrainer, SemiSupervisedTrainer
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("CHANGING PATH:")

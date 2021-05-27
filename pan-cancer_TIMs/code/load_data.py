@@ -5,7 +5,7 @@ import anndata
 import sys
 import scanpy as sc
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")
@@ -14,7 +14,7 @@ if WORKING_DIR not in sys.path:
 from Step0_Data.code.starter import *
 
 data_dir = "../data/"
-TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch/pan-cancer_TIMs/quickload_data/TIMs_all_data.h5ad"
+TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch_project/pan-cancer_TIMs/quickload_data/TIMs_all_data.h5ad"
 
 
 def read_dataset(name):

@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("CHANGING PATH")
@@ -21,7 +21,7 @@ class PdRccAllData:
     """
     def __init__(self, take_cell_label_intersection=True,
                  labels_to_remove=["Ambiguous", "Megakaryocyte", "TAM/TCR (Ambiguos)"],
-                 pkl_path='/data/leslie/bplee/scBatch/Step0_Data/data/201002_6pat_proto4_raw_counts.pkl'):
+                 pkl_path='/data/leslie/bplee/scBatch_project/Step0_Data/data/201002_6pat_proto4_raw_counts.pkl'):
         self.pkl_path = pkl_path
         self.take_cell_label_intersection = take_cell_label_intersection
         self.labels_to_remove = labels_to_remove
@@ -50,7 +50,7 @@ class PdRccAllData:
         print('Loading annotations...')
         annot = readRDS('/data/leslie/krc3004/RCC_Alireza_Sep2020/ccRCC_6pat_cell_annotations_June2020.rds')
         print("Loading raw counts...")
-        raw_counts = readRDS('/data/leslie/bplee/scBatch/Step0_Data/data/200929_raw_counts.rds').transpose()
+        raw_counts = readRDS('/data/leslie/bplee/scBatch_project/Step0_Data/data/200929_raw_counts.rds').transpose()
 
         cell_labels = np.array(annot.cluster_name)
         patient_labels = np.array(annot.Sample)
@@ -69,12 +69,12 @@ class PdRccAllData:
         if not os.path.isfile(self.pkl_path):
             print(f"Could not find pkl file: {self.pkl_path}")
             # saving new pkl_path
-            self.pkl_path = '/data/leslie/bplee/scBatch/Step0_Data/data/temp_6pat_raw_counts.pkl'
+            self.pkl_path = '/data/leslie/bplee/scBatch_project/Step0_Data/data/temp_6pat_raw_counts.pkl'
             return self._create_pkl(self.pkl_path)
         else:
             rtn = pd.read_pickle(self.pkl_path)
             if self.gene_symbol == True:
-                conversion_table = pd.read_csv("/data/leslie/bplee/scBatch/Step0_Data/code/feature_conversion/ccRCC_ensembl_to_gene_symbol_conversion.csv", index_col=0)
+                conversion_table = pd.read_csv("/data/leslie/bplee/scBatch_project/Step0_Data/code/feature_conversion/ccRCC_ensembl_to_gene_symbol_conversion.csv", index_col=0)
                 new_cols = np.array(conversion_table.gene_symbol)
                 new_cols = np.append(new_cols, ["cell_type", "patient"])
                 rtn.columns = new_cols

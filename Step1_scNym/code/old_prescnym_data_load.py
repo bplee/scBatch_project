@@ -20,7 +20,7 @@ tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 # changing directory to project dir
 print("________CHANGING WORKING DIR________")
 print(os.getcwd())
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 os.chdir(WORKING_DIR)
 print("\tNew working dir: %s\n" % (os.getcwd()))
 

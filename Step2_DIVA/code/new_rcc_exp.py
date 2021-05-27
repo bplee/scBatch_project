@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data_utils
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")

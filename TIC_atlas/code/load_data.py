@@ -7,7 +7,7 @@ import pandas as pd
 from scvi.dataset import GeneExpressionDataset
 import scipy
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")
@@ -20,9 +20,9 @@ from Step6_RCC_to_CRC.code.rcc_to_crc_test import get_diva_loaders
 # this data is from: https://zenodo.org/record/4263972#.YFjtJS1h1B0
 
 
-TIC_DATA_PATH = "/data/leslie/bplee/scBatch/TIC_atlas/data/TICAtlas.h5ad"
-TIC_META_DATA_PATH = "/data/leslie/bplee/scBatch/TIC_atlas/data/TICAtlas_metadata.csv"
-TIC_DOWNSAMPLED_PATH = "/data/leslie/bplee/scBatch/TIC_atlas/data/TICAtlas_downsampled_1000.h5ad"
+TIC_DATA_PATH = "/data/leslie/bplee/scBatch_project/TIC_atlas/data/TICAtlas.h5ad"
+TIC_META_DATA_PATH = "/data/leslie/bplee/scBatch_project/TIC_atlas/data/TICAtlas_metadata.csv"
+TIC_DOWNSAMPLED_PATH = "/data/leslie/bplee/scBatch_project/TIC_atlas/data/TICAtlas_downsampled_1000.h5ad"
 
 def load_data(data_path=TIC_DATA_PATH):
     """

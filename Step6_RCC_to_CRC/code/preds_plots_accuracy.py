@@ -8,7 +8,7 @@ import torch
 import anndata
 import scanpy as sc
 
-WORKING_DIR = "/data/leslie/bplee/scBatch"
+WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
 print("________CHANGING PATH_________")
 sys.path.append(WORKING_DIR)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         old_load = False
         shuffle = False
         cell_types_to_remove = ["Plasma"]
-        pkl_path = "/data/leslie/bplee/scBatch/CRC_dataset/pkl_files/201204_CRC_data.pkl"
+        pkl_path = "/data/leslie/bplee/scBatch_project/CRC_dataset/pkl_files/201204_CRC_data.pkl"
         all_data = pd.read_pickle(pkl_path)
         patient_subset = ["TS-101T",
                           "TS-104T",
