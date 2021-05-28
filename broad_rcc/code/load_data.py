@@ -14,9 +14,9 @@ if WORKING_DIR not in sys.path:
 
 from Step0_Data.code.starter import *
 
-COUNTS_FILEPATH = "/data/leslie/bplee/scBatch/broad_rcc/data/SCP1288/expression/ccRCC_scRNASeq_NormalizedCounts.txt"
-METADATA_FILEPATH = "/data/leslie/bplee/scBatch/broad_rcc/data/SCP1288/metadata/Final_SCP_Metadata.txt"
-H5AD_FILEPATH = "/data/leslie/bplee/scBatch/broad_rcc/quickload_data/ccRCC_broad_normalized_counts.h5ad"
+COUNTS_FILEPATH = "/data/leslie/bplee/scBatch_project/broad_rcc/data/SCP1288/expression/ccRCC_scRNASeq_NormalizedCounts.txt"
+METADATA_FILEPATH = "/data/leslie/bplee/scBatch_project/broad_rcc/data/SCP1288/metadata/Final_SCP_Metadata.txt"
+H5AD_FILEPATH = "/data/leslie/bplee/scBatch_project/broad_rcc/quickload_data/ccRCC_broad_normalized_counts.h5ad"
 
 domain_name = "donor_id"
 label_name = "FinalCellType"
