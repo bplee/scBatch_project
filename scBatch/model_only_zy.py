@@ -441,7 +441,7 @@ class DIVA(nn.Module):
             res, ind = torch.topk(alpha, 1)
 
             # convert the digit(s) to one-hot tensor(s)
-            y = x.new_zeinit commiros(alpha.size())
+            y = x.new_zeros(alpha.size())
             y = y.scatter_(1, ind, 1.0)
 
             d = None
