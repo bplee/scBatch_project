@@ -126,8 +126,8 @@ class DIVAObject:
         """
         if 'batch' not in adata.obs:
             # assume were doing ssl
-            print(f'"batch" not listed as column in anndata obj, running ssl')
-            ssl = True
+            print(f'"batch" not listed as column in anndata obj, running supervised learning on entire adata')
+            ssl = False
             adata.obs['batch'] = "0"
         train_loader, validation_loader, test_loader = DIVAObject.adata_to_diva_loaders(adata)
         self.set_data_loaders(train_loader, validation_loader, test_loader)
@@ -190,8 +190,11 @@ class DIVAObject:
         print(train.get_accuracy(data_loaders['sup'], self.model, device, save=self.model_name))
         print("Validation Accuracy")
         print(train.get_accuracy(data_loaders['valid'], self.model, device, save=self.model_name))
-        print("Testing Accuracy")
-        print(train.get_accuracy(data_loaders['unsup'], self.model, device, save=self.model_name))
+        if test_loader is not None:
+            print("Testing Accuracy")
+            print(train.get_accuracy(data_loaders['unsup'], self.model, device, save=self.model_name))
+        else:
+            print("No test loader found")
 
         visualization.plot_embeddings(self.model, data_loaders, device, self.model_name)
 
