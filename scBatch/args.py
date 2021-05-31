@@ -1,5 +1,16 @@
 import argparse
 
+# helper function for encoding bool into ssl arg
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 parser = argparse.ArgumentParser(description='DIVA_args')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='disables CUDA training')
@@ -64,6 +75,6 @@ parser.add_argument('--min_beta', type=float, default=0.0, metavar='MB',
 # parser.add_argument('--outpath', type=str, default='./',
 #                     help='where to save')
 
-parser.add_argument('--ssl', type=bool, default=True,
+parser.add_argument('--ssl', type=str2bool, default=True,
                     help='Semi supervised learning or just supervised?')
 default_args = parser.parse_args()
