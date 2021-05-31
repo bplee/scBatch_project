@@ -13,7 +13,7 @@ import torch.optim as optim
 from .helper_functions import ensure_dir
 
 
-def train(data_loaders, model, optimizer, device):
+def train(data_loaders, model, optimizer, device, ssl):
     """
     runs the inference algorithm for an epoch
     returns the values of all losses separately on supervised and unsupervised parts
@@ -25,6 +25,8 @@ def train(data_loaders, model, optimizer, device):
     optimizer
     periodic_interval_batches
     device
+    ssl : bool
+        indicates if it should use any unsupervised data in training
 
     Returns
     -------
@@ -54,7 +56,10 @@ def train(data_loaders, model, optimizer, device):
 
         # whether this batch is supervised or not
         # is_unsupervised = (i % (periodic_interval_batches + 1) == 0) and ctr_unsup < unsup_batches
-        is_unsupervised = (i % (periodic_interval_batches) == 0) and ctr_unsup < unsup_batches
+        if ssl:
+            is_unsupervised = (i % (periodic_interval_batches) == 0) and ctr_unsup < unsup_batches
+        else:
+            is_unsupervised = False
 
         # extract the corresponding batch
         if is_unsupervised:

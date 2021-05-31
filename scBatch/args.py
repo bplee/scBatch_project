@@ -26,7 +26,7 @@ parser.add_argument('--train_domain', nargs='+', type=int, default=None,
 #                     help='gets rid of any labels that arent shared by every patient')
 # dont have an arg for getting rid of certian types
 
-# Model
+# Model dimensions
 parser.add_argument('--d-dim', type=int, default=12,
                     help='number of classes')
 parser.add_argument('--x-dim', type=int, default=784,
@@ -42,7 +42,7 @@ parser.add_argument('--zy-dim', type=int, default=64,
 parser.add_argument('--encoding-dim', type=int, default=512,
                     help='dimension encoding layers work down to')
 
-# Aux multipliers
+# multipliers
 parser.add_argument('--aux_loss_multiplier_y', type=float, default=4200.,
                     help='multiplier for y classifier')
 parser.add_argument('--aux_loss_multiplier_d', type=float, default=2000.,
@@ -64,4 +64,6 @@ parser.add_argument('--min_beta', type=float, default=0.0, metavar='MB',
 # parser.add_argument('--outpath', type=str, default='./',
 #                     help='where to save')
 
+parser.add_argument('--ssl', type=bool, default=True,
+                    help='Semi supervised learning or just supervised?')
 default_args = parser.parse_args()

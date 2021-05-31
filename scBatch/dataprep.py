@@ -38,7 +38,8 @@ class DIVALoader(data_utils.Dataset):
 
 def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuffle=False):
     """
-    turns adata into two DIVALoader objs, utilizes batch column in adata to separate training and testing data
+    turns adata into two DIVALoader objs, requires batch column in adata to separate training and testing data
+    if adata.obs.batch = "0" then None is returned as test loader (for non-ssl runs)
 
     Parameters
     ----------
@@ -65,14 +66,18 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
 
     test_inds = ~train_inds
     n_test = sum(test_inds)
-    data_test = data[test_inds,:]
-    labels_test = labels[test_inds]
-    batch_test = patients[test_inds]
+    if n_test > 0:
+        data_test = data[test_inds,:]
+        labels_test = labels[test_inds]
+        batch_test = patients[test_inds]
+    else:
+        data_test = None
 
     # doing the normalization thing
     print("normalizing all values between 0 and 1")
     data_train = data_train/np.max(data_train)
-    data_test = data_test/np.max(data_test)
+    if n_test > 0:
+        data_test = data_test/np.max(data_test)
 
     if shuffle:
         # Shuffle everything one more time
@@ -81,43 +86,61 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
         data_train = data_train[inds]
         labels_train = labels_train[inds]
         batch_train = batch_train[inds]
-        inds = np.arange(n_test)
-        np.random.shuffle(inds)
-        data_test = data_test[inds]
-        labels_test = labels_test[inds]
-        batch_test = batch_test[inds]
+
+        if n_test > 0:
+            inds = np.arange(n_test)
+            np.random.shuffle(inds)
+            data_test = data_test[inds]
+            labels_test = labels_test[inds]
+            batch_test = batch_test[inds]
 
     # converting to tensors
     data_train = torch.as_tensor(data_train)
-    data_test = torch.as_tensor(data_test)
     labels_train = torch.as_tensor(labels_train.astype(int))
-    labels_test = torch.as_tensor(labels_test.astype(int))
     batch_train = torch.as_tensor(batch_train.astype(int))
-    batch_test = torch.as_tensor(batch_test.astype(int))
+    if n_test > 0:
+        data_test = torch.as_tensor(data_test)
+        labels_test = torch.as_tensor(labels_test.astype(int))
+        batch_test = torch.as_tensor(batch_test.astype(int))
 
     # Convert to onehot
     n_labels = len(label_map)
     y = torch.eye(n_labels)
     labels_train = y[labels_train]
-    labels_test = y[labels_test]
+
+    if n_test > 0:
+        labels_test = y[labels_test]
 
     # Convert to onehot
     n_pats = len(patient_map)
     d = torch.eye(n_pats)
     batch_train = d[batch_train]
-    batch_test = d[batch_test]
+    if n_test > 0:
+        batch_test = d[batch_test]
 
-    train_data_loader, test_data_loader = DIVALoader(), DIVALoader()
-
+    train_data_loader = DIVALoader()
     train_data_loader.train = True
-    test_data_loader.train = False
 
-    train_data_loader.train_data, test_data_loader.test_data        = data_train.unsqueeze(1), data_test.unsqueeze(1)
-    train_data_loader.train_labels, test_data_loader.test_labels    = labels_train, labels_test
-    train_data_loader.train_domain, test_data_loader.test_domain    = batch_train, batch_test
+    train_data_loader.train_data = data_train.unsqueeze(1)
+    train_data_loader.train_labels = labels_train
+    train_data_loader.train_domain = batch_train
 
-    train_data_loader.labels, test_data_loader.labels       = label_map, label_map
-    train_data_loader.domains, test_data_loader.domains           = patient_map, patient_map
+    train_data_loader.labels = label_map
+    train_data_loader.domains = patient_map
+
+    if n_test > 0:
+        test_data_loader = DIVALoader()
+        test_data_loader.train = False
+        test_data_loader.test_data = data_test.unsqueeze(1)
+        test_data_loader.test_labels = labels_test
+        test_data_loader.test_domain = batch_test
+
+        test_data_loader.labels = label_map
+        test_data_loader.domains = patient_map
+    else:
+        test_data_loader = None
+        print('Not returning test loader (not points specified in obs.batch)')
+
 
     return train_data_loader, test_data_loader
 

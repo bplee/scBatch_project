@@ -40,7 +40,11 @@ class DIVAObject:
 
 
     def __repr__(self):
-         return str(self.model)
+        rtn = f"DIVAObject:\n{self.args}"
+        if self.model is None:
+            return rtn
+        else:
+            return f"{rtn}\nModel:\n{self.model}"
         # print("Data")
         # if self.train_loader is not None:
         #     print(f" Training set shape: {self.train_loader.train_data.shape}")
@@ -76,6 +80,13 @@ class DIVAObject:
         print(f" changing x_dim from {self.args.x_dim} to {value}")
         self.args.x_dim = value
 
+    def set_args_ssl(self, x):
+        if isinstance(x, bool):
+            print(f'Setting model ssl to {x}')
+            self.args.ssl = x
+        else:
+            raise TypeError(f"Expecting ssl arg to be bool not {type(x)}")
+
     def set_outpath(self, name):
         self.outpath = name
 
@@ -95,7 +106,7 @@ class DIVAObject:
 
         return new_train_loader, validation_loader, test_loader
 
-    def fit(self, adata, model_name=None, outpath="./"):
+    def fit(self, adata, model_name=None, outpath="./", ssl=True):
         """
 
         runs training procedure for n epochs (set in args)
@@ -104,12 +115,20 @@ class DIVAObject:
         ----------
         adata : anndata obj
         model_name : str
+        outpath : str
+        ssl : bool
+            if True, will use unsupervised data (as specified in adata.obs.batch)
 
         Returns
         -------
         None
 
         """
+        if 'batch' not in adata.obs:
+            # assume were doing ssl
+            print(f'"batch" not listed as column in anndata obj, running ssl')
+            ssl = True
+            adata.obs['batch'] = "0"
         train_loader, validation_loader, test_loader = DIVAObject.adata_to_diva_loaders(adata)
         self.set_data_loaders(train_loader, validation_loader, test_loader)
         self.args.cuda = not self.args.no_cuda and torch.cuda.is_available()
@@ -162,7 +181,8 @@ class DIVAObject:
         self.model.labels = labels
         self.model.domains = domains
 
-        train.epoch_procedure(model_path, self.args, self.model, data_loaders, device)
+        self.set_args_ssl(ssl)
+        train.epoch_procedure(model_path, self.args, self.model, data_loaders, device, ssl=ssl)
 
         print(f"Train domain: {self.args.train_patient}")
         print(f"Test domain: {self.args.test_patient}")
