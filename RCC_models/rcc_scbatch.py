@@ -19,6 +19,17 @@ from Step0_Data.code.pkl_load_data import PdRccAllData
 from TIC_atlas.code.load_data import set_adata_train_test_batches
 from scBatch.main import DIVAObject
 
+# helper function for encoding bool into ssl arg
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 if __name__ == "__main__":
     # Training settings
     parser = argparse.ArgumentParser(description='TIC_Atlas_DIVA')
@@ -85,23 +96,13 @@ if __name__ == "__main__":
 
     parser.add_argument('--outpath', type=str, default='./',
                         help='where to save')
-    parser.add_argument('--ssl', type=bool, default=True,
+    parser.add_argument('--ssl', type=str2bool, default=True,
                         help='Semi supervised learning or just supervised?')
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if args.cuda else "cpu")
     kwargs = {'num_workers': 1, 'pin_memory': False} if args.cuda else {}
-
-    # Model name
-    print(args.outpath)
-    model_name = f"{args.outpath}210510_diva_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
-    fig_name = f"210510_diva_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
-    print(model_name)
-
-    # Choose training domains
-
-    # print('test domain: '+str(args.test_patient))
 
     # Set seed
     torch.manual_seed(args.seed)
