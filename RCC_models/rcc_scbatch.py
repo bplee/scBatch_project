@@ -85,6 +85,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--outpath', type=str, default='./',
                         help='where to save')
+    parser.add_argument('--ssl', type=bool, default=True,
+                        help='Semi supervised learning or just supervised?')
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
