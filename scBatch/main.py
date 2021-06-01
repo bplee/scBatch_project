@@ -106,7 +106,7 @@ class DIVAObject:
 
         return new_train_loader, validation_loader, test_loader
 
-    def fit(self, adata, model_name=None, outpath="./", ssl=True):
+    def fit(self, adata, model_name=None, outpath="./", ssl=None):
         """
 
         runs training procedure for n epochs (set in args)
@@ -125,10 +125,15 @@ class DIVAObject:
 
         """
         if 'batch' not in adata.obs:
-            # assume were doing ssl
+            # if no batches specified then ssl is automatically False
             print(f'"batch" not listed as column in anndata obj, running supervised learning on entire adata')
             ssl = False
             adata.obs['batch'] = "0"
+        else:
+            if ssl is None:
+                # if it wasnt set in .fit then use the ssl from the args
+                ssl = self.args.ssl
+            # otherwise ssl arg was already set, and it will be fine to use
         train_loader, validation_loader, test_loader = DIVAObject.adata_to_diva_loaders(adata)
         self.set_data_loaders(train_loader, validation_loader, test_loader)
         self.args.cuda = not self.args.no_cuda and torch.cuda.is_available()
