@@ -61,7 +61,6 @@ def load_data(data_dir):
 def quick_load(filepath=TIM_DATA_FILEPATH):
     return anndata.read_h5ad(filepath)
 
-# def cross_tumor_filter
 
 def identify_singleton_labels(label_count_table):
     # temp = get_label_counts(adata.obs, label_name, domain_name)
@@ -72,10 +71,12 @@ def identify_singleton_labels(label_count_table):
 
 def filter_cancers(adata, cancers_types_to_remove=["L", "OV", "PACA", "MM", "LYM"]):
     bool_inds = ~adata.obs.cancer.isin(cancers_types_to_remove)
+    print(f'removing {sum(~bool_inds)} cells')
     return adata[bool_inds, :]
 
 def filter_cell_types(adata, cell_types_to_remove):
     bool_inds = ~adata.obs.MajorCluster.isin(cell_types_to_remove)
+    print(f'removing {sum(~bool_inds)} cells')
     return adata[bool_inds, :]
 
 
@@ -86,4 +87,4 @@ if __name__ == "__main__":
     adata = filter_cancers(adata)
     label_counts = get_label_counts(adata.obs, "MajorCluster", "cancer")
     cell_types_to_remove = identify_singleton_labels(label_counts)
-    filter_cell_types(adata, cell_types_to_remove)
+    adata = filter_cell_types(adata, cell_types_to_remove)
