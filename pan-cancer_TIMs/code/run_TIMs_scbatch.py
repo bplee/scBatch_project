@@ -11,12 +11,12 @@ if WORKING_DIR not in sys.path:
     print("________CHANGING PATH_________")
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
-from scBatch.main import DIVAModel
+from scBatch.main import DIVAObject
 from scBatch.dataprep import set_adata_train_test_batches
 from load_data import quick_load
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='TIC_Atlas_DIVA')
+    parser = argparse.ArgumentParser(description='TIM_atlas_DIVA')
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=0,
@@ -119,5 +119,5 @@ if __name__ == '__main__':
 
     adata.obs['patient'] = adata.obs['cancer'].copy()
 
-    diva_obj = DIVAModel(args)
+    diva_obj = DIVAObject(args)
     diva_obj.fit(adata, model_name=f"210601_scBatch_TIMs_cancer_{args.test_patient}")
