@@ -15,6 +15,18 @@ from scBatch.main import DIVAObject
 from scBatch.dataprep import set_adata_train_test_batches
 from load_data import quick_load
 
+# helper function for encoding bool into ssl arg
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TIM_atlas_DIVA')
     parser.add_argument('--no-cuda', action='store_true', default=False,
