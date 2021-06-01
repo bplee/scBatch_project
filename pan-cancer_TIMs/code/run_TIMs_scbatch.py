@@ -13,7 +13,7 @@ if WORKING_DIR not in sys.path:
     print("\tWorking dir appended to Sys path.")
 from scBatch.main import DIVAObject
 from scBatch.dataprep import set_adata_train_test_batches
-from load_data import quick_load
+from load_data import *
 
 # helper function for encoding bool into ssl arg
 def str2bool(v):
