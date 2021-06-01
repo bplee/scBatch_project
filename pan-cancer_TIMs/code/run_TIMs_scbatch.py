@@ -105,7 +105,7 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
     np.random.seed(args.seed)
 
-    adata = quick_load(TIM_DATA_FILEPATH)
+    adata = quick_load()
     adata = filter_cancers(adata)
     label_counts = get_label_counts(adata.obs, "MajorCluster", "cancer")
     cell_types_to_remove = identify_singleton_labels(label_counts)
