@@ -82,7 +82,7 @@ class DIVAObject:
 
     def set_args_ssl(self, x):
         if isinstance(x, bool):
-            print(f'Setting model ssl to {x}')
+            print(f' Setting model ssl to {x}')
             self.args.ssl = x
         else:
             raise TypeError(f"Expecting ssl arg to be bool not {type(x)}")
