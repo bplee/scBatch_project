@@ -63,8 +63,27 @@ def quick_load(filepath=TIM_DATA_FILEPATH):
 
 # def cross_tumor_filter
 
-# def filter_cancers(cancers_types_to_remove=[])
+def identify_singleton_labels(label_count_table):
+    # temp = get_label_counts(adata.obs, label_name, domain_name)
+    temp = label_count_table > 0
+    # these are cell types that are only present in one patient
+    cell_type_cancer_prevalence = temp.sum(axis=1)[0]
+    return list(cell_type_cancer_prevalence[cell_type_cancer_prevalence == 1].index)
+
+def filter_cancers(adata, cancers_types_to_remove=["L", "OV", "PACA", "MM", "LYM"]):
+    bool_inds = ~adata.obs.cancer.isin(cancers_types_to_remove)
+    return adata[bool_inds, :]
+
+def filter_cell_types(adata, cell_types_to_remove):
+    bool_inds = ~adata.obs.MajorCluster.isin(cell_types_to_remove)
+    return adata[bool_inds, :]
+
 
 if __name__ == "__main__":
     adata = quick_load(TIM_DATA_FILEPATH)
-    print(f" loaded all TIM data into anndata obj named: `data`")
+    print(f" loaded all TIM data into anndata obj named: `adata`")
+
+    adata = filter_cancers(adata)
+    label_counts = get_label_counts(adata.obs, "MajorCluster", "cancer")
+    cell_types_to_remove = identify_singleton_labels(label_counts)
+    filter_cell_types(adata, cell_types_to_remove)
