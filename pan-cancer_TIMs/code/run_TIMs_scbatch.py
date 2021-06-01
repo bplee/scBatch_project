@@ -80,28 +80,24 @@ if __name__ == '__main__':
 
     parser.add_argument('--outpath', type=str, default='./',
                         help='where to save')
+    parser.add_argument('--ssl', type=str2bool, default=True,
+                        help='Semi supervised learning or just supervised?')
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if args.cuda else "cpu")
     kwargs = {'num_workers': 1, 'pin_memory': False} if args.cuda else {}
 
-    # Model name
-    print(args.outpath)
-    model_name = f"{args.outpath}210517_diva_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
-    fig_name = f"210517_diva_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
-    print(model_name)
-
-    # Choose training domains
-
-    # print('test domain: '+str(args.test_patient))
-
     # Set seed
     torch.manual_seed(args.seed)
     torch.backends.cudnn.benchmark = False
     np.random.seed(args.seed)
 
-    adata = quick_load()
+    adata = quick_load(TIM_DATA_FILEPATH)
+    adata = filter_cancers(adata)
+    label_counts = get_label_counts(adata.obs, "MajorCluster", "cancer")
+    cell_types_to_remove = identify_singleton_labels(label_counts)
+    adata = filter_cell_types(adata, cell_types_to_remove)
 
     gene_ds = GeneExpressionDataset()
     batches = adata.obs.patient
@@ -116,10 +112,12 @@ if __name__ == '__main__':
     adata = set_adata_train_test_batches(adata,
                                          test=args.test_patient,
                                          train=args.train_patient,
-                                         domain_name="patient")
+                                         domain_name="cancer")
 
-    adata.obs['cell_type'] = adata.obs['MajorCluster']
+    adata.obs['cell_type'] = adata.obs['MajorCluster'].copy()
     del adata.obs['MajorCluster']
 
+    adata.obs['patient'] = adata.obs['cancer'].copy()
+
     diva_obj = DIVAModel(args)
-    diva_obj.fit(adata, model_name=f"210517_scBatch_TIMs_test_pat_{args.test_patient}")
+    diva_obj.fit(adata, model_name=f"210601_scBatch_TIMs_cancer_{args.test_patient}")
