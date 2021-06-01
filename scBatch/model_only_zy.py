@@ -1,7 +1,7 @@
 """
 DIVA model architecture
 """
-
+print("Loaded only zy DIVA model")
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
