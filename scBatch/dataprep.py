@@ -74,10 +74,10 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
         data_test = None
 
     # doing the normalization thing
-    print("normalizing all values between 0 and 1")
-    data_train = data_train/np.max(data_train)
-    if n_test > 0:
-        data_test = data_test/np.max(data_test)
+    # print("normalizing all values between 0 and 1")
+    # data_train = data_train/np.max(data_train)
+    # if n_test > 0:
+    #     data_test = data_test/np.max(data_test)
 
     if shuffle:
         # Shuffle everything one more time

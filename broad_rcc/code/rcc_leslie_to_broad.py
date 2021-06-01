@@ -25,6 +25,18 @@ from TIC_atlas.code.load_data import set_adata_train_test_batches
 from scBatch.main import DIVAObject
 from broad_rcc.code.load_data import broad_quick_load
 
+# helper function for encoding bool into ssl arg
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 if __name__ == "__main__":
     # Training settings
     parser = argparse.ArgumentParser(description='TIC_Atlas_DIVA')
@@ -91,6 +103,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--outpath', type=str, default='./',
                         help='where to save')
+    parser.add_argument('--ssl', type=str2bool, default=True,
+                        help='Semi supervised learning or just supervised?')
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -139,6 +153,8 @@ if __name__ == "__main__":
     broad_adata.obs['batch'] = "1"
 
     adata = anndata.concat([rcc_adata, broad_adata])
+
+    sc.pp.normalize_total(adata, 1e5)
 
     gene_ds = GeneExpressionDataset()
     pats = rcc_adata.obs.patient
