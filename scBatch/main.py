@@ -10,7 +10,8 @@ from . import train
 from . import visualization
 # from . import model
 
-from .model_2layers import DIVA
+from .model import DIVA
+# from .model_2layers import DIVA
 # from .model_tanh import DIVA
 
 import numpy as np
