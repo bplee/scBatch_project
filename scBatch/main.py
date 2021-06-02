@@ -220,23 +220,22 @@ class DIVAObject:
         """
         tensor_data = torch.from_numpy(adata.X)
         d_preds, y_preds = self._predict(tensor_data)
-        d_preds_str = np.array([self.model.domains[i] for i in d_preds])
-        y_preds_str = np.array([self.model.labels[i] for i in y_preds])
+        d_preds_str = self.model.domains[d_preds]
+        y_preds_str = self.model.labels[y_preds]
 
         adata.obs['label_preds'] = y_preds_str
         adata.obs['domain_preds'] = d_preds_str
 
     def _predict(self, tensor):
+        """
+        These return torch tensors of ints
+        """
         self.model.eval()
         classifier_fn = self.model.classifier
-
-        d_preds, y_preds = [], []
-        for i in tensor:
-            pred_d, pred_y = classifier_fn(i)
-            d_preds.append(pred_d)
-            y_preds.append(pred_y)
-
+        d_onehots, y_onehots = classifier_fn(tensor)
+        d_preds, y_preds = torch.argmax(d_onehots, axis=1), torch.argmax(y_onehots, axis=1)
         return d_preds, y_preds
+
 
 def load_model_from_file(name):
     if torch.cuda.is_available():
