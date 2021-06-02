@@ -55,8 +55,8 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
         sc.pp.log1p(adata)
 
     data = adata.X
-    patients, patient_map = pd.factorize(adata.obs[domain_name])
-    labels, label_map = pd.factorize(adata.obs[label_name])
+    patients, patient_map = pd.factorize(adata.obs[domain_name], sort=True)
+    labels, label_map = pd.factorize(adata.obs[label_name], sort=True)
 
     train_inds = adata.obs.batch == "0"
     n_train = sum(train_inds)
