@@ -190,6 +190,7 @@ class DIVAObject:
         self.set_args_ssl(ssl)
         train.epoch_procedure(model_path, self.args, self.model, data_loaders, device, ssl=ssl)
 
+        print(f"Model name: {model_name}")
         print(f"Train domain: {self.args.train_patient}")
         print(f"Test domain: {self.args.test_patient}")
         print("Training Accuracy")
