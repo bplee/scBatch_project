@@ -101,6 +101,7 @@ def train(data_loaders, model, optimizer, device, ssl):
     return epoch_losses_sup, epoch_losses_unsup, epoch_class_y_loss
 
 
+# TODO: for only zy training d predictions are returning None, need to code to not break when its none
 def get_accuracy(data_loader, model, device, save=None):
     """
     computes accuracy for a dataloader and a model
@@ -136,14 +137,18 @@ def get_accuracy(data_loader, model, device, save=None):
             actuals_d.append(ds)
             predictions_y.append(pred_y)
             actuals_y.append(ys)
-        # compute the number of accurate predictions
-        accurate_preds_d = 0
-        for pred, act in zip(predictions_d, actuals_d):
-            for i in range(pred.size(0)):
-                v = torch.sum(pred[i] == act[i])
-                accurate_preds_d += (v.item() == n_batches)
-        # calculate the accuracy between 0 and 1
-        accuracy_d = (accurate_preds_d * 1.0) / len(data_loader.dataset)
+        # # momentarily taking out the d predicitons for the only zy test
+        #
+        # # compute the number of accurate predictions
+        # accurate_preds_d = 0
+        # for pred, act in zip(predictions_d, actuals_d):
+        #     for i in range(pred.size(0)):
+        #         v = torch.sum(pred[i] == act[i])
+        #         accurate_preds_d += (v.item() == n_batches)
+        # # calculate the accuracy between 0 and 1
+        # accuracy_d = (accurate_preds_d * 1.0) / len(data_loader.dataset)
+        accuracy_d = None
+
         # compute the number of accurate predictions
         accurate_preds_y = 0
         labels_true = []
