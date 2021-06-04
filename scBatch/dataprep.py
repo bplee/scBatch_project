@@ -212,7 +212,7 @@ def set_adata_train_test_batches(adata, test, train=None, domain_name="patient")
     adata.obs['batch'] = "0"
 
     # getting the ints:
-    domains, domain_map = pd.factorize(adata.obs[domain_name])
+    domains, domain_map = pd.factorize(adata.obs[domain_name], sort=True)
 
     # make sure the type of test and train are lists:
     test = wrap(test)
