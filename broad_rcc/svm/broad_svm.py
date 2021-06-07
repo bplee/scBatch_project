@@ -63,16 +63,17 @@ broad_adata = broad_adata[:, np.array(universe)]
 
 rcc_adata.obs['batch'] = "0"
 broad_adata.obs['batch'] = "1"
-
+sc.pp.normalize_total(rcc_adata)
+sc.pp.normalize_total(broad_adata)
 adata = anndata.concat([rcc_adata, broad_adata])
 
-sc.pp.normalize_total(adata, 1e5)
+# sc.pp.normalize_total(adata, 1e5)
 
 gene_ds = GeneExpressionDataset()
 pats = rcc_adata.obs.patient
-gene_ds.populate_from_data(X=rcc_adata.X,
+gene_ds.populate_from_data(X=adata.X,
                            gene_names=np.array(rcc_adata.var.index),
-                           batch_indices=pd.factorize(pats)[0],
+                           # batch_indices=pd.factorize(pats)[0],
                            remap_attributes=False)
 gene_ds.subsample_genes(784)
 
@@ -80,7 +81,7 @@ rcc_adata = rcc_adata[:, gene_ds.gene_names]
 broad_adata = broad_adata[:, gene_ds.gene_names]
 
 x = rcc_adata.X.copy()
-y = pd.factorize(adata.obs.cell_type)[0][adata.obs.batch == "0"]
+y = pd.factorize(rcc_adata.obs.cell_type)[0]
 test_x = broad_adata.X.copy()
 test_y = pd.factorize(adata.obs.cell_type)[0][adata.obs.batch == "1"]
 
@@ -90,17 +91,18 @@ svm = LinearSVC()
 svm.fit(x, y)
 train_accur = sum(np.equal(svm.predict(x), y))/len(y)
 test_preds = svm.predict(test_x)
-test_accur = sum(np.equal(test_preds, test_y))/len(test_y)
+# test_accur = sum(np.equal(test_preds, test_y))/len(test_y)
 cm = confusion_matrix(test_y, test_preds)
 cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 # weighted_accuracy = np.mean(np.diag(cm_norm))
 ensure_dir("cm_figs")
 print("Making confusion matrix")
 cm_norm_df = pd.DataFrame(cm_norm, index=cell_types, columns=cell_types)
-plt.figure(figsize=(20, 20))
+plt.figure(figsize=(60, 60))
 ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
                 linewidths=.5, annot=True, fmt='4.2f', square=True)
 name = f'cm_figs/cm_broad_transfer.png'
 plt.savefig(name)
+print(train_accur)
 # print(f"Unweighted:\n training accuracy: {train_accur}\n testing accuracy: {test_accur}")
 # print(f"Weighted Test Accuracy: {weighted_accuracy}")
