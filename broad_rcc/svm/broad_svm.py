@@ -10,6 +10,7 @@ import anndata
 import argparse
 import scanpy as sc
 from scvi.dataset import GeneExpressionDataset
+import time
 
 WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
@@ -80,15 +81,20 @@ gene_ds.subsample_genes(784)
 rcc_adata = rcc_adata[:, gene_ds.gene_names]
 broad_adata = broad_adata[:, gene_ds.gene_names]
 
+print("loading data for the svm")
 x = rcc_adata.X.copy()
 y = pd.factorize(rcc_adata.obs.cell_type)[0]
 test_x = broad_adata.X.copy()
 test_y = pd.factorize(adata.obs.cell_type)[0][adata.obs.batch == "1"]
-
 cell_types = pd.factorize(adata.obs.cell_type)[1]
 
+del adata
+
+print("running svm")
+start_time = time.time()
 svm = LinearSVC()
 svm.fit(x, y)
+print(f"total time: {time.time() - start_time}")
 train_accur = sum(np.equal(svm.predict(x), y))/len(y)
 test_preds = svm.predict(test_x)
 # test_accur = sum(np.equal(test_preds, test_y))/len(test_y)
