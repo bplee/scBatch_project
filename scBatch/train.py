@@ -102,7 +102,7 @@ def train(data_loaders, model, optimizer, device, ssl):
 
 
 # TODO: for only zy training d predictions are returning None, need to code to not break when its none
-def get_accuracy(data_loader, model, device, save=None):
+def get_accuracy(data_loader, model, device, save=None, remove_0_cols=True):
     """
     computes accuracy for a dataloader and a model
     has the option to save a confusion matrix of the results
@@ -171,6 +171,11 @@ def get_accuracy(data_loader, model, device, save=None):
         accuracy_y_weighted = np.mean(diag)
         if save is not None:
             cm_norm_df = pd.DataFrame(cm_norm, index=labels, columns=labels)
+            # dropping all na rows (if the labels dont appear in the test set)
+            cm_norm_df.dropna(axis=0, how='all')
+            cm_norm_df = cm_norm_df[~(cm_norm_df==0).all(axis=1)]
+            if remove_0_cols:
+                cm_norm_df = cm_norm_df.T[~(cm_norm_df==0).all(axis=0)].T
             plt.figure(figsize=(20, 20))
             ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
                             linewidths=.5, annot=True, fmt='4.2f', square=True)
