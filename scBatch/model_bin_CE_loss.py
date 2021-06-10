@@ -312,7 +312,7 @@ class DIVA(nn.Module):
             x_recon = self.px(zd_q, zx_q, zy_q)
 
 
-            x_target = x
+            x_target = x.long()
             CE_x = F.cross_entropy(x_recon, x_target, reduction='sum')
             # using reconstruction instead
             # CE_x = torch.norm(x_recon - x_target)
@@ -372,7 +372,7 @@ class DIVA(nn.Module):
         else: # supervised
             x_recon, d_hat, y_hat, qzd, pzd, zd_q, qzx, pzx, zx_q, qzy, pzy, zy_q = self.forward(d, x, y)
 
-            x_target = x
+            x_target = x.long()
             CE_x = F.cross_entropy(x_recon, x_target, reduction='sum')
             # mse of reconstructionx
             # CE_x = torch.norm(x_recon - x_target)
