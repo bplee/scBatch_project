@@ -172,7 +172,7 @@ def get_accuracy(data_loader, model, device, save=None, remove_0_cols=True):
         if save is not None:
             cm_norm_df = pd.DataFrame(cm_norm, index=labels, columns=labels)
             # dropping all na rows (if the labels dont appear in the test set)
-            cm_norm_df.dropna(axis=0, how='all')
+            cm_norm_df = cm_norm_df.dropna(axis=0, how='all')
             cm_norm_df = cm_norm_df[~(cm_norm_df==0).all(axis=1)]
             if remove_0_cols:
                 cm_norm_df = cm_norm_df.T[~(cm_norm_df==0).all(axis=0)].T
