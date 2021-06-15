@@ -176,7 +176,7 @@ def get_accuracy(data_loader, model, device, save=None, reduce_cm=True):
                 cm_norm_df = cm_norm_df.dropna(axis=0, how='all')
                 cm_norm_df = cm_norm_df[~(cm_norm_df==0).all(axis=1)]
                 cm_norm_df = cm_norm_df.T[~(cm_norm_df==0).all(axis=0)].T
-            plt.figure(figsize=(20, 20))
+            plt.figure(figsize=(cm_norm_df.shape[1], cm_norm_df.shape[0]))
             ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
                             linewidths=.5, annot=True, fmt='4.2f', square=True)
             ax.get_ylim()
