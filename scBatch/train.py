@@ -11,7 +11,7 @@ from sklearn.metrics import confusion_matrix
 import torch.optim as optim
 
 from .helper_functions import ensure_dir
-
+from .visualization import save_cm
 
 def train(data_loaders, model, optimizer, device, ssl):
     """
@@ -170,20 +170,21 @@ def get_accuracy(data_loader, model, device, save=None, reduce_cm=True):
         diag = diag[~np.isnan(diag)]
         accuracy_y_weighted = np.mean(diag)
         if save is not None:
-            cm_norm_df = pd.DataFrame(cm_norm, index=labels, columns=labels)
-            # dropping all na rows (if the labels dont appear in the test set)
-            if reduce_cm is True:
-                cm_norm_df = cm_norm_df.dropna(axis=0, how='all')
-                cm_norm_df = cm_norm_df[~(cm_norm_df==0).all(axis=1)]
-                cm_norm_df = cm_norm_df.T[~(cm_norm_df==0).all(axis=0)].T
-            plt.figure(figsize=(cm_norm_df.shape[1], cm_norm_df.shape[0]))
-            ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
-                            linewidths=.5, annot=True, fmt='4.2f', square=True)
-            ax.get_ylim()
-            ax.set_ylim(n_labels, 0)
-            ensure_dir("./cm_figs")
-            save_name = f"./cm_figs/cm_{save}.png"
-            plt.savefig(save_name)
+            save_cm(labels_true, labels_pred, name=save, reduce_cm=reduce_cm, sort_labels=True)
+            # cm_norm_df = pd.DataFrame(cm_norm, index=labels, columns=labels)
+            # # dropping all na rows (if the labels dont appear in the test set)
+            # if reduce_cm is True:
+            #     cm_norm_df = cm_norm_df.dropna(axis=0, how='all')
+            #     cm_norm_df = cm_norm_df[~(cm_norm_df==0).all(axis=1)]
+            #     cm_norm_df = cm_norm_df.T[~(cm_norm_df==0).all(axis=0)].T
+            # plt.figure(figsize=(cm_norm_df.shape[1], cm_norm_df.shape[0]))
+            # ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
+            #                 linewidths=.5, annot=True, fmt='4.2f', square=True)
+            # ax.get_ylim()
+            # ax.set_ylim(n_labels, 0)
+            # ensure_dir("./cm_figs")
+            # save_name = f"./cm_figs/cm_{save}.png"
+            # plt.savefig(save_name)
         return accuracy_d, accuracy_y, accuracy_y_weighted
 
 

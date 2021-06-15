@@ -8,7 +8,28 @@ import scanpy as sc
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.metrics import confusion_matrix
 import anndata
+
+from .helper_functions import ensure_dir
+
+def save_cm(true, preds, name, reduce_cm=True, sort_labels=False):
+    if sort_labels:
+        labels = np.unique(np.concatenate([true, preds]))
+    else:
+        labels = pd.factorize(np.concatenate([true, preds]))[1]
+    cm = confusion_matrix(true, preds, normalize='true', labels=labels)
+    cm_norm_df = pd.DataFrame(cm, index=labels, columns=labels)
+    if reduce_cm:
+        cm_norm_df = cm_norm_df.dropna(axis=0, how='all')
+        cm_norm_df = cm_norm_df[~(cm_norm_df == 0).all(axis=1)]
+        cm_norm_df = cm_norm_df.T[~(cm_norm_df == 0).all(axis=0)].T
+    plt.figure(figsize=(cm_norm_df.shape[1], cm_norm_df.shape[0]))
+    ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
+                     linewidths=.5, annot=True, fmt='4.2f', square=True)
+    ensure_dir("./cm_figs")
+    save_name = f"./cm_figs/cm_{name}.png"
+    plt.savefig(save_name)
 
 
 def plot_embeddings(model, data_loaders, device, fig_name):
