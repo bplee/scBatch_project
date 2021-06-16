@@ -2,6 +2,7 @@ import sys
 import argparse
 import pandas as pd
 import numpy as np
+import scanpy as sc
 import torch
 from scvi.dataset import GeneExpressionDataset
 
@@ -111,6 +112,8 @@ if __name__ == '__main__':
     label_counts = get_label_counts(adata.obs, "MajorCluster", "cancer")
     cell_types_to_remove = identify_singleton_labels(label_counts)
     adata = filter_cell_types(adata, cell_types_to_remove)
+
+    sc.normalize_total(adata, 1e5)
 
     gene_ds = GeneExpressionDataset()
     batches = adata.obs.patient
