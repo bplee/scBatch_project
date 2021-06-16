@@ -69,10 +69,16 @@ def identify_singleton_labels(label_count_table):
     cell_type_cancer_prevalence = temp.sum(axis=1)[0]
     return list(cell_type_cancer_prevalence[cell_type_cancer_prevalence == 1].index)
 
+
+def remove_prefixes(cell_names):
+    return cell_names.map(lambda x: x[4:])
+
+
 def filter_cancers(adata, cancers_types_to_remove=["L", "OV", "PACA", "MM", "LYM"]):
     bool_inds = ~adata.obs.cancer.isin(cancers_types_to_remove)
     print(f'removing {sum(~bool_inds)} cells')
     return adata[bool_inds, :]
+
 
 def filter_cell_types(adata, cell_types_to_remove):
     bool_inds = ~adata.obs.MajorCluster.isin(cell_types_to_remove)
@@ -83,6 +89,8 @@ def filter_cell_types(adata, cell_types_to_remove):
 if __name__ == "__main__":
     adata = quick_load(TIM_DATA_FILEPATH)
     print(f" loaded all TIM data into anndata obj named: `adata`")
+    print(" Removing prefixes")
+    adata.obs.MajorCluster = remove_prefixes(adata.obs.MajorCluster)
 
     adata = filter_cancers(adata)
     label_counts = get_label_counts(adata.obs, "MajorCluster", "cancer")
