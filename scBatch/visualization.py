@@ -19,11 +19,11 @@ def save_cm(true, preds, name, reduce_cm=True, sort_labels=False, label_names=No
             labels = np.unique(label_names)
         else:
             labels = label_names
-
-    if sort_labels:
-        labels = np.unique(np.concatenate([true, preds]))
     else:
-        labels = pd.factorize(np.concatenate([true, preds]))[1]
+        if sort_labels:
+            labels = np.unique(np.concatenate([true, preds]))
+        else:
+            labels = pd.factorize(np.concatenate([true, preds]))[1]
     cm = confusion_matrix(true, preds, normalize='true', labels=labels)
     cm_norm_df = pd.DataFrame(cm, index=labels, columns=labels)
     if reduce_cm:
