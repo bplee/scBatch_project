@@ -236,7 +236,7 @@ class DIVAObject:
         classifier_fn = self.model.classifier
         d_onehots, y_onehots = classifier_fn(tensor)
         d_preds, y_preds = torch.argmax(d_onehots, axis=1), torch.argmax(y_onehots, axis=1)
-        return d_preds, y_preds
+        return d_preds.numpy(), y_preds.numpy()
 
 
 def load_model_from_file(name):
