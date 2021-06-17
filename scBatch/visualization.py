@@ -13,7 +13,13 @@ import anndata
 
 from .helper_functions import ensure_dir
 
-def save_cm(true, preds, name, reduce_cm=True, sort_labels=False):
+def save_cm(true, preds, name, reduce_cm=True, sort_labels=False, label_names=None):
+    if label_names is not None:
+        if sort_labels:
+            labels = np.unique(label_names)
+        else:
+            labels = label_names
+
     if sort_labels:
         labels = np.unique(np.concatenate([true, preds]))
     else:
