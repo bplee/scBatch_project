@@ -126,8 +126,8 @@ if __name__ == '__main__':
     adata = adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
     adata = set_adata_train_test_batches(adata,
-                                         test=args.test_patient,
-                                         train=args.train_patient,
+                                         test=args.test_domain,
+                                         train=args.train_domain,
                                          domain_name="cancer")
 
     adata.obs['cell_type'] = adata.obs['MajorCluster'].copy()
@@ -136,4 +136,4 @@ if __name__ == '__main__':
     adata.obs['patient'] = adata.obs['cancer'].copy()
 
     diva_obj = DIVAObject(args)
-    diva_obj.fit(adata, model_name=f"210601_scBatch_TIMs_cancer_{args.test_patient}")
+    diva_obj.fit(adata, model_name=f"210601_scBatch_TIMs_cancer_{args.test_domain}")
