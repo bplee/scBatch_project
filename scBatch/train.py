@@ -170,6 +170,7 @@ def get_accuracy(data_loader, model, device, save=None, reduce_cm=True):
         diag = diag[~np.isnan(diag)]
         accuracy_y_weighted = np.mean(diag)
         if save is not None:
+            print(labels_true, labels_pred)
             save_cm(labels_true, labels_pred, name=save, reduce_cm=reduce_cm, sort_labels=True, label_names=labels)
             # cm_norm_df = pd.DataFrame(cm_norm, index=labels, columns=labels)
             # # dropping all na rows (if the labels dont appear in the test set)
