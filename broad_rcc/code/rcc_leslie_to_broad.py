@@ -24,6 +24,8 @@ from Step0_Data.code.pkl_load_data import PdRccAllData
 from TIC_atlas.code.load_data import set_adata_train_test_batches
 from scBatch.main import DIVAObject
 from broad_rcc.code.load_data import broad_quick_load
+from Step0_Data.code.starter import *
+from scBatch.main import *
 
 # helper function for encoding bool into ssl arg
 def str2bool(v):
@@ -56,9 +58,9 @@ if __name__ == "__main__":
     #                    help="number of supervised examples, /10 = samples per class")
 
     # Choose domains
-    parser.add_argument('--test_patient', nargs='+', type=int, default=None,
+    parser.add_argument('--test_domain', nargs='+', type=int, default=None,
                         help='test domain')
-    parser.add_argument('--train_patient', nargs='+', type=int, default=None,
+    parser.add_argument('--train_domain', nargs='+', type=int, default=None,
                         help='train domain')
     # data loading args
     # parser.add_argument('--clean_data', type=bool, default=True,
