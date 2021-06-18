@@ -115,8 +115,8 @@ if __name__ == "__main__":
 
     # Model name
     print(args.outpath)
-    model_name = f"{args.outpath}210510_diva_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
-    fig_name = f"210510_diva_test_pat_{args.test_patient}_train_pat_{args.train_patient}"
+    model_name = f"{args.outpath}210510_diva_test_pat_{args.test_domain}_train_pat_{args.train_domain}"
+    fig_name = f"210510_diva_test_pat_{args.test_domain}_train_pat_{args.train_domain}"
     print(model_name)
 
     # Choose training domains
@@ -153,6 +153,9 @@ if __name__ == "__main__":
 
     rcc_adata.obs['batch'] = "0"
     broad_adata.obs['batch'] = "1"
+
+    rcc_adata.obs['patient'] = "Leslie"
+    broad_adata.obs['patient'] = "Broad"
 
     adata = anndata.concat([rcc_adata, broad_adata])
 

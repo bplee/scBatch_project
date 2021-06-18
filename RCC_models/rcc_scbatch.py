@@ -134,9 +134,9 @@ if __name__ == "__main__":
 
     rcc_adata = rcc_adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
-    rcc_adata = set_adata_train_test_batches(rcc_adata, test=args.test_patient, train=args.train_patient, domain_name="patient")
+    rcc_adata = set_adata_train_test_batches(rcc_adata, test=args.test_domain, train=args.train_domain, domain_name="patient")
 
     adata = rcc_adata
 
     diva_obj = DIVAObject(args)
-    diva_obj.fit(adata, model_name=f"210510_scBatch_RCC_test_pat_{args.test_patient}", outpath="./")
+    diva_obj.fit(adata, model_name=f"210510_scBatch_RCC_test_pat_{args.test_domain}", outpath="./")
