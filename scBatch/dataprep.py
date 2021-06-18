@@ -140,10 +140,7 @@ def get_diva_loaders(adata, domain_name="patient", label_name="cell_type", shuff
     else:
         test_data_loader = None
         print('Not returning test loader (not points specified in obs.batch)')
-
-
     return train_data_loader, test_data_loader
-
 
 
 def get_validation_from_training(train_loader_obj, percentage_validation=.1):
