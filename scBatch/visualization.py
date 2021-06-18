@@ -13,18 +13,37 @@ import anndata
 
 from .helper_functions import ensure_dir
 
-def save_cm(true, preds, name, reduce_cm=True, sort_labels=False, label_names=None):
+def save_cm(true, preds, name, reduce_cm=True, label_names=None, sort_labels=False):
+    """
+
+    Parameters
+    ----------
+    true : list list (np.array)
+        true labels for a cm
+    preds : list like (np.array)
+        predictions for a cm
+    name : str
+        name of figure (without .png ext)
+    reduce_cm : bool
+        toggle to get rid of 0/NA cols and rows
+    label_names : list
+        if the true and preds are ints, provide a list of names that map the ints to labels
+    sort_labels : bool
+        if the true and preds args are lists of names, choose to sort them by alphabetical order
+
+    Returns
+    -------
+
+    """
     if label_names is not None:
-        if sort_labels:
-            labels = np.unique(label_names)
-        else:
-            labels = label_names
+        cm = confusion_matrix(true, preds, normalize='true')
+        labels = label_names
     else:
         if sort_labels:
             labels = np.unique(np.concatenate([true, preds]))
         else:
             labels = pd.factorize(np.concatenate([true, preds]))[1]
-    cm = confusion_matrix(true, preds, normalize='true', labels=labels)
+        cm = confusion_matrix(true, preds, normalize='true', labels=labels)
     cm_norm_df = pd.DataFrame(cm, index=labels, columns=labels)
     if reduce_cm:
         cm_norm_df = cm_norm_df.dropna(axis=0, how='all')
