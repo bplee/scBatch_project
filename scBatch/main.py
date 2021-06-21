@@ -29,6 +29,7 @@ class DIVAObject:
 
         # model architecture is dependent on data dimension so can't set it yet
         self.model = None
+        self.device = torch.device("cuda" if self.args.cuda else "cpu")
         # data loaders are stored in the obj
         self.train_loader, self.test_loader, self.valid_loader = None, None, None
 
@@ -138,7 +139,7 @@ class DIVAObject:
         train_loader, validation_loader, test_loader = DIVAObject.adata_to_diva_loaders(adata)
         self.set_data_loaders(train_loader, validation_loader, test_loader)
         self.args.cuda = not self.args.no_cuda and torch.cuda.is_available()
-        device = torch.device("cuda" if self.args.cuda else "cpu")
+        # device = torch.device("cuda" if self.args.cuda else "cpu")
         kwargs = {'num_workers': 1, 'pin_memory': False} if self.args.cuda else {}
 
         # Model name
@@ -188,7 +189,7 @@ class DIVAObject:
         self.model.domains = domains
 
         self.set_args_ssl(ssl)
-        train.epoch_procedure(model_path, self.args, self.model, data_loaders, device, ssl=ssl)
+        train.epoch_procedure(model_path, self.args, self.model, data_loaders, self.device, ssl=ssl)
 
         print(f"Model name: {model_name}")
         # print(f"Train domain: {self.args.train_patient}")
@@ -196,16 +197,18 @@ class DIVAObject:
         print(f"Train domain: {self.args.train_domain}")
         print(f"Test domain: {self.args.test_domain}")
         print("Training Accuracy")
-        print(train.get_accuracy(data_loaders['sup'], self.model, device, save=self.model_name))
+        print(train.get_accuracy(data_loaders['sup'], self.model, self.device))
         print("Validation Accuracy")
-        print(train.get_accuracy(data_loaders['valid'], self.model, device, save=self.model_name))
+        print(train.get_accuracy(data_loaders['valid'], self.model, self.devices))
         if test_loader is not None:
             print("Testing Accuracy")
-            print(train.get_accuracy(data_loaders['unsup'], self.model, device, save=self.model_name))
+            print(train.get_accuracy(data_loaders['unsup'], self.model, self.device))
         else:
             print("No test loader found")
+        self.predict(adata)
+        visualization.save_cm(true=adata.obs.domain, preds=adata.obs.domain_preds, save=self.model_name, sort_labels=True)
 
-        visualization.plot_embeddings(self.model, data_loaders, device, self.model_name)
+        visualization.plot_embeddings(self.model, data_loaders, self.device, self.model_name)
 
     def predict(self, adata):
         """
@@ -222,11 +225,10 @@ class DIVAObject:
             fills in adata.obs columns "label_preds" "domain_preds'
 
         """
-        tensor_data = torch.from_numpy(adata.X)
+        tensor_data = torch.from_numpy(adata.X).to(self.device)
         d_preds, y_preds = self._predict(tensor_data)
         d_preds_str = self.model.domains[d_preds]
         y_preds_str = self.model.labels[y_preds]
-
         adata.obs['label_preds'] = y_preds_str
         adata.obs['domain_preds'] = d_preds_str
 
@@ -238,7 +240,7 @@ class DIVAObject:
         classifier_fn = self.model.classifier
         d_onehots, y_onehots = classifier_fn(tensor)
         d_preds, y_preds = torch.argmax(d_onehots, axis=1), torch.argmax(y_onehots, axis=1)
-        return d_preds.numpy(), y_preds.numpy()
+        return d_preds.cpu().numpy(), y_preds.cpu().numpy()
 
 
 def load_model_from_file(name):
