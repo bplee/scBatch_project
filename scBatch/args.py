@@ -12,8 +12,8 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser(description='DIVA_args')
-parser.add_argument('--no-cuda', action='store_true', default=False,
-                    help='disables CUDA training')
+parser.add_argument('--cuda', action='store_true', default=True,
+                    help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=0,
                     help='random seed (default: 1)')
 parser.add_argument('--batch-size', type=int, default=100,
