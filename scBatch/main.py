@@ -29,7 +29,7 @@ class DIVAObject:
 
         # model architecture is dependent on data dimension so can't set it yet
         self.model = None
-        self.device = torch.device("cuda" if self.args.cuda else "cpu")
+        self.device = None
         # data loaders are stored in the obj
         self.train_loader, self.test_loader, self.valid_loader = None, None, None
 
@@ -139,7 +139,7 @@ class DIVAObject:
         train_loader, validation_loader, test_loader = DIVAObject.adata_to_diva_loaders(adata)
         self.set_data_loaders(train_loader, validation_loader, test_loader)
         self.args.cuda = not self.args.no_cuda and torch.cuda.is_available()
-        # device = torch.device("cuda" if self.args.cuda else "cpu")
+        self.device = torch.device("cuda" if self.args.cuda else "cpu")
         kwargs = {'num_workers': 1, 'pin_memory': False} if self.args.cuda else {}
 
         # Model name
