@@ -199,7 +199,7 @@ class DIVAObject:
         print("Training Accuracy")
         print(train.get_accuracy(data_loaders['sup'], self.model, self.device))
         print("Validation Accuracy")
-        print(train.get_accuracy(data_loaders['valid'], self.model, self.devices))
+        print(train.get_accuracy(data_loaders['valid'], self.model, self.device))
         if test_loader is not None:
             print("Testing Accuracy")
             print(train.get_accuracy(data_loaders['unsup'], self.model, self.device))
