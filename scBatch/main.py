@@ -160,7 +160,7 @@ class DIVAObject:
 
         # get dataloader from adata
         # can change the name of the domain and label columns
-        train_loader, test_loader = dataprep.get_diva_loaders(adata, shuffle=True)
+        train_loader, test_loader = dataprep.get_diva_loaders(adata, domain_name="domain", label_name="cell_type", shuffle=True)
 
         # splitting train loader into a training and validation set
         # can change the percent you want to make into a validation set
