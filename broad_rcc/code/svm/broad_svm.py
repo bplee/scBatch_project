@@ -98,17 +98,17 @@ print(f"total time: {time.time() - start_time}")
 train_accur = sum(np.equal(svm.predict(x), y))/len(y)
 test_preds = svm.predict(test_x)
 # test_accur = sum(np.equal(test_preds, test_y))/len(test_y)
-cm = confusion_matrix(test_y, test_preds)
-cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-# weighted_accuracy = np.mean(np.diag(cm_norm))
-ensure_dir("cm_figs")
-print("Making confusion matrix")
-cm_norm_df = pd.DataFrame(cm_norm, index=cell_types, columns=cell_types)
-plt.figure(figsize=(60, 60))
-ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
-                linewidths=.5, annot=True, fmt='4.2f', square=True)
-name = f'cm_figs/cm_broad_transfer.png'
-plt.savefig(name)
-print(train_accur)
+# cm = confusion_matrix(test_y, test_preds, labels=cell_types)
+# cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+# # weighted_accuracy = np.mean(np.diag(cm_norm))
+# ensure_dir("cm_figs")
+# print("Making confusion matrix")
+# cm_norm_df = pd.DataFrame(cm_norm, index=cell_types, columns=cell_types)
+# plt.figure(figsize=(40, 40))
+# ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
+#                 linewidths=.5, annot=True, fmt='4.2f', square=True)
+# name = f'cm_figs/cm_scnym_broad_transfer_4.png'
+# plt.savefig(name)
+# print(train_accur)
 # print(f"Unweighted:\n training accuracy: {train_accur}\n testing accuracy: {test_accur}")
 # print(f"Weighted Test Accuracy: {weighted_accuracy}")
