@@ -170,4 +170,4 @@ if __name__ == '__main__':
 
     save_cm(test_preds, test_y, outpath, sort_labels=True)
 
-    plot_scnym_umap(adata)
+    plot_scnym_umap(adata, save_name=f"_{outpath}")
