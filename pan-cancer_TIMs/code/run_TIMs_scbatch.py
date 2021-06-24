@@ -133,7 +133,7 @@ if __name__ == '__main__':
     adata.obs['cell_type'] = adata.obs['MajorCluster'].copy()
     del adata.obs['MajorCluster']
 
-    adata.obs['patient'] = adata.obs['cancer'].copy()
+    adata.obs['domain'] = adata.obs['cancer'].copy()
 
     diva_obj = DIVAObject(args)
     diva_obj.fit(adata, model_name=f"210601_scBatch_TIMs_cancer_{args.test_domain}")

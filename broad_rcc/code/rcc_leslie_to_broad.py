@@ -154,8 +154,8 @@ if __name__ == "__main__":
     rcc_adata.obs['batch'] = "0"
     broad_adata.obs['batch'] = "1"
 
-    rcc_adata.obs['patient'] = "Leslie"
-    broad_adata.obs['patient'] = "Broad"
+    rcc_adata.obs['domain'] = "Leslie"
+    broad_adata.obs['domain'] = "Broad"
 
     adata = anndata.concat([rcc_adata, broad_adata])
 

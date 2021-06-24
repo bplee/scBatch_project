@@ -121,7 +121,7 @@ if __name__ == "__main__":
     rcc_adata = anndata.AnnData(rcc_raw_counts)
     rcc_adata.obs['cell_type'] = rcc_cell_type
     rcc_adata.obs['annotations'] = rcc_cell_type
-    rcc_adata.obs['patient'] = rcc_obj.data.patient
+    rcc_adata.obs['domain'] = rcc_obj.data.patient
     del rcc_raw_counts
     sc.pp.normalize_total(rcc_adata, 1e5)
     gene_ds = GeneExpressionDataset()
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     rcc_adata = rcc_adata[:, gene_ds.gene_names]
     # batches are going to be built off of adata.obs.subtype
-    rcc_adata = set_adata_train_test_batches(rcc_adata, test=args.test_domain, train=args.train_domain, domain_name="patient")
+    rcc_adata = set_adata_train_test_batches(rcc_adata, test=args.test_domain, train=args.train_domain, domain_name="domain")
 
     adata = rcc_adata
 
