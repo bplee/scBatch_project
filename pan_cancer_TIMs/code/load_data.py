@@ -4,6 +4,9 @@ import os
 import anndata
 import sys
 import scanpy as sc
+from scvi.dataset import GeneExpressionDataset
+from scBatch.dataprep import set_adata_train_test_batches
+from scBatch.main import *
 
 WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
@@ -14,7 +17,7 @@ if WORKING_DIR not in sys.path:
 from Step0_Data.code.starter import *
 
 data_dir = "../data/"
-TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch_project/pan-cancer_TIMs/quickload_data/TIMs_all_data.h5ad"
+TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch_project/pan_cancer_TIMs/quickload_data/TIMs_all_data.h5ad"
 
 
 def read_dataset(name):
@@ -96,3 +99,29 @@ if __name__ == "__main__":
     label_counts = get_label_counts(adata.obs, "MajorCluster", "cancer")
     cell_types_to_remove = identify_singleton_labels(label_counts)
     adata = filter_cell_types(adata, cell_types_to_remove)
+
+    sc.normalize_total(adata, 1e5)
+
+    gene_ds = GeneExpressionDataset()
+    batches = adata.obs.patient
+    gene_ds.populate_from_data(X=adata.X,
+                               gene_names=np.array(adata.var.index),
+                               batch_indices=pd.factorize(batches)[0],
+                               remap_attributes=False)
+    gene_ds.subsample_genes(784)
+
+    adata = adata[:, gene_ds.gene_names]
+    # batches are going to be built off of adata.obs.subtype
+    adata = set_adata_train_test_batches(adata,
+                                         test=0,
+                                         train=None,
+                                         domain_name="cancer")
+
+    adata.obs['cell_type'] = adata.obs['MajorCluster'].copy()
+    del adata.obs['MajorCluster']
+
+    adata.obs['domain'] = adata.obs['cancer'].copy()
+
+    obj = DIVAObject()
+    obj.args.epochs=10
+    obj.fit(adata, '210624_test')
