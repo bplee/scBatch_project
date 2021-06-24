@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
     adata.obs['domain_label'] = np.array(list(map(lambda x: a[x], np.array(adata.obs.domain))))
 
-    outpath = f"./210624_multi_domain_test_caner_{args.test_domain}"
+    outpath = f"210624_multi_domain_test_caner_{args.test_domain}"
 
     scnym_api(adata=adata, task='train', groupby='annotations',
               domain_groupby='domain_label', out_path= outpath,
