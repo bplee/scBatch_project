@@ -167,7 +167,10 @@ def get_accuracies(adata, key_added="scNym", test_patient=None):
     accuracy = sum(preds_ints == golden_labels_ints) / len(preds)
     cm = confusion_matrix(golden_labels_ints, preds_ints)
     cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    weighted_accuracy = np.mean(np.diag(cm_norm))
+    diag = np.diag(cm_norm)
+    # removing nans
+    diag = diag[~np.isnan(diag)]
+    weighted_accuracy = np.mean(diag)
 
     if test_patient is not None:
         ensure_dir("cm_figs")
