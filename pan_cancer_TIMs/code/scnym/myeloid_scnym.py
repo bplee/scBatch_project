@@ -45,9 +45,9 @@ if __name__ == '__main__':
     # dont have an arg for getting rid of certian types
 
     args = parser.parse_args()
-    args.cuda = not args.no_cuda and torch.cuda.is_available()
-    device = torch.device("cuda" if args.cuda else "cpu")
-    kwargs = {'num_workers': 1, 'pin_memory': False} if args.cuda else {}
+    # args.cuda = not args.no_cuda and torch.cuda.is_available()
+    # device = torch.device("cuda" if args.cuda else "cpu")
+    # kwargs = {'num_workers': 1, 'pin_memory': False} if args.cuda else {}
 
     # Set seed
     torch.manual_seed(args.seed)
