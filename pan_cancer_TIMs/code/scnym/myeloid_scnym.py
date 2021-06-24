@@ -50,9 +50,9 @@ if __name__ == '__main__':
     # kwargs = {'num_workers': 1, 'pin_memory': False} if args.cuda else {}
 
     # Set seed
-    torch.manual_seed(args.seed)
-    torch.backends.cudnn.benchmark = False
-    np.random.seed(args.seed)
+    # torch.manual_seed(args.seed)
+    # torch.backends.cudnn.benchmark = False
+    # np.random.seed(args.seed)
 
     adata = quick_load()
     adata.obs.MajorCluster = remove_prefixes(adata.obs.MajorCluster)
