@@ -151,7 +151,7 @@ if __name__ == '__main__':
             a[domains[i]] = f"train_{count}"
             count += 1
 
-    adata.obs['domain_label'] = np.array(list(map(lambda x: a[x], np.array(adata.obs.batch))))
+    adata.obs['domain_label'] = np.array(list(map(lambda x: a[x], np.array(adata.obs.domain))))
 
     outpath = f"./210624_multi_domain_test_caner_{args.test_domain}"
 
