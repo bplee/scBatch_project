@@ -206,7 +206,9 @@ class DIVAObject:
         else:
             print("No test loader found")
         self.predict(adata)
-        visualization.save_cm(true=adata.obs.cell_type, preds=adata.obs.label_preds, name=self.model_name, sort_labels=True)
+        true_labels = adata.obs.cell_type[adata.obs.batch=="1"]
+        predicted = adata.obs.label_preds[adata.obs.batch=="1"]
+        visualization.save_cm(true=true_labels, preds=predicted, name=self.model_name, sort_labels=True)
 
         visualization.plot_embeddings(self.model, data_loaders, self.device, self.model_name)
 
