@@ -116,7 +116,10 @@ if __name__ == '__main__':
     save_cm(labels[test_y], labels[test_preds], name=f"svm_myeloid_cancer_{args.test_domain}", sort_labels=True)
     cm = confusion_matrix(test_y, test_preds)
     cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    weighted_accuracy = np.mean(np.diag(cm_norm))
+    diag = np.diag(cm_norm)
+    # removing nans
+    diag = diag[~np.isnan(diag)]
+    weighted_accuracy = np.mean(diag)
 
     print(f"Unweighted Test Accuracy: {test_accur}")
     print(f"Weighted Test Accuracy: {weighted_accuracy}")
