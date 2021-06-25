@@ -95,8 +95,8 @@ if __name__ == '__main__':
                                          train=args.train_domain,
                                          domain_name="cancer")
 
-    x = adata.X.copy()[:, adata.obs.batch=="0"]
-    test_x = adata.X.copy()[:, adata.obs.batch=="1"]
+    x = adata[adata.obs.batch=="0",:].X
+    test_x = adata[adata.obs.batch=="1",:].X
     labels, cell_types = pd.factorize(adata.obs.domain)
     y = labels[adata.obs.batch =="0"]
     test_y = labels[adata.obs.batch=="1"]
