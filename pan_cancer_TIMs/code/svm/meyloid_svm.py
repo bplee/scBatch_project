@@ -108,9 +108,15 @@ if __name__ == '__main__':
     print(f"total time: {time.time() - start_time}")
     train_accur = sum(np.equal(svm.predict(x), y)) / len(y)
     test_preds = svm.predict(test_x)
+    test_accur = sum(np.equal(test_preds, test_y)) / len(test_y)
 
     from scBatch.visualization import save_cm
 
-    from Step0_Data.code.starter import ensure_dir
     ensure_dir("cm_figs")
     save_cm(labels[test_y], labels[test_preds], name=f"svm_myeloid_cancer_{args.test_domain}", sort_labels=True)
+    cm = confusion_matrix(test_y, test_preds)
+    cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    weighted_accuracy = np.mean(np.diag(cm_norm))
+
+    print(f"Unweighted Test Accuracy: {test_accur}")
+    print(f"Weighted Test Accuracy: {weighted_accuracy}")
