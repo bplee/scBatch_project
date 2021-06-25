@@ -115,4 +115,7 @@ if __name__ == '__main__':
 
     save_cm(test_preds, test_y, outpath, sort_labels=True)
 
-    plot_scnym_umap(adata, save_name=f"_{outpath}")
+    sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
+    sc.tl.umap(adata, min_dist=.3)
+    # save_name = f"_scnym_train_domain_{test_pat}_test_domain_{train_pat}_batches+celltype.png"
+    sc.pl.umap(adata, color=['batch', 'domain', 'cell_type'], size=5, alpha=.2, save=f'_{outpath}')
