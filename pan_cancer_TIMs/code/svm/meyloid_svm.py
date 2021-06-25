@@ -111,4 +111,6 @@ if __name__ == '__main__':
 
     from scBatch.visualization import save_cm
 
+    from Step0_Data.code.starter import ensure_dir
+    ensure_dir("cm_figs")
     save_cm(labels[test_y], labels[test_preds], name=f"svm_myeloid_cancer_{args.test_domain}", sort_labels=True)
