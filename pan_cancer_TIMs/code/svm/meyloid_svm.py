@@ -113,7 +113,7 @@ if __name__ == '__main__':
     from scBatch.visualization import save_cm
 
     ensure_dir("cm_figs")
-    save_cm(labels[test_y], labels[test_preds], name=f"svm_myeloid_cancer_{args.test_domain}", sort_labels=True)
+    save_cm(cell_types[test_y], cell_types[test_preds], name=f"svm_myeloid_cancer_{args.test_domain}", sort_labels=True)
     cm = confusion_matrix(test_y, test_preds)
     cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
     diag = np.diag(cm_norm)
