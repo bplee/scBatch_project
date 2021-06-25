@@ -52,6 +52,7 @@ def save_cm(true, preds, name, reduce_cm=True, label_names=None, sort_labels=Fal
     plt.figure(figsize=(cm_norm_df.shape[1], cm_norm_df.shape[0]))
     ax = sns.heatmap(cm_norm_df, cmap="YlGnBu", vmin=0, vmax=1,
                      linewidths=.5, annot=True, fmt='4.2f', square=True)
+    ax.figure.tight_layout()
     ensure_dir("./cm_figs")
     save_name = f"./cm_figs/cm_{name}.png"
     plt.savefig(save_name)
