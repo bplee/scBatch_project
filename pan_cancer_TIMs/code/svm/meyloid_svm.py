@@ -66,6 +66,7 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
     np.random.seed(args.seed)
 
+for test_domain in range(8):
     adata = quick_load()
     adata.obs.MajorCluster = remove_prefixes(adata.obs.MajorCluster)
     adata = filter_cancers(adata)
@@ -91,7 +92,7 @@ if __name__ == '__main__':
     sc.pp.log1p(adata)
     # batches are going to be built off of adata.obs.subtype
     adata = set_adata_train_test_batches(adata,
-                                         test=args.test_domain,
+                                         test=test_domain,
                                          train=args.train_domain,
                                          domain_name="cancer")
 
@@ -113,7 +114,7 @@ if __name__ == '__main__':
     from scBatch.visualization import save_cm
 
     ensure_dir("cm_figs")
-    save_cm(cell_types[test_y], cell_types[test_preds], name=f"svm_myeloid_cancer_{args.test_domain}", sort_labels=True)
+    save_cm(cell_types[test_y], cell_types[test_preds], name=f"svm_myeloid_cancer_{test_domain}", sort_labels=True)
     cm = confusion_matrix(test_y, test_preds)
     cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
     diag = np.diag(cm_norm)
