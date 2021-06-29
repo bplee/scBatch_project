@@ -113,8 +113,8 @@ if __name__ == "__main__":
     adata = broad_quick_load()
     adata = filter_patients(adata)
     adata = filter_cell_types(adata)
-    adata.obs.domain = np.array(adata.obs.donor_id)
-    adata.obs.cell_type = np.array(adata.obs.FinalCellType)
+    adata.obs['domain'] = np.array(adata.obs.donor_id)
+    adata.obs['cell_type'] = np.array(adata.obs.FinalCellType)
 
     sc.pp.normalize_total(adata, 1e5)
     gene_ds = GeneExpressionDataset()
