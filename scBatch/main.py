@@ -101,7 +101,7 @@ class DIVAObject:
     @staticmethod
     def adata_to_diva_loaders(adata):
         train_loader, test_loader = dataprep.get_diva_loaders(adata,
-                                                              domain_name="patient",
+                                                              domain_name="domain",
                                                               label_name="cell_type",
                                                               shuffle=True)
         new_train_loader, validation_loader = dataprep.get_validation_from_training(train_loader)
