@@ -85,6 +85,7 @@ print("loading data for the svm")
 x = rcc_adata.X.copy()
 y = pd.factorize(rcc_adata.obs.cell_type)[0]
 test_x = broad_adata.X.copy()
+labels = pd.factorize(adata.obs.cell_type)[1]
 test_y = pd.factorize(adata.obs.cell_type)[0][adata.obs.batch == "1"]
 cell_types = pd.factorize(adata.obs.cell_type)[1]
 
@@ -97,6 +98,9 @@ svm.fit(x, y)
 print(f"total time: {time.time() - start_time}")
 train_accur = sum(np.equal(svm.predict(x), y))/len(y)
 test_preds = svm.predict(test_x)
+
+from scBatch.visualization import save_cm
+save_cm(labels[test_y], labels[test_preds], name="svm_broad", sort_labels=True)
 # test_accur = sum(np.equal(test_preds, test_y))/len(test_y)
 # cm = confusion_matrix(test_y, test_preds, labels=cell_types)
 # cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]

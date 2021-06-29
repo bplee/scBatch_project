@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     sc.pp.normalize_total(adata, 1e5)
     gene_ds = GeneExpressionDataset()
-    pats = adata.obs.patient
+    pats = adata.obs.domain
     gene_ds.populate_from_data(X=adata.X,
                                gene_names=np.array(adata.var.index),
                                batch_indices=pd.factorize(pats)[0],
