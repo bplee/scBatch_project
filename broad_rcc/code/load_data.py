@@ -100,7 +100,7 @@ low_cell_types = ["Misc/Undetermined",
 
 
 def filter_cell_types(adata, cell_types_to_remove=low_cell_types):
-    bool_inds = ~adata.obs.MajorCluster.isin(cell_types_to_remove)
+    bool_inds = ~adata.obs.FinalCellType.isin(cell_types_to_remove)
     print(f'removing {sum(~bool_inds)} cells')
     return adata[bool_inds, :]
 
