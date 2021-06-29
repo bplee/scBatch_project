@@ -217,9 +217,9 @@ def plot_scnym_umap(adata, save_name="_scnym_leslie_broad.png", use_rep='X_scnym
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='scnym')
-    parser.add_argument('--test_patient', type=int, default=5,
+    parser.add_argument('--test_domain', type=int, default=5,
                         help='test domain')
-    parser.add_argument('--train_patient', type=int, default=None,
+    parser.add_argument('--train_domain', type=int, default=None,
                         help='test domain')
     args = parser.parse_args()
     print(args)
