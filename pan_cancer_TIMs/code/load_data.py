@@ -100,7 +100,7 @@ if __name__ == "__main__":
     cell_types_to_remove = identify_singleton_labels(label_counts)
     adata = filter_cell_types(adata, cell_types_to_remove)
 
-    sc.normalize_total(adata, 1e5)
+    sc.pp.normalize_total(adata, 1e5)
 
     gene_ds = GeneExpressionDataset()
     batches = adata.obs.patient
