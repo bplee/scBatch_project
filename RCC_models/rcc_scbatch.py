@@ -125,7 +125,7 @@ if __name__ == "__main__":
     del rcc_raw_counts
     sc.pp.normalize_total(rcc_adata, 1e5)
     gene_ds = GeneExpressionDataset()
-    pats = rcc_adata.obs.patient
+    pats = rcc_adata.obs.domain
     gene_ds.populate_from_data(X=rcc_adata.X,
                                gene_names=np.array(rcc_adata.var.index),
                                batch_indices=pd.factorize(pats)[0],
