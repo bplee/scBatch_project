@@ -5,8 +5,6 @@ import anndata
 import sys
 import scanpy as sc
 from scvi.dataset import GeneExpressionDataset
-from scBatch.dataprep import set_adata_train_test_batches
-from scBatch.main import *
 
 WORKING_DIR = "/data/leslie/bplee/scBatch_project"
 # adding the project dir to the path to import relevant modules below
@@ -15,6 +13,8 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 from Step0_Data.code.starter import *
+from scBatch.dataprep import set_adata_train_test_batches
+from scBatch.main import *
 
 data_dir = "../data/"
 TIM_DATA_FILEPATH = "/data/leslie/bplee/scBatch_project/pan_cancer_TIMs/quickload_data/TIMs_all_data.h5ad"
@@ -122,6 +122,6 @@ if __name__ == "__main__":
 
     adata.obs['domain'] = adata.obs['cancer'].copy()
 
-    obj = DIVAObject()
-    obj.args.epochs=10
-    obj.fit(adata, '210624_test')
+    # obj = DIVAObject()
+    # obj.args.epochs=10
+    # obj.fit(adata, '210624_test')
