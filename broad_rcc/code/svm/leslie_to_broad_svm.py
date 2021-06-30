@@ -27,9 +27,9 @@ from Step0_Data.code.starter import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='scANVI')
-    parser.add_argument('--test_patient', type=int, default=5,
+    parser.add_argument('--test_domain', type=int, default=5,
                         help='test domain')
-    parser.add_argument('--train_patient', type=int, default=None,
+    parser.add_argument('--train_domain', type=int, default=None,
                         help='test domain')
     args_scnym = parser.parse_args()
     print(args_scnym)
