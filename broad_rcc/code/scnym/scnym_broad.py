@@ -212,7 +212,7 @@ def plot_scnym_umap(adata, save_name="_scnym_leslie_broad.png", use_rep='X_scnym
     sc.pp.neighbors(adata, use_rep=use_rep, n_neighbors=30)
     sc.tl.umap(adata, min_dist=.3)
     # save_name = f"_scnym_train_domain_{test_pat}_test_domain_{train_pat}_batches+celltype.png"
-    sc.pl.umap(adata, color=['batch', 'patient', 'cell_type'], size=5, alpha=.2, save=save_name)
+    sc.pl.umap(adata, color=['batch', 'domain', 'cell_type'], size=5, alpha=.2, save=save_name)
 
 
 if __name__ == "__main__":
@@ -253,12 +253,12 @@ if __name__ == "__main__":
 
     outpath = f"210629_scnym_broad_test_pat_{args.test_domain}"
 
-    # train_scnym_model(adata, outpath)
-    # print(f"Saved model to {outpath}")
-    # print(f"Predicting training and testing set")
-    # predict_from_scnym_model(adata, trained_model=outpath)
-    #
-    # plot_scnym_umap(adata)
+    train_scnym_model(adata, outpath)
+    print(f"Saved model to {outpath}")
+    print(f"Predicting training and testing set")
+    predict_from_scnym_model(adata, trained_model=outpath)
+
+    plot_scnym_umap(adata)
 
     # accurs, weighted_accurs = [],[]
     # for test_pat in range(6):
