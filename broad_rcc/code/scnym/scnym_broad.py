@@ -251,7 +251,7 @@ if __name__ == "__main__":
     adata.obs['annotations'] = adata.obs.cell_type.copy()
     adata.obs['annotations'][adata.obs.batch == "1"] = 'Unlabeled'
 
-    domains = np.unique(adata.obs.cancer)
+    domains = np.unique(adata.obs.domain)
 
     a = {}
     count = 0
