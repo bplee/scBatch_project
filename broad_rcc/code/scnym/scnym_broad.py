@@ -38,6 +38,7 @@ from Step0_Data.code.pkl_load_data import PdRccAllData
 from Step0_Data.code.starter import *
 from broad_rcc.code.load_data import *
 from scBatch.dataprep import set_adata_train_test_batches
+from scBatch.visualization import save_cm
 
 # to balance the test distribution
 def get_balanced_classes(adata):
@@ -250,15 +251,40 @@ if __name__ == "__main__":
     adata.obs['annotations'] = adata.obs.cell_type.copy()
     adata.obs['annotations'][adata.obs.batch == "1"] = 'Unlabeled'
 
+    domains = np.unique(adata.obs.cancer)
 
-    outpath = f"210629_scnym_broad_test_pat_{args.test_domain}"
+    a = {}
+    count = 0
+    for i in range(len(domains)):
+        if i == args.test_domain:
+            a[domains[i]] = 'target_0'
+        else:
+            a[domains[i]] = f"train_{count}"
+            count += 1
 
-    train_scnym_model(adata, outpath)
-    print(f"Saved model to {outpath}")
-    print(f"Predicting training and testing set")
+    adata.obs['domain_label'] = np.array(list(map(lambda x: a[x], np.array(adata.obs.domain))))
+
+    outpath = f"210630_scnym_broad_test_pat_{args.test_domain}"
+
+    scnym_api(adata=adata, task='train', groupby='annotations',
+              domain_groupby='domain_label', out_path=outpath,
+              config='no_new_identity')
+
     predict_from_scnym_model(adata, trained_model=outpath)
 
-    plot_scnym_umap(adata)
+    accur, weighted_accur = get_accuracies(adata)
+    print(f'{outpath} training results')
+    print(f"Weighted Accur: {weighted_accur}\nUnweighted Accur: {accur}")
+
+    test_preds = adata.obs.scNym[adata.obs.batch == "1"]
+    test_y = adata.obs.cell_type[adata.obs.batch == "1"]
+
+    save_cm(test_preds, test_y, outpath, sort_labels=True)
+
+    sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
+    sc.tl.umap(adata, min_dist=.3)
+    # save_name = f"_scnym_train_domain_{test_pat}_test_domain_{train_pat}_batches+celltype.png"
+    sc.pl.umap(adata, color=['batch', 'domain', 'cell_type'], size=5, alpha=.2, save=f'_{outpath}.png')
 
     # accurs, weighted_accurs = [],[]
     # for test_pat in range(6):
