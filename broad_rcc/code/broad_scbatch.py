@@ -126,6 +126,7 @@ if __name__ == "__main__":
     gene_ds.subsample_genes(784)
 
     adata = adata[:, gene_ds.gene_names]
+    sc.pp.log1p(adata)
     # batches are going to be built off of adata.obs.subtype
     adata = set_adata_train_test_batches(adata, test=args.test_domain, train=args.train_domain, domain_name="domain")
 
