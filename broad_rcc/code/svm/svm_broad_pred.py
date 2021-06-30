@@ -88,7 +88,7 @@ for test_domain in range(6):
     # batches are going to be built off of adata.obs.subtype
     adata = set_adata_train_test_batches(adata,
                                          test=test_domain,
-                                         train=args.train_domain,
+                                         train=None,
                                          domain_name="domain")
 
     x = adata[adata.obs.batch=="0",:].X
@@ -116,6 +116,6 @@ for test_domain in range(6):
     # removing nans
     diag = diag[~np.isnan(diag)]
     weighted_accuracy = np.mean(diag)
-    print(f"Broad test pat: {args.test_domain}")
+    print(f"Broad test pat: {test_domain}")
     print(f"Unweighted Test Accuracy: {test_accur}")
     print(f"Weighted Test Accuracy: {weighted_accuracy}")
