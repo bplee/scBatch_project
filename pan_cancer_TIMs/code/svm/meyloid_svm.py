@@ -116,6 +116,7 @@ for test_domain in range(8):
     ensure_dir("cm_figs")
     save_cm(cell_types[test_y], cell_types[test_preds], name=f"svm_myeloid_cancer_{test_domain}", sort_labels=True)
     cm = confusion_matrix(test_y, test_preds)
+    print(cm)
     cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
     diag = np.diag(cm_norm)
     # removing nans
