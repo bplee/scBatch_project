@@ -208,7 +208,7 @@ class DIVAObject:
         self.predict(adata)
         true_labels = adata.obs.cell_type[adata.obs.batch=="1"]
         predicted = adata.obs.label_preds[adata.obs.batch=="1"]
-        visualization.save_cm(true=true_labels, preds=predicted, name=self.model_name, sort_labels=True)
+        visualization.save_cm(true=true_labels, preds=predicted, name=self.model_name, sort_labels=True, reduce_cm=False)
 
         visualization.plot_embeddings(self.model, data_loaders, self.device, self.model_name)
 
