@@ -113,7 +113,7 @@ if __name__ == '__main__':
     test_preds = adata.obs.scNym[adata.obs.batch=="1"]
     test_y = adata.obs.cell_type[adata.obs.batch == "1"]
 
-    save_cm(test_y, test_preds, outpath, sort_labels=True)
+    save_cm(test_y, test_preds, outpath, sort_labels=True, reduce_cm=False)
 
     sc.pp.neighbors(adata, use_rep='X_scnym', n_neighbors=30)
     sc.tl.umap(adata, min_dist=.3)
