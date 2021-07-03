@@ -14,8 +14,8 @@ if WORKING_DIR not in sys.path:
     sys.path.append(WORKING_DIR)
     print("\tWorking dir appended to Sys path.")
 from scBatch.main import DIVAObject
+from Step0_Data.code.pkl_load_data import PdRccAllData
 from scBatch.dataprep import set_adata_train_test_batches
-from pan_cancer_TIMs.code.load_data import *
 from broad_rcc.code.scnym.scnym_leslie_to_broad import *
 from scBatch.visualization import save_cm
 
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     adata.obs['annotations'] = adata.obs.cell_type.copy()
     adata.obs['annotations'][adata.obs.batch=="1"] = "Unlabeled"
 
-    domains = np.unique(adata.obs.cancer)
+    domains = np.unique(adata.obs.domain)
 
     a = {}
     count = 0
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     adata.obs['domain_label'] = np.array(list(map(lambda x: a[x], np.array(adata.obs.domain))))
 
-    outpath = f"210703_multidomain_2000_genes_test_cancer_{args.test_domain}"
+    outpath = f"210703_multidomain_2000_genes_test_pat_{args.test_domain}"
 
     scnym_api(adata=adata, task='train', groupby='annotations',
               domain_groupby='domain_label', out_path= outpath,
