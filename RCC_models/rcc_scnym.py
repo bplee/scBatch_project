@@ -75,7 +75,7 @@ if __name__ == '__main__':
                                batch_indices=pd.factorize(pats)[0],
                                remap_attributes=False)
     gene_ds.subsample_genes(2000)
-
+    adata = rcc_adata
     adata = adata[:, gene_ds.gene_names]
 
     sc.pp.log1p(adata)
