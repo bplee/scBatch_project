@@ -83,7 +83,7 @@ if __name__ == '__main__':
     adata = set_adata_train_test_batches(adata,
                                          test=args.test_domain,
                                          train=args.train_domain,
-                                         domain_name="cancer")
+                                         domain_name="domain")
     adata.obs['annotations'] = adata.obs.cell_type.copy()
     adata.obs['annotations'][adata.obs.batch=="1"] = "Unlabeled"
 
