@@ -10,3 +10,7 @@ quickload="/lila/data/leslie/bplee/scBatch_project/sclc_peer/quickload_data/adat
 
 def quickload_sclc(filepath=quickload):
     return anndata.read_h5ad(filepath)
+
+
+if __name__ == "__main__":
+    adata = quickload_sclc()
